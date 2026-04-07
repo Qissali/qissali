@@ -37,6 +37,10 @@ function isValidEmail(v) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v).trim());
 }
 
+function genreLibelle(g) {
+  return g === "fille" ? "Fille" : "Garçon";
+}
+
 const chipBase =
   "rounded-2xl border-2 px-3 py-2.5 text-center text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-deep)] sm:px-4";
 
@@ -89,11 +93,13 @@ function OrderModalDialog({ open, onClose }) {
   const [checkoutUrl, setCheckoutUrl] = useState(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
-  const [twoChildren, setTwoChildren] = useState(false);
+  const [childCount, setChildCount] = useState(1);
   const [child1Name, setChild1Name] = useState("");
   const [child1Age, setChild1Age] = useState("");
+  const [genre1, setGenre1] = useState("");
   const [child2Name, setChild2Name] = useState("");
   const [child2Age, setChild2Age] = useState("");
+  const [genre2, setGenre2] = useState("");
   const [siblingLink, setSiblingLink] = useState("");
 
   const [universe, setUniverse] = useState("");
@@ -117,11 +123,13 @@ function OrderModalDialog({ open, onClose }) {
     setShowSuccess(false);
     setCheckoutUrl(null);
     setCheckoutLoading(false);
-    setTwoChildren(false);
+    setChildCount(1);
     setChild1Name("");
     setChild1Age("");
+    setGenre1("");
     setChild2Name("");
     setChild2Age("");
+    setGenre2("");
     setSiblingLink("");
     setUniverse("");
     setValeur("");
@@ -169,17 +177,30 @@ function OrderModalDialog({ open, onClose }) {
     if (Number.isNaN(a1) || a1 < 2 || a1 > 12) {
       e.child1Age = "Âge entre 2 et 12 ans.";
     }
-    if (twoChildren) {
+    if (!genre1) {
+      e.genre1 = "Indique si l’enfant est une fille ou un garçon.";
+    }
+    if (childCount === 2) {
       if (!child2Name.trim()) e.child2Name = "Indique le prénom.";
       const a2 = parseInt(child2Age, 10);
       if (Number.isNaN(a2) || a2 < 2 || a2 > 12) {
         e.child2Age = "Âge entre 2 et 12 ans.";
       }
+      if (!genre2) e.genre2 = "Indique le genre du deuxième enfant.";
       if (!siblingLink) e.siblingLink = "Choisis le lien entre les enfants.";
     }
     setErrors(e);
     return Object.keys(e).length === 0;
-  }, [child1Name, child1Age, twoChildren, child2Name, child2Age, siblingLink]);
+  }, [
+    child1Name,
+    child1Age,
+    genre1,
+    childCount,
+    child2Name,
+    child2Age,
+    genre2,
+    siblingLink,
+  ]);
 
   const validateStep2 = useCallback(() => {
     const e = {};
@@ -214,34 +235,60 @@ function OrderModalDialog({ open, onClose }) {
   }, [universe]);
 
   const recapLines = useMemo(() => {
-    const names = twoChildren
-      ? `${child1Name.trim()} & ${child2Name.trim()}`
-      : child1Name.trim();
     const u = UNIVERSES.find((x) => x.id === universe);
     const fmt =
       format === "pdf"
         ? "PDF illustré — 3,90€"
         : "PDF + Audio — 7,90€";
-    return [
-      { k: "Enfant(s)", v: names },
+    const g1 = genre1 ? genreLibelle(genre1) : "";
+    const enfant1 = `${child1Name.trim()} (${child1Age} ans${g1 ? `, ${g1}` : ""})`;
+    let enfants = enfant1;
+    if (childCount === 2) {
+      const g2 = genre2 ? genreLibelle(genre2) : "";
+      enfants = `${enfant1} · ${child2Name.trim()} (${child2Age} ans${g2 ? `, ${g2}` : ""})`;
+    }
+    const lines = [
+      {
+        k: "Type",
+        v: childCount === 1 ? "Solo (un enfant)" : "Fratrie (deux enfants)",
+      },
+      { k: "Enfant(s)", v: enfants },
+    ];
+    if (childCount === 2 && siblingLink) {
+      const linkLabel =
+        siblingLink === "soeurs"
+          ? "Sœurs"
+          : siblingLink === "freres"
+            ? "Frères"
+            : "Mixte";
+      lines.push({ k: "Lien", v: linkLabel });
+    }
+    lines.push(
       { k: "Univers", v: u ? `${u.emoji} ${u.label}` : "—" },
       { k: "Valeur", v: valeur || "—" },
       { k: "Occasion", v: occasion || "—" },
-      { k: "Format", v: fmt },
-    ];
+      { k: "Format", v: fmt }
+    );
+    return lines;
   }, [
-    twoChildren,
+    childCount,
     child1Name,
+    child1Age,
+    genre1,
     child2Name,
+    child2Age,
+    genre2,
+    siblingLink,
     universe,
     valeur,
     occasion,
     format,
   ]);
 
-  const displayName = twoChildren
-    ? `${child1Name.trim()} & ${child2Name.trim()}`
-    : child1Name.trim();
+  const displayName =
+    childCount === 2
+      ? `${child1Name.trim()} & ${child2Name.trim()}`
+      : child1Name.trim();
 
   const handlePay = async (ev) => {
     ev.preventDefault();
@@ -258,12 +305,16 @@ function OrderModalDialog({ open, onClose }) {
           email: email.trim(),
           montant,
           prenom1: child1Name.trim(),
-          prenom2: twoChildren ? child2Name.trim() : "",
+          prenom2: childCount === 2 ? child2Name.trim() : "",
           univers: universLabelForApi,
           valeur,
           occasion,
           format,
           message: "",
+          typeHistoire: childCount === 1 ? "solo" : "fratrie",
+          genre1: genre1 ? genreLibelle(genre1) : "",
+          genre2:
+            childCount === 2 && genre2 ? genreLibelle(genre2) : "",
         }),
       });
 
@@ -380,88 +431,128 @@ function OrderModalDialog({ open, onClose }) {
                     👧 L&apos;enfant
                   </h3>
                   <div>
-                    <label
-                      htmlFor="m-c1-name"
-                      className="mb-2 block text-sm font-medium text-[var(--text)]"
-                    >
-                      Prénom <span className="text-[var(--rose-deep)]">*</span>
-                    </label>
-                    <input
-                      id="m-c1-name"
-                      type="text"
-                      autoComplete="given-name"
-                      value={child1Name}
-                      onChange={(e) => {
-                        setChild1Name(e.target.value);
-                        clearError("child1Name");
-                      }}
-                      className="w-full rounded-2xl border border-[var(--rose-light)] bg-[var(--white)] px-4 py-3 text-[var(--text)] outline-none ring-[var(--mauve)]/30 focus:border-[var(--mauve)] focus:ring-2"
-                    />
-                    {errors.child1Name && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.child1Name}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="m-c1-age"
-                      className="mb-2 block text-sm font-medium text-[var(--text)]"
-                    >
-                      Âge <span className="text-[var(--rose-deep)]">*</span>
-                    </label>
-                    <input
-                      id="m-c1-age"
-                      type="number"
-                      min={2}
-                      max={12}
-                      inputMode="numeric"
-                      value={child1Age}
-                      onChange={(e) => {
-                        setChild1Age(e.target.value);
-                        clearError("child1Age");
-                      }}
-                      className="w-full rounded-2xl border border-[var(--rose-light)] bg-[var(--white)] px-4 py-3 outline-none focus:border-[var(--mauve)] focus:ring-2 focus:ring-[var(--mauve)]/30"
-                    />
-                    {errors.child1Age && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.child1Age}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--rose-light)] bg-[var(--rose-pale)]/40 px-4 py-3">
-                    <span className="text-sm font-medium text-[var(--text)]">
-                      Histoire pour deux sœurs/frères
-                    </span>
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-checked={twoChildren}
-                      onClick={() => {
-                        setTwoChildren((v) => {
-                          if (v) {
-                            setChild2Name("");
-                            setChild2Age("");
-                            setSiblingLink("");
-                          }
-                          return !v;
-                        });
-                        clearError("siblingLink");
-                      }}
-                      className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${
-                        twoChildren ? "bg-[var(--mauve)]" : "bg-[var(--text-light)]/40"
-                      }`}
-                    >
-                      <span
-                        className={`absolute top-1 left-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
-                          twoChildren ? "translate-x-6" : "translate-x-0"
+                    <p className="mb-3 text-sm font-medium text-[var(--text)]">
+                      Histoire solo ou fratrie ?
+                    </p>
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setChildCount(1);
+                          setChild2Name("");
+                          setChild2Age("");
+                          setGenre2("");
+                          setSiblingLink("");
+                          clearError("siblingLink");
+                          clearError("genre2");
+                        }}
+                        className={`${chipBase} flex-1 ${
+                          childCount === 1
+                            ? "border-[var(--mauve)] bg-[var(--rose-pale)] text-[var(--mauve-deep)]"
+                            : "border-[var(--rose-light)] bg-white text-[var(--text-mid)] hover:border-[var(--mauve)]/50"
                         }`}
-                      />
-                    </button>
+                      >
+                        Un seul enfant
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setChildCount(2);
+                          clearError("siblingLink");
+                        }}
+                        className={`${chipBase} flex-1 ${
+                          childCount === 2
+                            ? "border-[var(--mauve)] bg-[var(--rose-pale)] text-[var(--mauve-deep)]"
+                            : "border-[var(--rose-light)] bg-white text-[var(--text-mid)] hover:border-[var(--mauve)]/50"
+                        }`}
+                      >
+                        Deux enfants (fratrie)
+                      </button>
+                    </div>
                   </div>
 
-                  {twoChildren && (
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <div>
+                      <label
+                        htmlFor="m-c1-name"
+                        className="mb-2 block text-sm font-medium text-[var(--text)]"
+                      >
+                        Prénom <span className="text-[var(--rose-deep)]">*</span>
+                      </label>
+                      <input
+                        id="m-c1-name"
+                        type="text"
+                        autoComplete="given-name"
+                        value={child1Name}
+                        onChange={(e) => {
+                          setChild1Name(e.target.value);
+                          clearError("child1Name");
+                        }}
+                        className="w-full rounded-2xl border border-[var(--rose-light)] bg-[var(--white)] px-4 py-3 text-[var(--text)] outline-none ring-[var(--mauve)]/30 focus:border-[var(--mauve)] focus:ring-2"
+                      />
+                      {errors.child1Name && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.child1Name}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="m-c1-age"
+                        className="mb-2 block text-sm font-medium text-[var(--text)]"
+                      >
+                        Âge <span className="text-[var(--rose-deep)]">*</span>
+                      </label>
+                      <input
+                        id="m-c1-age"
+                        type="number"
+                        min={2}
+                        max={12}
+                        inputMode="numeric"
+                        value={child1Age}
+                        onChange={(e) => {
+                          setChild1Age(e.target.value);
+                          clearError("child1Age");
+                        }}
+                        className="w-full rounded-2xl border border-[var(--rose-light)] bg-[var(--white)] px-4 py-3 outline-none focus:border-[var(--mauve)] focus:ring-2 focus:ring-[var(--mauve)]/30"
+                      />
+                      {errors.child1Age && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.child1Age}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="mb-3 text-sm font-medium text-[var(--text)]">
+                      Genre <span className="text-[var(--rose-deep)]">*</span>
+                    </p>
+                    <div className="flex gap-3">
+                      {["fille", "garcon"].map((g) => (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() => {
+                            setGenre1(g);
+                            clearError("genre1");
+                          }}
+                          className={`${chipBase} flex-1 ${
+                            genre1 === g
+                              ? "border-[var(--mauve)] bg-[var(--rose-pale)] text-[var(--mauve-deep)]"
+                              : "border-[var(--rose-light)] bg-white text-[var(--text-mid)] hover:border-[var(--mauve)]/50"
+                          }`}
+                        >
+                          {g === "fille" ? "Fille" : "Garçon"}
+                        </button>
+                      ))}
+                    </div>
+                    {errors.genre1 && (
+                      <p className="mt-2 text-sm text-red-600">{errors.genre1}</p>
+                    )}
+                  </div>
+
+                  {childCount === 2 && (
                     <>
                       <div className="grid gap-6 sm:grid-cols-2">
                         <div>
@@ -514,7 +605,39 @@ function OrderModalDialog({ open, onClose }) {
                         </div>
                       </div>
                       <div>
-                        <p className="mb-3 text-sm font-medium">Lien</p>
+                        <p className="mb-3 text-sm font-medium">
+                          Genre enfant 2{" "}
+                          <span className="text-[var(--rose-deep)]">*</span>
+                        </p>
+                        <div className="flex gap-3">
+                          {["fille", "garcon"].map((g) => (
+                            <button
+                              key={g}
+                              type="button"
+                              onClick={() => {
+                                setGenre2(g);
+                                clearError("genre2");
+                              }}
+                              className={`${chipBase} flex-1 ${
+                                genre2 === g
+                                  ? "border-[var(--mauve)] bg-[var(--rose-pale)] text-[var(--mauve-deep)]"
+                                  : "border-[var(--rose-light)] bg-white text-[var(--text-mid)] hover:border-[var(--mauve)]/50"
+                              }`}
+                            >
+                              {g === "fille" ? "Fille" : "Garçon"}
+                            </button>
+                          ))}
+                        </div>
+                        {errors.genre2 && (
+                          <p className="mt-2 text-sm text-red-600">
+                            {errors.genre2}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="mb-3 text-sm font-medium">
+                          Lien entre les enfants
+                        </p>
                         <div className="flex flex-wrap gap-2">
                           {[
                             { id: "soeurs", label: "Sœurs" },
@@ -750,6 +873,10 @@ function OrderModalDialog({ open, onClose }) {
                       {errors.checkout}
                     </p>
                   )}
+                  <p className="text-center text-sm text-[var(--text-mid)]">
+                    Sur la page de paiement Stripe : carte bancaire, Apple Pay ou Google Pay selon
+                    l&apos;appareil.
+                  </p>
                   <div className="flex flex-col gap-3 border-t border-[var(--rose-light)] pt-6 sm:flex-row sm:justify-between">
                     <button
                       type="button"

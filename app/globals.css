@@ -61,3 +61,38 @@ body {
 .modal-moon-animate {
   animation: modal-moon 2.2s ease-in-out infinite;
 }
+
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-fade-up {
+  opacity: 0;
+  animation: hero-fade-up 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.hero-delay-1 {
+  animation-delay: 0.08s;
+}
+.hero-delay-2 {
+  animation-delay: 0.16s;
+}
+.hero-delay-3 {
+  animation-delay: 0.28s;
+}
+.hero-delay-4 {
+  animation-delay: 0.4s;
+}
+.hero-delay-5 {
+  animation-delay: 0.52s;
+}
+.hero-delay-6 {
+  animation-delay: 0.64s;
+}

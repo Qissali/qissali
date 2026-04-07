@@ -28,7 +28,13 @@ const OCCASIONS = [
 
 type SiblingLink = "soeurs" | "freres" | "mixte";
 
+type Genre = "fille" | "garcon";
+
 type FormatId = "pdf" | "pdf-audio";
+
+function genreLibelle(g: Genre): "Fille" | "Garçon" {
+  return g === "fille" ? "Fille" : "Garçon";
+}
 
 const FORMATS: { id: FormatId; label: string; price: string }[] = [
   { id: "pdf", label: "PDF illustré", price: "3,90€" },
@@ -45,8 +51,10 @@ export function CommanderForm() {
   const [childCount, setChildCount] = useState<1 | 2>(1);
   const [child1Name, setChild1Name] = useState("");
   const [child1Age, setChild1Age] = useState("");
+  const [genre1, setGenre1] = useState<Genre | "">("");
   const [child2Name, setChild2Name] = useState("");
   const [child2Age, setChild2Age] = useState("");
+  const [genre2, setGenre2] = useState<Genre | "">("");
   const [siblingLink, setSiblingLink] = useState<SiblingLink | "">("");
 
   const [universe, setUniverse] = useState<(typeof UNIVERSES)[number]["id"] | "">("");
@@ -75,12 +83,14 @@ export function CommanderForm() {
     if (Number.isNaN(a1) || a1 < 2 || a1 > 12) {
       e.child1Age = "Âge entre 2 et 12 ans.";
     }
+    if (!genre1) e.genre1 = "Indique si l’enfant est une fille ou un garçon.";
     if (childCount === 2) {
       if (!child2Name.trim()) e.child2Name = "Indique le prénom.";
       const a2 = parseInt(child2Age, 10);
       if (Number.isNaN(a2) || a2 < 2 || a2 > 12) {
         e.child2Age = "Âge entre 2 et 12 ans.";
       }
+      if (!genre2) e.genre2 = "Indique le genre du deuxième enfant.";
       if (!siblingLink) e.siblingLink = "Choisis le lien entre les enfants.";
     }
     setErrors(e);
@@ -88,8 +98,10 @@ export function CommanderForm() {
   }, [
     child1Name,
     child1Age,
+    genre1,
     child2Name,
     child2Age,
+    genre2,
     childCount,
     siblingLink,
   ]);
@@ -153,6 +165,10 @@ export function CommanderForm() {
           occasion,
           format,
           message: message.trim(),
+          typeHistoire: childCount === 1 ? "solo" : "fratrie",
+          genre1: genre1 ? genreLibelle(genre1) : "",
+          genre2:
+            childCount === 2 && genre2 ? genreLibelle(genre2) : "",
         }),
       });
 
@@ -234,26 +250,41 @@ export function CommanderForm() {
             <h2 className="font-display text-xl text-qissali-mauve">Étape 1 — L&apos;enfant</h2>
 
             <div>
-              <p className="mb-3 text-sm font-medium text-slate-700">Nombre d&apos;enfants</p>
-              <div className="flex gap-3">
-                {([1, 2] as const).map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => {
-                      setChildCount(n);
-                      clearError("siblingLink");
-                      if (n === 1) setSiblingLink("");
-                    }}
-                    className={`${chipBtn} flex-1 ${
-                      childCount === n
-                        ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
-                        : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
-                    }`}
-                  >
-                    {n}
-                  </button>
-                ))}
+              <p className="mb-3 text-sm font-medium text-slate-700">Histoire solo ou fratrie ?</p>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setChildCount(1);
+                    clearError("siblingLink");
+                    clearError("genre2");
+                    setSiblingLink("");
+                    setChild2Name("");
+                    setChild2Age("");
+                    setGenre2("");
+                  }}
+                  className={`${chipBtn} flex-1 ${
+                    childCount === 1
+                      ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
+                      : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                  }`}
+                >
+                  Un seul enfant
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setChildCount(2);
+                    clearError("siblingLink");
+                  }}
+                  className={`${chipBtn} flex-1 ${
+                    childCount === 2
+                      ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
+                      : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                  }`}
+                >
+                  Deux enfants (fratrie)
+                </button>
               </div>
             </div>
 
@@ -300,6 +331,32 @@ export function CommanderForm() {
               </div>
             </div>
 
+            <div>
+              <p className="mb-3 text-sm font-medium text-slate-700">
+                Genre <span className="text-qissali-rose">*</span>
+              </p>
+              <div className="flex gap-3">
+                {(["fille", "garcon"] as const).map((g) => (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => {
+                      setGenre1(g);
+                      clearError("genre1");
+                    }}
+                    className={`${chipBtn} flex-1 ${
+                      genre1 === g
+                        ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
+                        : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                    }`}
+                  >
+                    {g === "fille" ? "Fille" : "Garçon"}
+                  </button>
+                ))}
+              </div>
+              {errors.genre1 && <p className="mt-2 text-sm text-red-600">{errors.genre1}</p>}
+            </div>
+
             {childCount === 2 && (
               <>
                 <div className="grid gap-6 sm:grid-cols-2">
@@ -342,6 +399,32 @@ export function CommanderForm() {
                       <p className="mt-1 text-sm text-red-600">{errors.child2Age}</p>
                     )}
                   </div>
+                </div>
+
+                <div>
+                  <p className="mb-3 text-sm font-medium text-slate-700">
+                    Genre enfant 2 <span className="text-qissali-rose">*</span>
+                  </p>
+                  <div className="flex gap-3">
+                    {(["fille", "garcon"] as const).map((g) => (
+                      <button
+                        key={g}
+                        type="button"
+                        onClick={() => {
+                          setGenre2(g);
+                          clearError("genre2");
+                        }}
+                        className={`${chipBtn} flex-1 ${
+                          genre2 === g
+                            ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
+                            : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                        }`}
+                      >
+                        {g === "fille" ? "Fille" : "Garçon"}
+                      </button>
+                    ))}
+                  </div>
+                  {errors.genre2 && <p className="mt-2 text-sm text-red-600">{errors.genre2}</p>}
                 </div>
 
                 <div>
@@ -561,13 +644,21 @@ export function CommanderForm() {
               <h3 className="mb-4 font-display text-lg text-qissali-mauve">Récapitulatif</h3>
               <dl className="space-y-2 text-sm text-slate-700">
                 <div className="flex justify-between gap-4">
+                  <dt className="text-slate-500">Type</dt>
+                  <dd className="text-right font-medium">
+                    {childCount === 1 ? "Solo (un enfant)" : "Fratrie (deux enfants)"}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
                   <dt className="text-slate-500">Enfant(s)</dt>
                   <dd className="text-right font-medium">
-                    {child1Name.trim()} ({child1Age} ans)
+                    {child1Name.trim()} ({child1Age} ans
+                    {genre1 ? `, ${genreLibelle(genre1)}` : ""})
                     {childCount === 2 && (
                       <>
                         {" "}
-                        & {child2Name.trim()} ({child2Age} ans)
+                        · {child2Name.trim()} ({child2Age} ans
+                        {genre2 ? `, ${genreLibelle(genre2)}` : ""})
                       </>
                     )}
                   </dd>
@@ -611,6 +702,11 @@ export function CommanderForm() {
                 {errors.checkout}
               </p>
             )}
+
+            <p className="text-center text-sm text-slate-600">
+              Sur la page de paiement Stripe : carte bancaire, Apple Pay ou Google Pay selon
+              l&apos;appareil.
+            </p>
 
             <div className="flex flex-col gap-3 border-t border-qissali-rose/20 pt-6 sm:flex-row sm:justify-between">
               <button

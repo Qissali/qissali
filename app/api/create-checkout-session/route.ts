@@ -11,6 +11,11 @@ type Body = {
   occasion?: string;
   format?: string;
   message?: string;
+  /** "solo" | "fratrie" */
+  typeHistoire?: string;
+  /** "Fille" | "Garçon" */
+  genre1?: string;
+  genre2?: string;
 };
 
 function str(v: unknown) {
@@ -50,6 +55,9 @@ export async function POST(req: Request) {
   const occasion = str(body.occasion);
   const format = str(body.format);
   const message = str(body.message);
+  const typeHistoire = str(body.typeHistoire);
+  const genre1 = str(body.genre1);
+  const genre2 = str(body.genre2);
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Email invalide." }, { status: 400 });
@@ -79,9 +87,15 @@ export async function POST(req: Request) {
     occasion,
     format,
     message: message || "",
+    type_histoire: typeHistoire || "",
+    genre_enfant1: genre1 || "",
+    genre_enfant2: genre2 || "",
   };
 
   try {
+    // Carte, portefeuilles (Apple Pay, Google Pay) : gérés par Stripe sur la page Checkout.
+    // Activer Apple Pay dans le Dashboard Stripe et enregistrer le domaine de prod :
+    // https://dashboard.stripe.com/settings/payment_method_domains
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: email,

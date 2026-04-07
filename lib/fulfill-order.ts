@@ -1,16 +1,24 @@
 import type Stripe from "stripe";
 import { Resend } from "resend";
+import { sendDeliveryEmail, sendEmailSequence } from "./emails.js";
 import { generateStoryPDF } from "./generatePDF.js";
 import { getStory } from "./stories.js";
 import type { StoryMetadata } from "./story-metadata";
 import { prenomDisplay } from "./story-metadata";
 
-const QISSALI_ROSE = "#E8A0C0";
 const QISSALI_MAUVE = "#C49AD8";
 const QISSALI_CREAM = "#FEF6FF";
 
 function getResendFrom(): string {
-  return process.env.RESEND_FROM_EMAIL?.trim() || "Qissali <onboarding@resend.dev>";
+  return (
+    process.env.EMAIL_FROM?.trim() ||
+    process.env.RESEND_FROM_EMAIL?.trim() ||
+    "Qissali <onboarding@resend.dev>"
+  );
+}
+
+function getAdminEmail(): string {
+  return process.env.EMAIL_ADMIN?.trim() || "contact@qissali.fr";
 }
 
 function sessionToMetadata(
@@ -29,43 +37,6 @@ function sessionToMetadata(
     message: metadata.message || "",
     email: metadata.email?.trim() || "",
   };
-}
-
-function buildCustomerEmailHtml(prenomLabel: string): string {
-  return `<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-</head>
-<body style="margin:0;padding:0;background:${QISSALI_CREAM};font-family:'Segoe UI',Tahoma,sans-serif;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${QISSALI_CREAM};padding:32px 16px;">
-    <tr>
-      <td align="center">
-        <table role="presentation" width="100%" style="max-width:520px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(196,154,216,0.2);">
-          <tr>
-            <td style="padding:32px 28px 16px;text-align:center;background:linear-gradient(135deg,${QISSALI_ROSE}33,${QISSALI_MAUVE}33);">
-              <div style="font-size:48px;line-height:1;">&#127769;</div>
-              <h1 style="margin:16px 0 0;font-family:Georgia,serif;font-size:26px;font-weight:400;color:${QISSALI_MAUVE};font-style:italic;">Qissali</h1>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:24px 28px 36px;color:#4a4a55;font-size:16px;line-height:1.65;">
-              <p style="margin:0 0 16px;">As-salamu alaykum,</p>
-              <p style="margin:0 0 16px;">Ta commande est pr&#234;te ! Tu trouveras l&#8217;histoire personnalis&#233;e de <strong style="color:${QISSALI_MAUVE};">${escapeHtml(
-                prenomLabel
-              )}</strong> en pi&#232;ce jointe (PDF).</p>
-              <p style="margin:0 0 16px;">Qu&#8217;Allah accepte nos bonnes actions et b&#233;nisse ton foyer.</p>
-              <p style="margin:0;font-style:italic;color:${QISSALI_ROSE};">Barakallahu fik &#8212; l&#8217;&#233;quipe Qissali</p>
-            </td>
-          </tr>
-        </table>
-        <p style="margin:24px 0 0;font-size:12px;color:#888;">qissali.fr</p>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
 }
 
 function buildAdminEmailHtml(meta: StoryMetadata, extras: { sessionId: string; amountTotal: string }): string {
@@ -150,9 +121,6 @@ export async function fulfillOrderFromSession(
     defi: story.defi,
   });
   const prenomLabel = prenomDisplay(meta);
-  const safeFile =
-    meta.prenom1.replace(/[^a-zA-ZÀ-ÿ0-9-_]/g, "-").slice(0, 40) || "enfant";
-  const filename = `histoire-qissali-${safeFile}.pdf`;
 
   const amount =
     session.amount_total != null
@@ -162,15 +130,7 @@ export async function fulfillOrderFromSession(
   const resend = new Resend(apiKey);
   const from = getResendFrom();
 
-  const subject = `🌙 L'histoire de ${prenomLabel} est prête !`;
-
-  const customerSend = await resend.emails.send({
-    from,
-    to: [clientEmail],
-    subject,
-    html: buildCustomerEmailHtml(prenomLabel),
-    attachments: [{ filename, content: pdfBase64 }],
-  });
+  const customerSend = await sendDeliveryEmail(clientEmail, prenomLabel, pdfBase64, undefined);
 
   if (customerSend.error) {
     console.error("Resend client email:", customerSend.error);
@@ -179,7 +139,7 @@ export async function fulfillOrderFromSession(
 
   const adminSend = await resend.emails.send({
     from,
-    to: ["contact@qissali.fr"],
+    to: [getAdminEmail()],
     subject: `[Qissali] Commande — ${prenomLabel}`,
     html: buildAdminEmailHtml(meta, { sessionId: session.id, amountTotal: amount }),
   });
@@ -187,6 +147,11 @@ export async function fulfillOrderFromSession(
   if (adminSend.error) {
     console.error("Resend admin email (non bloquant):", adminSend.error);
   }
+
+  sendEmailSequence(clientEmail, meta.prenom1, meta.prenom2, {
+    sessionId: session.id,
+    amountTotal: amount,
+  });
 
   return { ok: true };
 }

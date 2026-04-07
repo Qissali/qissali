@@ -30,7 +30,7 @@ export default function RootLayout({
       <body className="antialiased">
         <OrderModalProvider>
           <Nav />
-          <div className="pt-[4.5rem] sm:pt-20">{children}</div>
+          <div className="pt-[120px]">{children}</div>
         </OrderModalProvider>
       </body>
     </html>
