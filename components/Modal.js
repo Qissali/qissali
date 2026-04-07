@@ -9,6 +9,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { StripeEmbeddedCheckout } from "@/components/stripe-embedded-checkout";
 
 const UNIVERSES = [
   { id: "princesse", emoji: "👑", label: "Princesse" },
@@ -92,6 +93,16 @@ function OrderModalDialog({ open, onClose }) {
   const [showSuccess, setShowSuccess] = useState(false);
   const [checkoutUrl, setCheckoutUrl] = useState(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [embeddedClientSecret, setEmbeddedClientSecret] = useState(null);
+
+  const canUseEmbeddedCheckout = useMemo(
+    () =>
+      Boolean(
+        typeof process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY === "string" &&
+          process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.length > 0
+      ),
+    []
+  );
 
   const [childCount, setChildCount] = useState(1);
   const [child1Name, setChild1Name] = useState("");
@@ -122,6 +133,7 @@ function OrderModalDialog({ open, onClose }) {
     setStep(1);
     setShowSuccess(false);
     setCheckoutUrl(null);
+    setEmbeddedClientSecret(null);
     setCheckoutLoading(false);
     setChildCount(1);
     setChild1Name("");
@@ -315,6 +327,9 @@ function OrderModalDialog({ open, onClose }) {
           genre1: genre1 ? genreLibelle(genre1) : "",
           genre2:
             childCount === 2 && genre2 ? genreLibelle(genre2) : "",
+          age_enfant1: String(child1Age).trim(),
+          age_enfant2: childCount === 2 ? String(child2Age).trim() : "",
+          embedded: canUseEmbeddedCheckout,
         }),
       });
 
@@ -328,6 +343,11 @@ function OrderModalDialog({ open, onClose }) {
         return;
       }
 
+      if (data.clientSecret) {
+        setEmbeddedClientSecret(data.clientSecret);
+        return;
+      }
+
       if (data.url) {
         setCheckoutUrl(data.url);
         setShowSuccess(true);
@@ -336,7 +356,8 @@ function OrderModalDialog({ open, onClose }) {
 
       setErrors((e) => ({
         ...e,
-        checkout: "Réponse serveur invalide (pas d’URL Stripe).",
+        checkout:
+          "Réponse serveur invalide (pas d’URL ni de session de paiement intégrée).",
       }));
     } catch {
       setErrors((e) => ({
@@ -424,6 +445,40 @@ function OrderModalDialog({ open, onClose }) {
               </div>
             </div>
 
+            {embeddedClientSecret ? (
+              <div className="space-y-4">
+                <h3 className="text-center text-xl font-bold text-[var(--text)]">
+                  Paiement sécurisé
+                </h3>
+                <p className="text-center text-sm text-[var(--text-mid)]">
+                  Carte, Apple Pay ou Google Pay — le formulaire Stripe s&apos;affiche
+                  ci-dessous.
+                </p>
+                <StripeEmbeddedCheckout
+                  clientSecret={embeddedClientSecret}
+                  onError={(msg) =>
+                    setErrors((prev) => ({ ...prev, checkout: msg }))
+                  }
+                />
+                {errors.checkout && (
+                  <p className="text-center text-sm text-red-600">
+                    {errors.checkout}
+                  </p>
+                )}
+                <div className="flex justify-center border-t border-[var(--rose-light)] pt-6">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmbeddedClientSecret(null);
+                      clearError("checkout");
+                    }}
+                    className="rounded-full border-2 border-[var(--mauve)]/35 px-6 py-3 text-sm font-semibold text-[var(--mauve-deep)]"
+                  >
+                    ← Modifier ma commande
+                  </button>
+                </div>
+              </div>
+            ) : (
             <form onSubmit={step === 3 ? handlePay : (e) => e.preventDefault()}>
               {step === 1 && (
                 <div className="space-y-6">
@@ -874,8 +929,9 @@ function OrderModalDialog({ open, onClose }) {
                     </p>
                   )}
                   <p className="text-center text-sm text-[var(--text-mid)]">
-                    Sur la page de paiement Stripe : carte bancaire, Apple Pay ou Google Pay selon
-                    l&apos;appareil.
+                    {canUseEmbeddedCheckout
+                      ? "Le paiement Stripe s’ouvre sur cette page (carte, Apple Pay, Google Pay…)."
+                      : "Tu seras redirigé·e vers Stripe : carte, Apple Pay ou Google Pay selon l’appareil."}
                   </p>
                   <div className="flex flex-col gap-3 border-t border-[var(--rose-light)] pt-6 sm:flex-row sm:justify-between">
                     <button
@@ -891,13 +947,18 @@ function OrderModalDialog({ open, onClose }) {
                       className="rounded-full bg-gradient-to-r from-[var(--or)] via-[var(--rose)] to-[var(--mauve)] px-8 py-3 text-sm font-bold text-white shadow-lg shadow-[#9B6EC8]/30 transition hover:brightness-105 disabled:opacity-60"
                     >
                       {checkoutLoading
-                        ? "Patienter…"
-                        : "Commander 🌙"}
+                        ? canUseEmbeddedCheckout
+                          ? "Préparation du paiement…"
+                          : "Patienter…"
+                        : canUseEmbeddedCheckout
+                          ? "Continuer vers le paiement"
+                          : "Commander 🌙"}
                     </button>
                   </div>
                 </div>
               )}
             </form>
+            )}
           </>
         )}
       </div>

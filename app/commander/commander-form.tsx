@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
+import { StripeEmbeddedCheckout } from "@/components/stripe-embedded-checkout";
 
 const UNIVERSES = [
   { id: "princesse" as const, emoji: "👑", label: "Princesse" },
@@ -67,6 +68,16 @@ export function CommanderForm() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [embeddedClientSecret, setEmbeddedClientSecret] = useState<string | null>(null);
+
+  const canUseEmbeddedCheckout = useMemo(
+    () =>
+      Boolean(
+        typeof process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY === "string" &&
+          process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.length > 0
+      ),
+    []
+  );
 
   const clearError = useCallback((key: string) => {
     setErrors((e) => {
@@ -169,16 +180,28 @@ export function CommanderForm() {
           genre1: genre1 ? genreLibelle(genre1) : "",
           genre2:
             childCount === 2 && genre2 ? genreLibelle(genre2) : "",
+          age_enfant1: child1Age.trim(),
+          age_enfant2: childCount === 2 ? child2Age.trim() : "",
+          embedded: canUseEmbeddedCheckout,
         }),
       });
 
-      const data = (await res.json()) as { url?: string; error?: string };
+      const data = (await res.json()) as {
+        url?: string;
+        clientSecret?: string;
+        error?: string;
+      };
 
       if (!res.ok) {
         setErrors((e) => ({
           ...e,
           checkout: data.error || "Impossible de créer la session de paiement.",
         }));
+        return;
+      }
+
+      if (data.clientSecret) {
+        setEmbeddedClientSecret(data.clientSecret);
         return;
       }
 
@@ -189,7 +212,8 @@ export function CommanderForm() {
 
       setErrors((e) => ({
         ...e,
-        checkout: "Réponse serveur invalide (pas d’URL Stripe).",
+        checkout:
+          "Réponse serveur invalide (pas d’URL ni de session de paiement intégrée).",
       }));
     } catch {
       setErrors((e) => ({
@@ -200,6 +224,9 @@ export function CommanderForm() {
       setCheckoutLoading(false);
     }
   };
+
+  const formShellClass =
+    "rounded-2xl border border-qissali-rose/30 bg-white/70 p-6 shadow-lg shadow-qissali-mauve/10 backdrop-blur-sm sm:p-8";
 
   const chipBtn =
     "rounded-xl border-2 px-4 py-3 text-center text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-qissali-mauve";
@@ -240,10 +267,42 @@ export function CommanderForm() {
         </div>
       </div>
 
-      <form
-        onSubmit={handlePay}
-        className="rounded-2xl border border-qissali-rose/30 bg-white/70 p-6 shadow-lg shadow-qissali-mauve/10 backdrop-blur-sm sm:p-8"
-      >
+      {embeddedClientSecret ? (
+        <div className={formShellClass}>
+          <h2 className="mb-2 font-display text-xl text-qissali-mauve">
+            Paiement sécurisé
+          </h2>
+          <p className="mb-4 text-sm text-slate-600">
+            Carte bancaire, Apple Pay ou Google Pay selon l&apos;appareil — le formulaire
+            Stripe s&apos;affiche ci-dessous, sans quitter le site.
+          </p>
+          <StripeEmbeddedCheckout
+            clientSecret={embeddedClientSecret}
+            onError={(msg) => setErrors((prev) => ({ ...prev, checkout: msg }))}
+          />
+          {errors.checkout && (
+            <p
+              className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              role="alert"
+            >
+              {errors.checkout}
+            </p>
+          )}
+          <div className="mt-6 flex justify-start border-t border-qissali-rose/20 pt-6">
+            <button
+              type="button"
+              onClick={() => {
+                setEmbeddedClientSecret(null);
+                clearError("checkout");
+              }}
+              className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-mauve transition hover:bg-qissali-mauve/10"
+            >
+              ← Modifier ma commande
+            </button>
+          </div>
+        </div>
+      ) : (
+        <form onSubmit={handlePay} className={formShellClass}>
         {/* STEP 1 */}
         {step === 1 && (
           <div className="space-y-8">
@@ -704,8 +763,9 @@ export function CommanderForm() {
             )}
 
             <p className="text-center text-sm text-slate-600">
-              Sur la page de paiement Stripe : carte bancaire, Apple Pay ou Google Pay selon
-              l&apos;appareil.
+              {canUseEmbeddedCheckout
+                ? "Tu vas ouvrir le paiement Stripe sur cette page (carte, Apple Pay, Google Pay…)."
+                : "Tu seras redirigé·e vers une page Stripe : carte bancaire, Apple Pay ou Google Pay selon l’appareil."}
             </p>
 
             <div className="flex flex-col gap-3 border-t border-qissali-rose/20 pt-6 sm:flex-row sm:justify-between">
@@ -723,12 +783,19 @@ export function CommanderForm() {
                 aria-busy={checkoutLoading}
                 className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-qissali-rose to-qissali-mauve px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-qissali-mauve/25 transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {checkoutLoading ? "Redirection vers Stripe…" : "Commander et payer"}
+                {checkoutLoading
+                  ? canUseEmbeddedCheckout
+                    ? "Préparation du paiement…"
+                    : "Redirection vers Stripe…"
+                  : canUseEmbeddedCheckout
+                    ? "Continuer vers le paiement"
+                    : "Commander et payer"}
               </button>
             </div>
           </div>
         )}
-      </form>
+        </form>
+      )}
 
       <p className="mt-8 text-center text-xs text-slate-500">
         <Link href="/" className="text-qissali-mauve underline-offset-2 hover:underline">

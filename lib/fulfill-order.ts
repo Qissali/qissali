@@ -1,25 +1,9 @@
 import type Stripe from "stripe";
-import { Resend } from "resend";
-import { sendDeliveryEmail, sendEmailSequence } from "./emails.js";
+import { sendAdminNotification, sendDeliveryEmail, sendEmailSequence } from "./emails.js";
 import { generateStoryPDF } from "./generatePDF.js";
 import { getStory } from "./stories.js";
 import type { StoryMetadata } from "./story-metadata";
 import { prenomDisplay } from "./story-metadata";
-
-const QISSALI_MAUVE = "#C49AD8";
-const QISSALI_CREAM = "#FEF6FF";
-
-function getResendFrom(): string {
-  return (
-    process.env.EMAIL_FROM?.trim() ||
-    process.env.RESEND_FROM_EMAIL?.trim() ||
-    "Qissali <onboarding@resend.dev>"
-  );
-}
-
-function getAdminEmail(): string {
-  return process.env.EMAIL_ADMIN?.trim() || "contact@qissali.fr";
-}
 
 function sessionToMetadata(
   metadata: Record<string, string> | null | undefined
@@ -36,41 +20,23 @@ function sessionToMetadata(
     format: metadata.format || "",
     message: metadata.message || "",
     email: metadata.email?.trim() || "",
+    age_enfant1: metadata.age_enfant1?.trim() || "",
+    age_enfant2: metadata.age_enfant2?.trim() || "",
   };
 }
 
-function buildAdminEmailHtml(meta: StoryMetadata, extras: { sessionId: string; amountTotal: string }): string {
-  const rows: [string, string][] = [
-    ["Session Stripe", extras.sessionId],
-    ["Montant", extras.amountTotal],
-    ["Email client", meta.email],
-    ["Prénom(s)", prenomDisplay(meta)],
-    ["Univers", meta.univers],
-    ["Valeur", meta.valeur],
-    ["Occasion", meta.occasion],
-    ["Format", meta.format],
-    ["Message", meta.message || "—"],
-  ];
-  const bodyRows = rows
-    .map(
-      ([k, v]) =>
-        `<tr><td style="padding:8px 12px;border-bottom:1px solid #eee;font-weight:600;color:${QISSALI_MAUVE};width:140px;">${escapeHtml(
-          k
-        )}</td><td style="padding:8px 12px;border-bottom:1px solid #eee;">${escapeHtml(v)}</td></tr>`
-    )
-    .join("");
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"/></head><body style="margin:0;padding:24px;background:${QISSALI_CREAM};font-family:sans-serif;font-size:14px;">
-  <h2 style="color:${QISSALI_MAUVE};">Nouvelle commande Qissali</h2>
-  <table style="width:100%;max-width:560px;background:#fff;border-radius:12px;border-collapse:collapse;">${bodyRows}</table>
-  </body></html>`;
+function formatOrderFormatLabel(formatId: string): string {
+  if (formatId === "pdf-audio") return "PDF + Audio";
+  if (formatId === "pdf") return "PDF illustré";
+  return formatId || "—";
 }
 
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+function formatAgeLine(meta: StoryMetadata): string {
+  const a = meta.age_enfant1?.trim();
+  const b = meta.age_enfant2?.trim();
+  if (a && b) return `${a} ans et ${b} ans`;
+  if (a) return `${a} ans`;
+  return "—";
 }
 
 /**
@@ -93,8 +59,7 @@ export async function fulfillOrderFromSession(
   }
   meta.email = clientEmail;
 
-  const apiKey = process.env.RESEND_API_KEY?.trim();
-  if (!apiKey) {
+  if (!process.env.RESEND_API_KEY?.trim()) {
     return { ok: false, reason: "RESEND_API_KEY manquant." };
   }
 
@@ -122,13 +87,18 @@ export async function fulfillOrderFromSession(
   });
   const prenomLabel = prenomDisplay(meta);
 
-  const amount =
+  const prixEuro =
     session.amount_total != null
-      ? `${(session.amount_total / 100).toFixed(2)} ${(session.currency || "eur").toUpperCase()}`
+      ? `${(session.amount_total / 100).toFixed(2).replace(".", ",")} €`
       : "—";
 
-  const resend = new Resend(apiKey);
-  const from = getResendFrom();
+  const timestamp =
+    session.created != null
+      ? new Date(session.created * 1000).toLocaleString("fr-FR", {
+          dateStyle: "short",
+          timeStyle: "short",
+        })
+      : new Date().toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" });
 
   const customerSend = await sendDeliveryEmail(clientEmail, prenomLabel, pdfBase64, undefined);
 
@@ -137,11 +107,18 @@ export async function fulfillOrderFromSession(
     return { ok: false, reason: `Email client: ${JSON.stringify(customerSend.error)}` };
   }
 
-  const adminSend = await resend.emails.send({
-    from,
-    to: [getAdminEmail()],
-    subject: `[Qissali] Commande — ${prenomLabel}`,
-    html: buildAdminEmailHtml(meta, { sessionId: session.id, amountTotal: amount }),
+  const adminSend = await sendAdminNotification({
+    prenom1: meta.prenom1,
+    prenom2: meta.prenom2,
+    age: formatAgeLine(meta),
+    univers: meta.univers,
+    valeur: meta.valeur,
+    occasion: meta.occasion,
+    format: formatOrderFormatLabel(meta.format),
+    prix: prixEuro,
+    emailClient: clientEmail,
+    timestamp,
+    sessionId: session.id,
   });
 
   if (adminSend.error) {
@@ -150,7 +127,7 @@ export async function fulfillOrderFromSession(
 
   sendEmailSequence(clientEmail, meta.prenom1, meta.prenom2, {
     sessionId: session.id,
-    amountTotal: amount,
+    amountTotal: prixEuro,
   });
 
   return { ok: true };

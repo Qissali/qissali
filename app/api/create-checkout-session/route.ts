@@ -16,6 +16,10 @@ type Body = {
   /** "Fille" | "Garçon" */
   genre1?: string;
   genre2?: string;
+  age_enfant1?: string;
+  age_enfant2?: string;
+  /** Checkout intégré sur le site (iframe Stripe + portefeuilles dans l’UI) */
+  embedded?: boolean;
 };
 
 function str(v: unknown) {
@@ -58,6 +62,9 @@ export async function POST(req: Request) {
   const typeHistoire = str(body.typeHistoire);
   const genre1 = str(body.genre1);
   const genre2 = str(body.genre2);
+  const age_enfant1 = str(body.age_enfant1).trim();
+  const age_enfant2 = str(body.age_enfant2).trim();
+  const embedded = body.embedded === true;
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Email invalide." }, { status: 400 });
@@ -90,27 +97,51 @@ export async function POST(req: Request) {
     type_histoire: typeHistoire || "",
     genre_enfant1: genre1 || "",
     genre_enfant2: genre2 || "",
+    age_enfant1: age_enfant1 || "",
+    age_enfant2: age_enfant2 || "",
   };
 
+  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
+    {
+      price_data: {
+        currency: "eur",
+        product_data: {
+          name: productName,
+        },
+        unit_amount: montant,
+      },
+      quantity: 1,
+    },
+  ];
+
   try {
-    // Carte, portefeuilles (Apple Pay, Google Pay) : gérés par Stripe sur la page Checkout.
-    // Activer Apple Pay dans le Dashboard Stripe et enregistrer le domaine de prod :
+    // Paiement : page hébergée Stripe (redirection) ou checkout intégré (client_secret).
+    // Apple Pay / Google Pay : activer dans le Dashboard + domaines de prod :
     // https://dashboard.stripe.com/settings/payment_method_domains
+    if (embedded) {
+      const session = await stripe.checkout.sessions.create({
+        ui_mode: "embedded",
+        mode: "payment",
+        customer_email: email,
+        line_items: lineItems,
+        return_url: `${baseUrl}/merci?session_id={CHECKOUT_SESSION_ID}`,
+        metadata,
+      });
+
+      if (!session.client_secret) {
+        return NextResponse.json(
+          { error: "Session Stripe sans secret client (checkout intégré)." },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({ clientSecret: session.client_secret });
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: email,
-      line_items: [
-        {
-          price_data: {
-            currency: "eur",
-            product_data: {
-              name: productName,
-            },
-            unit_amount: montant,
-          },
-          quantity: 1,
-        },
-      ],
+      line_items: lineItems,
       success_url: `${baseUrl}/merci?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/commander`,
       metadata,
