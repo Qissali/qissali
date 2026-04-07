@@ -22,8 +22,8 @@ const VALEURS = [
 const OCCASIONS = [
   "Aïd el-Fitr",
   "Aïd el-Adha",
-  "Anniversaire",
   "Ramadan",
+  "Anniversaire",
   "Sans occasion",
 ] as const;
 

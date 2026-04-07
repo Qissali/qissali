@@ -1,7 +1,14 @@
 import type Stripe from "stripe";
-import { sendAdminNotification, sendDeliveryEmail, sendEmailSequence } from "./emails.js";
+import {
+  sendAdminNotification,
+  sendDeliveryEmail,
+  sendEmailSequence,
+  sendMissingStoryAdminEmail,
+  sendStoryPendingClientEmail,
+} from "./emails.js";
 import { generateStoryPDF } from "./generatePDF.js";
-import { getStory } from "./stories.js";
+import { createOrderPdfToken } from "./order-pdf-token";
+import { getStory, getStoryOrDefault, storyKey } from "./stories.js";
 import type { StoryMetadata } from "./story-metadata";
 import { prenomDisplay } from "./story-metadata";
 
@@ -39,6 +46,53 @@ function formatAgeLine(meta: StoryMetadata): string {
   return "—";
 }
 
+function safePdfFilename(prenomLabel: string): string {
+  const safe =
+    String(prenomLabel || "enfant")
+      .replace(/[^a-zA-ZÀ-ÿ0-9-_]/g, "-")
+      .slice(0, 48) || "enfant";
+  return `histoire-qissali-${safe}.pdf`;
+}
+
+/**
+ * Régénère le PDF à partir d’une session Checkout (paiement confirmé).
+ * Utilisé par l’email (pièce jointe) et la route /api/order-pdf.
+ */
+export function buildPdfFromCheckoutSession(
+  session: Stripe.Checkout.Session
+):
+  | { ok: true; base64: string; filename: string }
+  | { ok: false; reason: string } {
+  const meta = sessionToMetadata(session.metadata as Record<string, string> | null);
+  if (!meta) {
+    return { ok: false, reason: "Metadata invalides ou prenom1 manquant." };
+  }
+  const nbEnfants = meta.prenom2.trim() ? 2 : 1;
+  const story = getStoryOrDefault(
+    meta.univers,
+    meta.valeur,
+    meta.occasion,
+    nbEnfants,
+    meta.prenom1,
+    meta.prenom2
+  );
+  const base64 = generateStoryPDF({
+    prenom1: meta.prenom1,
+    prenom2: meta.prenom2,
+    univers: meta.univers,
+    valeur: meta.valeur,
+    occasion: meta.occasion,
+    titre: story.titre,
+    texte: story.texte,
+    citation: story.citation,
+    source: story.source,
+    questions: story.questions,
+    defi: story.defi,
+  });
+  const prenomLabel = prenomDisplay(meta);
+  return { ok: true, base64, filename: safePdfFilename(prenomLabel) };
+}
+
 /**
  * Après paiement confirmé (webhook) : PDF + emails client et admin.
  */
@@ -64,7 +118,9 @@ export async function fulfillOrderFromSession(
   }
 
   const nbEnfants = meta.prenom2.trim() ? 2 : 1;
-  const story = getStory(
+  const prenomLabel = prenomDisplay(meta);
+
+  const storyResolved = getStory(
     meta.univers,
     meta.valeur,
     meta.occasion,
@@ -72,20 +128,55 @@ export async function fulfillOrderFromSession(
     meta.prenom1,
     meta.prenom2
   );
-  const pdfBase64 = generateStoryPDF({
-    prenom1: meta.prenom1,
-    prenom2: meta.prenom2,
-    univers: meta.univers,
-    valeur: meta.valeur,
-    occasion: meta.occasion,
-    titre: story.titre,
-    texte: story.texte,
-    citation: story.citation,
-    source: story.source,
-    questions: story.questions,
-    defi: story.defi,
-  });
-  const prenomLabel = prenomDisplay(meta);
+
+  if (storyResolved === null) {
+    console.error(
+      "[Qissali] Histoire manquante (getStory null)",
+      JSON.stringify(
+        {
+          sessionId: session.id,
+          storyKey: storyKey(meta.univers, meta.valeur, meta.occasion, nbEnfants),
+          univers: meta.univers,
+          valeur: meta.valeur,
+          occasion: meta.occasion,
+          nbEnfants,
+          emailClient: clientEmail,
+          prenom1: meta.prenom1,
+          prenom2: meta.prenom2,
+        },
+        null,
+        2
+      )
+    );
+
+    const adminMissing = await sendMissingStoryAdminEmail({
+      sessionId: session.id,
+      univers: meta.univers,
+      valeur: meta.valeur,
+      occasion: meta.occasion,
+      nbEnfants,
+      emailClient: clientEmail,
+    });
+    if (adminMissing.error) {
+      console.error("sendMissingStoryAdminEmail:", adminMissing.error);
+    }
+
+    const clientPending = await sendStoryPendingClientEmail(clientEmail, prenomLabel);
+    if (clientPending.error) {
+      return {
+        ok: false,
+        reason: `Email client (histoire en préparation): ${JSON.stringify(clientPending.error)}`,
+      };
+    }
+
+    return { ok: true };
+  }
+
+  const built = buildPdfFromCheckoutSession(session);
+  if (!built.ok) {
+    return { ok: false, reason: built.reason };
+  }
+  const pdfBase64 = built.base64;
 
   const prixEuro =
     session.amount_total != null
@@ -100,7 +191,19 @@ export async function fulfillOrderFromSession(
         })
       : new Date().toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" });
 
-  const customerSend = await sendDeliveryEmail(clientEmail, prenomLabel, pdfBase64, undefined);
+  let downloadPdfUrl = "";
+  try {
+    const token = createOrderPdfToken(session.id);
+    const base =
+      process.env.NEXT_PUBLIC_URL?.replace(/\/$/, "") || "https://qissali.com";
+    downloadPdfUrl = `${base}/api/order-pdf?token=${encodeURIComponent(token)}`;
+  } catch (e) {
+    console.error("Lien téléchargement PDF email:", e);
+  }
+
+  const customerSend = await sendDeliveryEmail(clientEmail, prenomLabel, pdfBase64, undefined, {
+    downloadPdfUrl,
+  });
 
   if (customerSend.error) {
     console.error("Resend client email:", customerSend.error);

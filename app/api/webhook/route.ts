@@ -9,9 +9,21 @@ export async function POST(request: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
   const secretKey = process.env.STRIPE_SECRET_KEY?.trim();
 
-  if (!webhookSecret || !secretKey) {
+  if (!webhookSecret) {
     return NextResponse.json(
-      { error: "STRIPE_WEBHOOK_SECRET ou STRIPE_SECRET_KEY manquant." },
+      {
+        error:
+          "STRIPE_WEBHOOK_SECRET manquant. Crée un endpoint vers /api/webhook dans Stripe (Developers → Webhooks) et copie le secret whsec_… dans .env.local ou Vercel.",
+      },
+      { status: 500 }
+    );
+  }
+  if (!secretKey) {
+    return NextResponse.json(
+      {
+        error:
+          "STRIPE_SECRET_KEY manquant. Ajoute la clé secrète Stripe (sk_test_… / sk_live_…) dans .env.local ou les variables d’environnement du déploiement.",
+      },
       { status: 500 }
     );
   }
@@ -42,6 +54,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ received: true, ignored: "payment not paid" });
     }
 
+    // fulfillOrderFromSession : PDF + emails ; si getStory() est null → emails admin/client
+    // « histoire en préparation » (pas de remboursement automatique, livraison manuelle).
     const result = await fulfillOrderFromSession(session);
     if (!result.ok) {
       console.error("fulfillOrderFromSession:", result.reason);

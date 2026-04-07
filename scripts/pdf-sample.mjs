@@ -7,7 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { generateStoryPDF } from "../lib/generatePDF.js";
-import { getStory } from "../lib/stories.js";
+import { getStoryOrDefault } from "../lib/stories.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const out = process.argv[2] || path.join(__dirname, "..", "test-nour.pdf");
@@ -18,7 +18,7 @@ const occasion = "Aïd el-Fitr";
 const prenom1 = "Nour";
 const prenom2 = "";
 
-const story = getStory(univers, valeur, occasion, 1, prenom1, prenom2);
+const story = getStoryOrDefault(univers, valeur, occasion, 1, prenom1, prenom2);
 
 const b64 = generateStoryPDF({
   prenom1,

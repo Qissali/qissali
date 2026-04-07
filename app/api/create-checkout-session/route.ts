@@ -27,10 +27,13 @@ function str(v: unknown) {
 }
 
 export async function POST(req: Request) {
-  const secret = process.env.STRIPE_SECRET_KEY;
+  const secret = process.env.STRIPE_SECRET_KEY?.trim();
   if (!secret) {
     return NextResponse.json(
-      { error: "Configuration Stripe manquante (STRIPE_SECRET_KEY)." },
+      {
+        error:
+          "Configuration Stripe manquante : définis STRIPE_SECRET_KEY dans .env.local (local) ou dans les variables d’environnement du projet (ex. Vercel → Settings → Environment Variables). Clé : Dashboard Stripe → API keys (sk_test_… ou sk_live_…).",
+      },
       { status: 500 }
     );
   }
