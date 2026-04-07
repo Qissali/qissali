@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Nav from "@/components/Nav";
+import { OrderModalProvider } from "@/components/Modal";
 import { Nunito, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
@@ -25,8 +27,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${nunito.variable} ${playfair.variable}`}>
-      <body className="font-sans antialiased bg-qissali-cream text-slate-700">
-        {children}
+      <body className="antialiased">
+        <OrderModalProvider>
+          <Nav />
+          <div className="pt-[4.5rem] sm:pt-20">{children}</div>
+        </OrderModalProvider>
       </body>
     </html>
   );

@@ -1,3 +1,4 @@
+import { CommanderModalTrigger } from "@/components/Modal";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -89,7 +90,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Hero */}
-      <section className="relative overflow-hidden px-4 pb-20 pt-16 sm:px-6 sm:pb-28 sm:pt-24">
+      <section className="relative overflow-hidden px-4 pb-20 pt-6 sm:px-6 sm:pb-28 sm:pt-12">
         <div
           className="pointer-events-none absolute inset-0 opacity-40"
           style={{
@@ -114,12 +115,9 @@ export default function Home() {
             Mon histoire islamique personnalisée
           </p>
           <div className="mt-10">
-            <Link
-              href="/commander"
-              className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-qissali-rose to-qissali-mauve px-8 py-4 text-base font-medium text-white shadow-lg shadow-qissali-mauve/25 transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-qissali-mauve active:scale-[0.98]"
-            >
+            <CommanderModalTrigger className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-qissali-rose to-qissali-mauve px-8 py-4 text-base font-medium text-white shadow-lg shadow-qissali-mauve/25 transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-qissali-mauve active:scale-[0.98]">
               Créer l&apos;histoire de mon enfant
-            </Link>
+            </CommanderModalTrigger>
           </div>
         </div>
       </section>
@@ -192,12 +190,9 @@ export default function Home() {
                 <span className="font-display text-xl text-qissali-mauve">{name}</span>
                 <span className="mt-4 font-display text-4xl italic text-qissali-rose">{price}</span>
                 <p className="mt-4 flex-1 text-sm leading-relaxed text-slate-600">{hint}</p>
-                <Link
-                  href="/commander"
-                  className="mt-8 inline-flex w-full items-center justify-center rounded-full border-2 border-qissali-mauve/40 bg-white/80 py-3 text-center text-sm font-semibold text-qissali-mauve transition hover:bg-qissali-mauve/10"
-                >
+                <CommanderModalTrigger className="mt-8 inline-flex w-full items-center justify-center rounded-full border-2 border-qissali-mauve/40 bg-white/80 py-3 text-center text-sm font-semibold text-qissali-mauve transition hover:bg-qissali-mauve/10">
                   Choisir
-                </Link>
+                </CommanderModalTrigger>
               </li>
             ))}
           </ul>

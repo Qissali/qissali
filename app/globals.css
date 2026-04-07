@@ -1,3 +1,63 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --rose: #E8A0C0;
+  --rose-deep: #D4729E;
+  --rose-light: #F5D0E4;
+  --rose-pale: #FDF0F7;
+  --mauve: #C49AD8;
+  --mauve-deep: #9B6EC8;
+  --mauve-light: #E8D5F5;
+  --bleu: #A0C4E8;
+  --or: #E8C870;
+  --or-deep: #C8A040;
+  --cream: #FEF6FF;
+  --dark: #2A1A2E;
+  --dark-2: #3D2845;
+  --text: #4A2E5A;
+  --text-mid: #7A5A8A;
+  --text-light: #A888B8;
+  --white: #FFFBFF;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+@keyframes modal-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes modal-moon {
+  0%,
+  100% {
+    transform: rotate(-8deg) scale(1);
+  }
+  50% {
+    transform: rotate(8deg) scale(1.12);
+  }
+}
+
+.modal-fade-up {
+  animation: modal-fade-up 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.modal-moon-animate {
+  animation: modal-moon 2.2s ease-in-out infinite;
+}
