@@ -97,17 +97,18 @@ export default function TestStoriesPage() {
   const neuroRows = buildNeuroRows();
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <div className="min-h-screen bg-qissali-cream">
+      <div className="mx-auto max-w-7xl px-4 py-8">
       <div className="mb-5 flex items-center justify-between gap-4">
-        <h1 className="font-display text-2xl text-qissali-mauve">Catalogue des histoires (dev)</h1>
-        <Link href="/" className="rounded-lg border px-3 py-2 text-sm hover:bg-slate-50">
+        <h1 className="font-display text-2xl text-qissali-title">Catalogue des histoires (dev)</h1>
+        <Link href="/" className="rounded-lg border border-qissali-rose-light px-3 py-2 text-sm text-qissali-body hover:bg-qissali-section">
           ← Accueil
         </Link>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-        <table className="w-full min-w-[1100px] text-left text-sm">
-          <thead className="bg-slate-50 text-slate-700">
+      <div className="overflow-x-auto rounded-xl border border-qissali-rose-light bg-white">
+        <table className="w-full min-w-[1100px] text-left text-sm text-qissali-body">
+          <thead className="bg-qissali-section text-qissali-title">
             <tr>
               <th className="px-3 py-2">Clé</th>
               <th className="px-3 py-2">Univers</th>
@@ -134,7 +135,7 @@ export default function TestStoriesPage() {
         </table>
       </div>
 
-      <div className="mt-6 space-y-2 text-sm">
+      <div className="mt-6 space-y-2 text-sm text-qissali-body">
         <p>
           Nombre total d&apos;histoires : <strong>{totalStories}</strong>
         </p>
@@ -152,10 +153,10 @@ export default function TestStoriesPage() {
       </div>
 
       <div className="mt-10">
-        <h2 className="mb-3 font-display text-xl text-qissali-mauve">Histoires profils neuro</h2>
-        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <table className="w-full min-w-[1000px] text-left text-sm">
-            <thead className="bg-slate-50 text-slate-700">
+        <h2 className="mb-3 font-display text-xl text-qissali-title">Histoires profils neuro</h2>
+        <div className="overflow-x-auto rounded-xl border border-qissali-rose-light bg-white">
+          <table className="w-full min-w-[1000px] text-left text-sm text-qissali-body">
+            <thead className="bg-qissali-section text-qissali-title">
               <tr>
                 <th className="px-3 py-2">Clé</th>
                 <th className="px-3 py-2">Profil</th>
@@ -179,6 +180,7 @@ export default function TestStoriesPage() {
             </tbody>
           </table>
         </div>
+      </div>
       </div>
     </div>
   );

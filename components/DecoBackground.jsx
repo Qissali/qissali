@@ -36,7 +36,7 @@ export default function DecoBackground({ variant }) {
         >
           <path
             d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"
-            fill="#E8C870"
+            fill="#E8A0C0"
           />
         </svg>
       ))}
@@ -55,7 +55,7 @@ export default function DecoBackground({ variant }) {
         >
           <path
             d="M70 50c0 22-18 40-40 40 C13 90 2 74 2 57c13 8 28 8 40 0 12-8 20-22 20-38 5 8 8 19 8 31z"
-            fill="#E8C870"
+            fill="#C49AD8"
           />
         </svg>
       )}
@@ -91,24 +91,24 @@ export default function DecoBackground({ variant }) {
           height="80"
           viewBox="0 0 60 80"
         >
-          <line x1="30" y1="0" x2="30" y2="10" stroke="#E8C870" strokeWidth="2" />
-          <ellipse cx="30" cy="12" rx="8" ry="4" fill="none" stroke="#E8C870" strokeWidth="1.5" />
+          <line x1="30" y1="0" x2="30" y2="10" stroke="#E8A0C0" strokeWidth="2" />
+          <ellipse cx="30" cy="12" rx="8" ry="4" fill="none" stroke="#E8A0C0" strokeWidth="1.5" />
           <path
             d="M15 20 Q10 45 15 60 L45 60 Q50 45 45 20 Z"
             fill="none"
-            stroke="#E8C870"
+            stroke="#E8A0C0"
             strokeWidth="1.5"
           />
-          <line x1="20" y1="20" x2="17" y2="60" stroke="#E8C870" strokeWidth="0.8" opacity="0.6" />
-          <line x1="30" y1="20" x2="30" y2="60" stroke="#E8C870" strokeWidth="0.8" opacity="0.6" />
-          <line x1="40" y1="20" x2="43" y2="60" stroke="#E8C870" strokeWidth="0.8" opacity="0.6" />
+          <line x1="20" y1="20" x2="17" y2="60" stroke="#E8A0C0" strokeWidth="0.8" opacity="0.6" />
+          <line x1="30" y1="20" x2="30" y2="60" stroke="#E8A0C0" strokeWidth="0.8" opacity="0.6" />
+          <line x1="40" y1="20" x2="43" y2="60" stroke="#E8A0C0" strokeWidth="0.8" opacity="0.6" />
           <path
             d="M12 60 L15 68 L45 68 L48 60 Z"
             fill="none"
-            stroke="#E8C870"
+            stroke="#E8A0C0"
             strokeWidth="1.5"
           />
-          <ellipse cx="30" cy="42" rx="6" ry="8" fill="#E8C870" opacity="0.15" />
+          <ellipse cx="30" cy="42" rx="6" ry="8" fill="#E8A0C0" opacity="0.15" />
         </svg>
       )}
 
@@ -178,7 +178,7 @@ export default function DecoBackground({ variant }) {
             width: dot.r * 2,
             height: dot.r * 2,
             borderRadius: "50%",
-            background: "var(--or)",
+            background: "var(--rose)",
             opacity: 0.15,
           }}
         />

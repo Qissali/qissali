@@ -36,8 +36,8 @@ function MerciShell({
         height={100}
         className="mb-4 h-auto w-[min(200px,55vw)]"
       />
-      <h1 className="mt-4 font-display text-2xl text-qissali-mauve md:text-3xl">{title}</h1>
-      <div className="mt-6 text-lg leading-relaxed text-slate-600">{children}</div>
+      <h1 className="mt-4 font-display text-2xl text-qissali-title md:text-3xl">{title}</h1>
+      <div className="mt-6 text-lg leading-relaxed text-qissali-body">{children}</div>
     </div>
   );
 }
@@ -54,7 +54,7 @@ export default async function MerciPage({ searchParams }: Props) {
       <MerciShell title="Configuration incomplète">
         <p>
           Le serveur n’a pas accès à la clé Stripe. En production, vérifie que{" "}
-          <code className="rounded bg-slate-100 px-1.5 py-0.5 text-sm">STRIPE_SECRET_KEY</code> est
+          <code className="rounded bg-qissali-section px-1.5 py-0.5 text-sm text-qissali-title">STRIPE_SECRET_KEY</code> est
           bien définie (Vercel → Environment Variables).
         </p>
         <Link
@@ -78,18 +78,18 @@ export default async function MerciPage({ searchParams }: Props) {
         <p>
           Ce lien de confirmation n’est pas valide ou a expiré. Si tu viens de payer, ouvre le
           récapitulatif depuis l’email envoyé par Stripe ou{" "}
-          <Link href="/commander" className="font-medium text-qissali-mauve underline">
+          <Link href="/commander" className="font-medium text-qissali-mauve-mid underline">
             repasse par la commande
           </Link>
           .
         </p>
-        <p className="mt-4 text-sm text-slate-500">
+        <p className="mt-4 text-sm text-qissali-soft">
           En test : une session créée avec des clés <strong>test</strong> ne peut pas être lue avec
           des clés <strong>live</strong> (et inversement).
         </p>
         <Link
           href="/"
-          className="mt-10 inline-flex rounded-full border-2 border-qissali-mauve/30 px-8 py-3 text-sm font-semibold text-qissali-mauve transition hover:bg-qissali-mauve/5"
+          className="mt-10 inline-flex rounded-full border-2 border-qissali-mauve/30 px-8 py-3 text-sm font-semibold text-qissali-title transition hover:bg-qissali-mauve/5"
         >
           Retour à l&apos;accueil
         </Link>
@@ -141,16 +141,16 @@ export default async function MerciPage({ searchParams }: Props) {
       <p className="text-7xl md:text-8xl" aria-hidden>
         🌙
       </p>
-      <h1 className="mt-8 font-display text-3xl text-qissali-mauve md:text-4xl">
+      <h1 className="mt-8 font-display text-3xl text-qissali-title md:text-4xl">
         Barakallahu fik !
       </h1>
-      <p className="mt-6 text-lg leading-relaxed text-slate-600">
+      <p className="mt-6 text-lg leading-relaxed text-qissali-body">
         L&apos;histoire de {prenom} est en préparation. Tu la recevras par email en moins de 5
         minutes sur{" "}
         {email ? (
-          <span className="font-medium text-qissali-mauve">{email}</span>
+          <span className="font-medium text-qissali-title">{email}</span>
         ) : (
-          <span className="text-slate-500">ton adresse email</span>
+          <span className="text-qissali-soft">ton adresse email</span>
         )}
         .
       </p>

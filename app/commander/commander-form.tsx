@@ -347,7 +347,7 @@ function CommanderFormInner() {
     <div className="mx-auto max-w-2xl">
       {/* Header fixe */}
       <div className="sticky top-0 z-20 -mx-4 mb-6 border-b border-qissali-rose/20 bg-qissali-cream/95 px-4 py-3 backdrop-blur-sm sm:-mx-0 sm:rounded-t-2xl">
-        <p className="text-center text-sm font-semibold text-qissali-mauve">
+        <p className="text-center text-sm font-semibold text-qissali-mauve-mid">
           Pack {pack.label} · Histoire {currentHistoire + 1}/{pack.nbHistoires}
         </p>
         <div className="mt-2 flex justify-center gap-2">
@@ -359,7 +359,7 @@ function CommanderFormInner() {
                   ? "bg-qissali-rose text-white"
                   : i === currentHistoire
                     ? "bg-qissali-mauve text-white"
-                    : "bg-slate-200 text-slate-500"
+                    : "bg-qissali-rose-light/80 text-qissali-soft"
               }`}
             >
               {i < currentHistoire ? "✓" : i + 1}
@@ -375,16 +375,16 @@ function CommanderFormInner() {
       </div>
 
       <div className="mb-8 text-center">
-        <p className="font-display text-sm uppercase tracking-[0.15em] text-qissali-mauve">Commande</p>
-        <h1 className="mt-2 font-display text-3xl font-normal text-qissali-mauve md:text-4xl">
+        <p className="font-display text-sm uppercase tracking-[0.15em] text-qissali-mauve-mid">Commande</p>
+        <h1 className="mt-2 font-display text-3xl font-normal text-qissali-title md:text-4xl">
           Personnalise ton histoire
         </h1>
       </div>
 
       {embeddedClientSecret ? (
         <div className={formShellClass}>
-          <h2 className="mb-2 font-display text-xl text-qissali-mauve">Paiement sécurisé</h2>
-          <p className="mb-4 text-sm text-slate-600">
+          <h2 className="mb-2 font-display text-xl text-qissali-title">Paiement sécurisé</h2>
+          <p className="mb-4 text-sm text-qissali-body">
             Carte bancaire, Apple Pay ou Google Pay selon l&apos;appareil — le formulaire Stripe
             s&apos;affiche ci-dessous.
           </p>
@@ -404,7 +404,7 @@ function CommanderFormInner() {
                 setEmbeddedClientSecret(null);
                 clearError("checkout");
               }}
-              className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-mauve transition hover:bg-qissali-mauve/10"
+              className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-title transition hover:bg-qissali-mauve/10"
             >
               ← Modifier ma commande
             </button>
@@ -416,10 +416,10 @@ function CommanderFormInner() {
             <>
               {currentStep === 1 && (
                 <div className="space-y-8">
-                  <h2 className="font-display text-xl text-qissali-mauve">Étape 1 — L&apos;enfant</h2>
+                  <h2 className="font-display text-xl text-qissali-title">Étape 1 — L&apos;enfant</h2>
 
                   <div>
-                    <p className="mb-3 text-sm font-medium text-slate-700">Histoire solo ou fratrie ?</p>
+                    <p className="mb-3 text-sm font-medium text-qissali-title">Histoire solo ou fratrie ?</p>
                     <div className="flex flex-col gap-3 sm:flex-row">
                       <button
                         type="button"
@@ -436,8 +436,8 @@ function CommanderFormInner() {
                         }}
                         className={`${chipBtn} flex-1 ${
                           h.nbEnfants === 1
-                            ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
-                            : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                            ? "border-qissali-mauve bg-qissali-cream text-qissali-title shadow-inner"
+                            : "border-qissali-rose/40 bg-white text-qissali-body hover:border-qissali-mauve/50"
                         }`}
                       >
                         Un seul enfant
@@ -450,8 +450,8 @@ function CommanderFormInner() {
                         }}
                         className={`${chipBtn} flex-1 ${
                           h.nbEnfants === 2
-                            ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
-                            : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                            ? "border-qissali-mauve bg-qissali-cream text-qissali-title shadow-inner"
+                            : "border-qissali-rose/40 bg-white text-qissali-body hover:border-qissali-mauve/50"
                         }`}
                       >
                         Deux enfants (fratrie)
@@ -461,7 +461,7 @@ function CommanderFormInner() {
 
                   <div className="grid gap-6 sm:grid-cols-2">
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                      <label className="mb-2 block text-sm font-medium text-qissali-title">
                         Prénom enfant 1 <span className="text-qissali-rose">*</span>
                       </label>
                       <input
@@ -471,12 +471,12 @@ function CommanderFormInner() {
                           patchHistoire({ prenom1: e.target.value });
                           clearError("child1Name");
                         }}
-                        className="w-full rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 text-slate-800 outline-none focus:border-qissali-mauve focus:ring-2"
+                        className="w-full rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 text-qissali-title outline-none focus:border-qissali-mauve focus:ring-2"
                       />
                       {errors.child1Name && <p className="mt-1 text-sm text-red-600">{errors.child1Name}</p>}
                     </div>
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                      <label className="mb-2 block text-sm font-medium text-qissali-title">
                         Âge enfant 1 <span className="text-qissali-rose">*</span>
                       </label>
                       <input
@@ -495,7 +495,7 @@ function CommanderFormInner() {
                   </div>
 
                   <div>
-                    <p className="mb-3 text-sm font-medium text-slate-700">
+                    <p className="mb-3 text-sm font-medium text-qissali-title">
                       Genre <span className="text-qissali-rose">*</span>
                     </p>
                     <div className="flex gap-3">
@@ -509,8 +509,8 @@ function CommanderFormInner() {
                           }}
                           className={`${chipBtn} flex-1 ${
                             h.genre1 === g
-                              ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
-                              : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                              ? "border-qissali-mauve bg-qissali-cream text-qissali-title shadow-inner"
+                              : "border-qissali-rose/40 bg-white text-qissali-body hover:border-qissali-mauve/50"
                           }`}
                         >
                           {g === "fille" ? "Fille" : "Garçon"}
@@ -524,7 +524,7 @@ function CommanderFormInner() {
                     <>
                       <div className="grid gap-6 sm:grid-cols-2">
                         <div>
-                          <label className="mb-2 block text-sm font-medium text-slate-700">
+                          <label className="mb-2 block text-sm font-medium text-qissali-title">
                             Prénom enfant 2 <span className="text-qissali-rose">*</span>
                           </label>
                           <input
@@ -539,7 +539,7 @@ function CommanderFormInner() {
                           {errors.child2Name && <p className="mt-1 text-sm text-red-600">{errors.child2Name}</p>}
                         </div>
                         <div>
-                          <label className="mb-2 block text-sm font-medium text-slate-700">
+                          <label className="mb-2 block text-sm font-medium text-qissali-title">
                             Âge enfant 2 <span className="text-qissali-rose">*</span>
                           </label>
                           <input
@@ -557,7 +557,7 @@ function CommanderFormInner() {
                         </div>
                       </div>
                       <div>
-                        <p className="mb-3 text-sm font-medium text-slate-700">
+                        <p className="mb-3 text-sm font-medium text-qissali-title">
                           Genre enfant 2 <span className="text-qissali-rose">*</span>
                         </p>
                         <div className="flex gap-3">
@@ -571,8 +571,8 @@ function CommanderFormInner() {
                               }}
                               className={`${chipBtn} flex-1 ${
                                 h.genre2 === g
-                                  ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
-                                  : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                                  ? "border-qissali-mauve bg-qissali-cream text-qissali-title shadow-inner"
+                                  : "border-qissali-rose/40 bg-white text-qissali-body hover:border-qissali-mauve/50"
                               }`}
                             >
                               {g === "fille" ? "Fille" : "Garçon"}
@@ -582,7 +582,7 @@ function CommanderFormInner() {
                         {errors.genre2 && <p className="mt-2 text-sm text-red-600">{errors.genre2}</p>}
                       </div>
                       <div>
-                        <p className="mb-3 text-sm font-medium text-slate-700">Lien entre les enfants</p>
+                        <p className="mb-3 text-sm font-medium text-qissali-title">Lien entre les enfants</p>
                         <div className="flex flex-wrap gap-3">
                           {(
                             [
@@ -600,8 +600,8 @@ function CommanderFormInner() {
                               }}
                               className={`${chipBtn} min-w-[100px] flex-1 ${
                                 h.lien === id
-                                  ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
-                                  : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                                  ? "border-qissali-mauve bg-qissali-cream text-qissali-title"
+                                  : "border-qissali-rose/40 bg-white text-qissali-body hover:border-qissali-mauve/50"
                               }`}
                             >
                               {label}
@@ -616,7 +616,7 @@ function CommanderFormInner() {
                   <div className="flex flex-col gap-3 border-t border-qissali-rose/20 pt-6 sm:flex-row sm:justify-between">
                     <Link
                       href="/"
-                      className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-center text-sm font-medium text-qissali-mauve transition hover:bg-qissali-mauve/10"
+                      className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-center text-sm font-medium text-qissali-title transition hover:bg-qissali-mauve/10"
                     >
                       ← Accueil
                     </Link>
@@ -633,7 +633,7 @@ function CommanderFormInner() {
 
               {currentStep === 2 && (
                 <div className="space-y-8">
-                  <h2 className="font-display text-xl text-qissali-mauve">Étape 2 — Profil neuro (optionnel)</h2>
+                  <h2 className="font-display text-xl text-qissali-title">Étape 2 — Profil neuro (optionnel)</h2>
 
                   <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-qissali-rose/30 bg-qissali-cream/30 p-4">
                     <input
@@ -649,8 +649,8 @@ function CommanderFormInner() {
                         });
                       }}
                     />
-                    <span className="text-sm text-slate-700">
-                      <span className="font-medium text-qissali-mauve">Adapter l&apos;histoire</span> à un profil
+                    <span className="text-sm text-qissali-body">
+                      <span className="font-medium text-qissali-title">Adapter l&apos;histoire</span> à un profil
                       neuroatypique (Dys, TDAH, TSA, HPI…)
                     </span>
                   </label>
@@ -682,8 +682,8 @@ function CommanderFormInner() {
                               }}
                               className={`${chipBtn} w-full text-left ${
                                 selected
-                                  ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
-                                  : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                                  ? "border-qissali-mauve bg-qissali-cream text-qissali-title"
+                                  : "border-qissali-rose/40 bg-white text-qissali-body hover:border-qissali-mauve/50"
                               }`}
                             >
                               {label}
@@ -708,7 +708,7 @@ function CommanderFormInner() {
                     <button
                       type="button"
                       onClick={handlePrev}
-                      className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-mauve transition hover:bg-qissali-mauve/10"
+                      className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-title transition hover:bg-qissali-mauve/10"
                     >
                       ← Retour
                     </button>
@@ -725,10 +725,10 @@ function CommanderFormInner() {
 
               {currentStep === 3 && (
                 <div className="space-y-8">
-                  <h2 className="font-display text-xl text-qissali-mauve">Étape 3 — L&apos;histoire</h2>
+                  <h2 className="font-display text-xl text-qissali-title">Étape 3 — L&apos;histoire</h2>
 
                   <div>
-                    <p className="mb-3 text-sm font-medium text-slate-700">Univers</p>
+                    <p className="mb-3 text-sm font-medium text-qissali-title">Univers</p>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                       {UNIVERSES.map(({ id, emoji, label }) => (
                         <button
@@ -740,8 +740,8 @@ function CommanderFormInner() {
                           }}
                           className={`${chipBtn} flex flex-col items-center gap-1 py-4 ${
                             h.univers === id
-                              ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
-                              : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                              ? "border-qissali-mauve bg-qissali-cream text-qissali-title"
+                              : "border-qissali-rose/40 bg-white text-qissali-body hover:border-qissali-mauve/50"
                           }`}
                         >
                           <span className="text-3xl" aria-hidden>
@@ -753,14 +753,14 @@ function CommanderFormInner() {
                     </div>
                     {errors.universe && <p className="mt-2 text-sm text-red-600">{errors.universe}</p>}
                     {hasNeuroProfile && (
-                      <p className="mt-2 text-sm text-qissali-mauve">
+                      <p className="mt-2 text-sm text-qissali-mauve-mid">
                         ✨ Adaptation pour : {profilsLabel}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <p className="mb-3 text-sm font-medium text-slate-700">Valeur</p>
+                    <p className="mb-3 text-sm font-medium text-qissali-title">Valeur</p>
                     <div className="flex flex-col gap-2">
                       {VALEURS.map(({ value, chip }) => (
                         <button
@@ -772,8 +772,8 @@ function CommanderFormInner() {
                           }}
                           className={`${chipBtn} w-full text-left ${
                             h.valeur === value
-                              ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
-                              : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                              ? "border-qissali-mauve bg-qissali-cream text-qissali-title"
+                              : "border-qissali-rose/40 bg-white text-qissali-body hover:border-qissali-mauve/50"
                           }`}
                         >
                           {chip}
@@ -784,7 +784,7 @@ function CommanderFormInner() {
                   </div>
 
                   <div>
-                    <p className="mb-3 text-sm font-medium text-slate-700">Occasion</p>
+                    <p className="mb-3 text-sm font-medium text-qissali-title">Occasion</p>
                     <div className="flex flex-col gap-2">
                       {OCCASIONS.map(({ value, chip }) => (
                         <button
@@ -796,8 +796,8 @@ function CommanderFormInner() {
                           }}
                           className={`${chipBtn} w-full text-left ${
                             h.occasion === value
-                              ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
-                              : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                              ? "border-qissali-mauve bg-qissali-cream text-qissali-title"
+                              : "border-qissali-rose/40 bg-white text-qissali-body hover:border-qissali-mauve/50"
                           }`}
                         >
                           {chip}
@@ -808,8 +808,8 @@ function CommanderFormInner() {
                   </div>
 
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-700">
-                      Message <span className="text-slate-400">(optionnel)</span>
+                    <label className="mb-2 block text-sm font-medium text-qissali-title">
+                      Message <span className="text-qissali-soft">(optionnel)</span>
                     </label>
                     <textarea
                       rows={3}
@@ -821,7 +821,7 @@ function CommanderFormInner() {
 
                   {currentHistoire < pack.nbHistoires - 1 && (
                     <div className="rounded-xl border border-qissali-mauve/25 bg-qissali-cream/80 p-4">
-                      <p className="text-sm text-slate-700">
+                      <p className="text-sm text-qissali-title">
                         ✓ Histoire {currentHistoire + 1} : {h.prenom1.trim() || "…"} ·{" "}
                         {UNIVERSES.find((x) => x.id === h.univers)?.label ?? "…"} · {h.valeur || "…"}
                       </p>
@@ -832,7 +832,7 @@ function CommanderFormInner() {
                     <button
                       type="button"
                       onClick={handlePrev}
-                      className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-mauve transition hover:bg-qissali-mauve/10"
+                      className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-title transition hover:bg-qissali-mauve/10"
                     >
                       ← Retour
                     </button>
@@ -853,16 +853,16 @@ function CommanderFormInner() {
 
           {phase === "payment" && (
             <div className="space-y-8">
-              <h2 className="font-display text-xl text-qissali-mauve">Récapitulatif & paiement</h2>
+              <h2 className="font-display text-xl text-qissali-title">Récapitulatif & paiement</h2>
 
-              <ul className="space-y-2 rounded-xl border border-qissali-rose/25 bg-qissali-cream/50 p-4 text-sm text-slate-800">
+              <ul className="space-y-2 rounded-xl border border-qissali-rose/25 bg-qissali-cream/50 p-4 text-sm text-qissali-title">
                 {histoires.map((story, i) => (
                   <li key={story.id}>{recapLine(story, i)}</li>
                 ))}
               </ul>
 
               <div>
-                <label htmlFor="email-pay" className="mb-2 block text-sm font-medium text-slate-700">
+                <label htmlFor="email-pay" className="mb-2 block text-sm font-medium text-qissali-title">
                   Email de livraison <span className="text-qissali-rose">*</span>
                 </label>
                 <input
@@ -880,26 +880,26 @@ function CommanderFormInner() {
               </div>
 
               <div>
-                <p className="mb-3 text-sm font-medium text-slate-700">Format</p>
+                <p className="mb-3 text-sm font-medium text-qissali-title">Format</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div
-                    className={`${chipBtn} flex flex-col items-start border-qissali-mauve bg-qissali-cream py-4 text-left text-qissali-mauve`}
+                    className={`${chipBtn} flex flex-col items-start border-qissali-mauve bg-qissali-cream py-4 text-left text-qissali-title`}
                   >
                     <span className="font-semibold">PDF illustré</span>
                     <span className="mt-1 font-display text-2xl italic text-qissali-rose">Inclus</span>
                   </div>
                   <div
-                    className={`${chipBtn} flex cursor-not-allowed flex-col items-start border-dashed border-slate-300 bg-slate-100 py-4 text-left opacity-60`}
+                    className={`${chipBtn} flex cursor-not-allowed flex-col items-start border-dashed border-qissali-rose-light bg-qissali-section py-4 text-left opacity-70`}
                   >
-                    <span className="font-semibold text-slate-500">PDF + Audio</span>
-                    <span className="mt-1 text-xs text-slate-500">Bientôt disponible</span>
+                    <span className="font-semibold text-qissali-soft">PDF + Audio</span>
+                    <span className="mt-1 text-xs text-qissali-soft">Bientôt disponible</span>
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center justify-between rounded-xl border border-qissali-mauve/20 bg-white px-4 py-3">
-                <span className="text-sm font-medium text-slate-600">Total pack {pack.label}</span>
-                <span className="font-display text-2xl font-bold text-qissali-mauve">
+                <span className="text-sm font-medium text-qissali-body">Total pack {pack.label}</span>
+                <span className="font-display text-2xl font-bold text-qissali-title">
                   {centsToEuroLabel(pack.prix)}
                 </span>
               </div>
@@ -910,7 +910,7 @@ function CommanderFormInner() {
                 </p>
               )}
 
-              <p className="text-center text-sm text-slate-600">
+              <p className="text-center text-sm text-qissali-body">
                 {canUseEmbeddedCheckout
                   ? "Paiement Stripe sur cette page."
                   : "Redirection vers Stripe pour le paiement sécurisé."}
@@ -921,7 +921,7 @@ function CommanderFormInner() {
                   type="button"
                   onClick={handlePrev}
                   disabled={checkoutLoading}
-                  className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-mauve transition hover:bg-qissali-mauve/10 disabled:opacity-50"
+                  className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-title transition hover:bg-qissali-mauve/10 disabled:opacity-50"
                 >
                   ← Modifier
                 </button>
@@ -940,8 +940,8 @@ function CommanderFormInner() {
         </form>
       )}
 
-      <p className="mt-8 text-center text-xs text-slate-500">
-        <Link href="/" className="text-qissali-mauve underline-offset-2 hover:underline">
+      <p className="mt-8 text-center text-xs text-qissali-soft">
+        <Link href="/" className="text-qissali-mauve-mid underline-offset-2 hover:underline">
           Retour à l&apos;accueil
         </Link>
       </p>
@@ -953,7 +953,7 @@ export function CommanderForm() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-2xl rounded-2xl border border-qissali-rose/20 bg-white/80 p-12 text-center text-slate-600">
+        <div className="mx-auto max-w-2xl rounded-2xl border border-qissali-rose-light bg-white/90 p-12 text-center text-qissali-body">
           Chargement du formulaire…
         </div>
       }

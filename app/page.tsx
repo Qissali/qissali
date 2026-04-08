@@ -51,12 +51,11 @@ const packs = [
 
 const neuroProfiles = [
   { label: "Dys", sub: "Dyslexie, dyscalculie, dyspraxie" },
-  { label: "TDAH", sub: "Énergie vive et créativité débordante" },
-  { label: "TSA", sub: "Autisme, sensibilité intense du monde" },
-  { label: "HPI", sub: "Haut potentiel, tête qui va très loin" },
+  { label: "TDAH", sub: "Énergie vive et créativité" },
+  { label: "TSA", sub: "Autisme, sensibilité du monde" },
+  { label: "HPI", sub: "Haut potentiel intellectuel" },
 ] as const;
 
-/** Placeholders honnêtes en attendant des avis vérifiés */
 const avis = [
   {
     texte:
@@ -79,11 +78,11 @@ const avis = [
 export default function Home() {
   return (
     <main className="min-h-screen">
-      {/* 1. Hero / header */}
+      {/* 1. Hero */}
       <section
         style={{
-          background: "var(--violet-deep)",
-          minHeight: "100vh",
+          background: "var(--bg-main)",
+          minHeight: "90vh",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -95,7 +94,7 @@ export default function Home() {
         }}
       >
         <svg
-          style={{ position: "absolute", right: "6%", top: "8%", opacity: 0.12 }}
+          style={{ position: "absolute", right: "5%", top: "8%", opacity: 0.08 }}
           width="140"
           height="140"
           viewBox="0 0 100 100"
@@ -103,63 +102,57 @@ export default function Home() {
         >
           <path
             d="M70 50c0 22-18 40-40 40C13 90 2 74 2 57c13 8 28 8 40 0 12-8 20-22 20-38 5 8 8 19 8 31z"
-            fill="#E0D0F0"
+            fill="#C49AD8"
           />
         </svg>
 
         <svg
-          style={{ position: "absolute", right: "3%", bottom: "15%", opacity: 0.1 }}
+          style={{ position: "absolute", right: "3%", bottom: "15%", opacity: 0.07 }}
           width="50"
           height="70"
           viewBox="0 0 60 80"
           aria-hidden
         >
-          <line x1="30" y1="0" x2="30" y2="10" stroke="#E0D0F0" strokeWidth="2" />
-          <ellipse cx="30" cy="12" rx="8" ry="4" fill="none" stroke="#E0D0F0" strokeWidth="1.5" />
+          <line x1="30" y1="0" x2="30" y2="10" stroke="#E8A0C0" strokeWidth="2" />
+          <ellipse cx="30" cy="12" rx="8" ry="4" fill="none" stroke="#E8A0C0" strokeWidth="1.5" />
           <path
             d="M15 20 Q10 45 15 60 L45 60 Q50 45 45 20 Z"
             fill="none"
-            stroke="#E0D0F0"
+            stroke="#E8A0C0"
             strokeWidth="1.5"
           />
-          <line x1="30" y1="20" x2="30" y2="60" stroke="#E0D0F0" strokeWidth="0.8" opacity="0.6" />
-          <path d="M12 60 L15 68 L45 68 L48 60 Z" fill="none" stroke="#E0D0F0" strokeWidth="1.5" />
-          <ellipse cx="30" cy="42" rx="6" ry="8" fill="#E0D0F0" opacity="0.2" />
+          <line x1="30" y1="20" x2="30" y2="60" stroke="#E8A0C0" strokeWidth="0.8" opacity="0.6" />
+          <path d="M12 60 L15 68 L45 68 L48 60 Z" fill="none" stroke="#E8A0C0" strokeWidth="1.5" />
+          <ellipse cx="30" cy="42" rx="6" ry="8" fill="#E8A0C0" opacity="0.15" />
         </svg>
 
         <svg
-          style={{
-            position: "absolute",
-            left: "3%",
-            top: "20%",
-            opacity: 0.08,
-            transform: "scale(0.75)",
-          }}
-          width="50"
-          height="70"
+          style={{ position: "absolute", left: "3%", top: "20%", opacity: 0.06 }}
+          width="40"
+          height="55"
           viewBox="0 0 60 80"
           aria-hidden
         >
-          <line x1="30" y1="0" x2="30" y2="10" stroke="#D0B8E8" strokeWidth="2" />
-          <ellipse cx="30" cy="12" rx="8" ry="4" fill="none" stroke="#D0B8E8" strokeWidth="1.5" />
+          <line x1="30" y1="0" x2="30" y2="10" stroke="#C49AD8" strokeWidth="2" />
+          <ellipse cx="30" cy="12" rx="8" ry="4" fill="none" stroke="#C49AD8" strokeWidth="1.5" />
           <path
             d="M15 20 Q10 45 15 60 L45 60 Q50 45 45 20 Z"
             fill="none"
-            stroke="#D0B8E8"
+            stroke="#C49AD8"
             strokeWidth="1.5"
           />
-          <path d="M12 60 L15 68 L45 68 L48 60 Z" fill="none" stroke="#D0B8E8" strokeWidth="1.5" />
+          <path d="M12 60 L15 68 L45 68 L48 60 Z" fill="none" stroke="#C49AD8" strokeWidth="1.5" />
         </svg>
 
         {[
-          { x: "12%", y: "20%", s: 5 },
-          { x: "88%", y: "15%", s: 4 },
-          { x: "20%", y: "75%", s: 6 },
-          { x: "78%", y: "70%", s: 3 },
-          { x: "50%", y: "10%", s: 4 },
-          { x: "35%", y: "85%", s: 5 },
-          { x: "65%", y: "88%", s: 3 },
-          { x: "8%", y: "50%", s: 4 },
+          { x: "10%", y: "15%", s: 5 },
+          { x: "90%", y: "12%", s: 4 },
+          { x: "18%", y: "78%", s: 6 },
+          { x: "82%", y: "72%", s: 3 },
+          { x: "50%", y: "6%", s: 4 },
+          { x: "30%", y: "88%", s: 5 },
+          { x: "70%", y: "85%", s: 3 },
+          { x: "6%", y: "50%", s: 4 },
         ].map((s, i) => (
           <svg
             key={i}
@@ -167,7 +160,7 @@ export default function Home() {
               position: "absolute",
               left: s.x,
               top: s.y,
-              opacity: 0.2,
+              opacity: 0.15,
             }}
             width={s.s * 2}
             height={s.s * 2}
@@ -176,7 +169,7 @@ export default function Home() {
           >
             <path
               d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"
-              fill="#E0D0F0"
+              fill="#E8A0C0"
             />
           </svg>
         ))}
@@ -184,12 +177,12 @@ export default function Home() {
         <div style={{ position: "relative", zIndex: 1 }}>
           <Image
             src="/logo-qissali.png"
-            alt="Qissali — Mon histoire islamique personnalisée"
+            alt="Qissali"
             width={420}
             height={210}
             priority
             style={{
-              height: "clamp(120px, 20vw, 200px)",
+              height: "clamp(120px, 18vw, 180px)",
               width: "auto",
               marginBottom: "32px",
             }}
@@ -199,23 +192,22 @@ export default function Home() {
             style={{
               fontFamily: "'Playfair Display', serif",
               fontSize: "clamp(28px, 5vw, 52px)",
-              color: "#FFFFFF",
+              color: "var(--text-title)",
               lineHeight: 1.2,
-              maxWidth: "680px",
+              maxWidth: "640px",
               margin: "0 auto 16px",
             }}
           >
             Offre-lui une histoire
             <br />
-            <em style={{ color: "var(--lila)" }}>qu&apos;il n&apos;oubliera jamais</em>
+            <em style={{ color: "var(--rose)" }}>qu&apos;il n&apos;oubliera jamais</em>
           </h1>
 
           <p
             style={{
-              color: "rgba(240,234,248,0.75)",
+              color: "var(--text-body)",
               fontSize: "clamp(15px, 2vw, 18px)",
-              marginBottom: "40px",
-              maxWidth: "480px",
+              maxWidth: "460px",
               margin: "0 auto 40px",
               lineHeight: 1.7,
             }}
@@ -227,45 +219,31 @@ export default function Home() {
             ✨ Créer l&apos;histoire de mon enfant
           </CommanderModalTrigger>
 
-          <p style={{ color: "rgba(240,234,248,0.4)", fontSize: "13px", marginTop: "16px" }}>
+          <p style={{ color: "var(--text-soft)", fontSize: "13px", marginTop: "16px" }}>
             à partir de 3,90€ · PDF livré par email
           </p>
         </div>
       </section>
 
-      {/* 2. Notre histoire */}
-      <section className="story-two-col">
+      {/* 2. Storytelling */}
+      <section className="storytelling-grid">
         <div
           style={{
-            background: "var(--violet-deep)",
+            background: "var(--bg-section)",
             padding: "64px 48px",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            position: "relative",
-            overflow: "hidden",
+            borderRight: "1px solid var(--rose-light)",
           }}
         >
-          <svg
-            style={{ position: "absolute", right: "-10px", top: "20px", opacity: 0.08 }}
-            width="100"
-            height="100"
-            viewBox="0 0 100 100"
-            aria-hidden
-          >
-            <path
-              d="M70 50c0 22-18 40-40 40C13 90 2 74 2 57c13 8 28 8 40 0 12-8 20-22 20-38 5 8 8 19 8 31z"
-              fill="var(--lila)"
-            />
-          </svg>
-
-          <div style={{ position: "relative", zIndex: 1 }}>
+          <div>
             <p
               style={{
                 fontSize: "11px",
                 letterSpacing: "3px",
                 textTransform: "uppercase",
-                color: "var(--violet-soft)",
+                color: "var(--mauve-mid)",
                 marginBottom: "20px",
               }}
             >
@@ -276,17 +254,17 @@ export default function Home() {
               style={{
                 fontFamily: "'Playfair Display', serif",
                 fontSize: "clamp(20px, 2.5vw, 30px)",
-                color: "white",
+                color: "var(--text-title)",
                 lineHeight: 1.35,
                 marginBottom: "20px",
               }}
             >
               Qissali, c&apos;est
-              <em style={{ color: "var(--lila)" }}> mon histoire </em>
+              <em style={{ color: "var(--rose)" }}> mon histoire </em>
               en arabe
             </h2>
 
-            <p style={{ fontSize: "14px", color: "rgba(240,234,248,0.65)", lineHeight: 1.8 }}>
+            <p style={{ fontSize: "14px", color: "var(--text-body)", lineHeight: 1.8 }}>
               Qissali vient de l&apos;arabe{" "}
               <span dir="rtl" lang="ar" className="inline-block">
                 قصتي
@@ -297,17 +275,16 @@ export default function Home() {
 
           <div
             style={{
-              borderLeft: "2px solid var(--violet-soft)",
+              borderLeft: "2px solid var(--rose)",
               paddingLeft: "20px",
-              position: "relative",
-              zIndex: 1,
+              marginTop: "40px",
             }}
           >
             <p
               style={{
                 fontFamily: "'Playfair Display', serif",
                 fontStyle: "italic",
-                color: "var(--lila-med)",
+                color: "var(--text-title)",
                 fontSize: "15px",
                 lineHeight: 1.6,
                 marginBottom: "8px",
@@ -316,16 +293,16 @@ export default function Home() {
               &ldquo;Le plus grand trésor d&apos;une princesse, ma chérie, ce n&apos;est pas sa couronne. C&apos;est son
               cœur.&rdquo;
             </p>
-            <p style={{ fontSize: "11px", color: "rgba(240,234,248,0.35)", letterSpacing: "1px" }}>
+            <p style={{ fontSize: "11px", color: "var(--text-soft)", letterSpacing: "1px" }}>
               Extrait d&apos;une histoire Qissali
             </p>
           </div>
         </div>
 
-        <div style={{ background: "var(--lila)", padding: "64px 56px" }}>
-          <div style={{ fontSize: "15px", color: "var(--violet)", lineHeight: 1.9 }}>
+        <div style={{ background: "var(--bg-main)", padding: "64px 56px" }}>
+          <div style={{ fontSize: "15px", color: "var(--text-body)", lineHeight: 1.9 }}>
             <p style={{ marginBottom: "20px" }}>
-              <strong style={{ color: "var(--violet-deep)" }}>Un soir, ma fille m&apos;a demandé une histoire.</strong>{" "}
+              <strong style={{ color: "var(--text-title)" }}>Un soir, ma fille m&apos;a demandé une histoire.</strong>{" "}
               Pas n&apos;importe laquelle. Une histoire avec elle dedans. Avec son prénom, ses héros, son univers à elle.
             </p>
             <p style={{ marginBottom: "20px" }}>
@@ -334,8 +311,8 @@ export default function Home() {
             </p>
             <p style={{ marginBottom: "20px" }}>
               Je voulais lui transmettre l&apos;islam comme je l&apos;ai reçu, moi — dans des histoires. Pas des leçons.
-              Pas des obligations. Des récits qui restent toute une vie, ceux qu&apos;on raconte à ses propres enfants
-              des décennies plus tard.
+              Pas des obligations. Des récits qui restent toute une vie, ceux qu&apos;on raconte à ses propres enfants des
+              décennies plus tard.
             </p>
             <p>Alors j&apos;ai créé Qissali. Pour mes filles. Et pour toutes les vôtres.</p>
           </div>
@@ -343,12 +320,12 @@ export default function Home() {
       </section>
 
       {/* 3. Comment ça marche */}
-      <section id="decouvrir" style={{ background: "var(--lila-med)", padding: "80px 24px" }}>
+      <section id="decouvrir" style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center" }}>
           <h2
             style={{
               fontFamily: "'Playfair Display', serif",
-              color: "var(--violet-deep)",
+              color: "var(--text-title)",
               fontSize: "clamp(22px, 3vw, 36px)",
               marginBottom: "56px",
             }}
@@ -359,28 +336,29 @@ export default function Home() {
           <div className="steps-flex-home">
             {commentSteps.map((step, i) => (
               <Fragment key={step.num}>
-                <div style={{ textAlign: "center", flex: "1 1 180px", maxWidth: "220px" }}>
+                <div style={{ textAlign: "center", flex: 1, minWidth: "160px" }}>
                   <div
                     style={{
-                      width: "56px",
-                      height: "56px",
+                      width: "52px",
+                      height: "52px",
                       borderRadius: "50%",
-                      background: "var(--violet)",
-                      color: "var(--lila)",
+                      background: "linear-gradient(135deg,#E8A0C0,#C49AD8)",
+                      color: "white",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                       margin: "0 auto 16px",
                       fontFamily: "'Playfair Display', serif",
                       fontWeight: 700,
-                      fontSize: "22px",
+                      fontSize: "20px",
+                      boxShadow: "0 4px 16px rgba(196,154,216,0.3)",
                     }}
                   >
                     {step.num}
                   </div>
                   <h3
                     style={{
-                      color: "var(--violet-deep)",
+                      color: "var(--text-title)",
                       fontFamily: "'Nunito', sans-serif",
                       fontWeight: 700,
                       fontSize: "16px",
@@ -392,10 +370,11 @@ export default function Home() {
                 {i < 2 ? (
                   <div
                     style={{
-                      color: "var(--violet-soft)",
+                      color: "var(--rose)",
                       fontSize: "22px",
-                      opacity: 0.5,
+                      opacity: 0.6,
                       flexShrink: 0,
+                      paddingBottom: "20px",
                     }}
                     aria-hidden
                   >
@@ -409,13 +388,13 @@ export default function Home() {
       </section>
 
       {/* 4. Les univers */}
-      <section style={{ background: "var(--lila)", padding: "80px 24px" }}>
+      <section style={{ background: "var(--bg-main)", padding: "80px 24px" }}>
         <div style={{ maxWidth: "900px", margin: "0 auto" }}>
           <h2
             style={{
               textAlign: "center",
               fontFamily: "'Playfair Display', serif",
-              color: "var(--violet-deep)",
+              color: "var(--text-title)",
               fontSize: "clamp(22px, 3vw, 36px)",
               marginBottom: "48px",
             }}
@@ -423,7 +402,7 @@ export default function Home() {
             Les univers
           </h2>
 
-          <div className="univers-grid-page">
+          <div className="grid-4">
             <UniversTile emoji="👑" titre="Princesse" />
             <UniversTile emoji="🦄" titre="Licorne & Magie" />
             <UniversTile emoji="🦸" titre="Super-Héros" />
@@ -433,12 +412,12 @@ export default function Home() {
       </section>
 
       {/* 5. Neuroatypie */}
-      <section style={{ background: "var(--lila-med)", padding: "80px 24px" }}>
+      <section style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center" }}>
           <h2
             style={{
               fontFamily: "'Playfair Display', serif",
-              color: "var(--violet-deep)",
+              color: "var(--text-title)",
               fontSize: "clamp(22px, 3vw, 36px)",
               marginBottom: "16px",
             }}
@@ -448,24 +427,24 @@ export default function Home() {
 
           <p
             style={{
-              color: "var(--violet-soft)",
+              color: "var(--text-body)",
               fontSize: "15px",
               lineHeight: 1.8,
-              maxWidth: "580px",
+              maxWidth: "560px",
               margin: "0 auto 48px",
             }}
           >
-            Chaque enfant mérite une histoire qui lui ressemble vraiment. C&apos;est pourquoi nos histoires peuvent être
-            adaptées aux profils neuroatypiques.
+            Chaque enfant mérite une histoire qui lui ressemble vraiment. Nos histoires peuvent être adaptées aux profils
+            neuroatypiques.
           </p>
 
-          <div className="neuro-grid-page" style={{ marginBottom: "40px" }}>
+          <div className="grid-4" style={{ marginBottom: "32px" }}>
             {neuroProfiles.map((p) => (
               <div
                 key={p.label}
                 style={{
-                  background: "var(--lila)",
-                  border: "1px solid var(--lila-dark)",
+                  background: "var(--bg-card)",
+                  border: "1px solid var(--rose-light)",
                   borderRadius: "16px",
                   padding: "24px 16px",
                   textAlign: "center",
@@ -476,32 +455,31 @@ export default function Home() {
                     fontFamily: "'Playfair Display', serif",
                     fontWeight: 700,
                     fontSize: "20px",
-                    color: "var(--violet-deep)",
+                    color: "var(--text-title)",
                     marginBottom: "8px",
                   }}
                 >
                   {p.label}
                 </p>
-                <p style={{ fontSize: "12px", color: "var(--violet-soft)", lineHeight: 1.5 }}>{p.sub}</p>
+                <p style={{ fontSize: "12px", color: "var(--text-soft)", lineHeight: 1.5 }}>{p.sub}</p>
               </div>
             ))}
           </div>
 
-          <p style={{ fontSize: "13px", color: "var(--violet-soft)", fontStyle: "italic" }}>
-            Option disponible dans le formulaire de commande. Informations confidentielles, utilisées uniquement pour
-            adapter l&apos;histoire.
+          <p style={{ fontSize: "12px", color: "var(--text-soft)", fontStyle: "italic" }}>
+            Option disponible dans le formulaire. Informations confidentielles.
           </p>
         </div>
       </section>
 
       {/* 6. Les packs */}
-      <section style={{ background: "var(--lila)", padding: "80px 24px" }}>
+      <section style={{ background: "var(--bg-main)", padding: "80px 24px" }}>
         <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
           <h2
             style={{
               textAlign: "center",
               fontFamily: "'Playfair Display', serif",
-              color: "var(--violet-deep)",
+              color: "var(--text-title)",
               fontSize: "clamp(22px, 3vw, 36px)",
               marginBottom: "12px",
             }}
@@ -511,7 +489,7 @@ export default function Home() {
           <p
             style={{
               textAlign: "center",
-              color: "var(--violet-soft)",
+              color: "var(--text-soft)",
               fontSize: "14px",
               marginBottom: "48px",
             }}
@@ -519,19 +497,20 @@ export default function Home() {
             Plus vous commandez, plus vous économisez.
           </p>
 
-          <div className="packs-grid-page">
+          <div className="grid-4">
             {packs.map((pack) => (
               <div
                 key={pack.slug}
                 style={{
-                  background: pack.highlight ? "var(--violet)" : "var(--lila-med)",
-                  border: pack.highlight ? "none" : "1px solid var(--lila-dark)",
+                  background: pack.highlight ? "linear-gradient(160deg,#E8A0C0,#C49AD8)" : "var(--bg-card)",
+                  border: pack.highlight ? "none" : "1px solid var(--rose-light)",
                   borderRadius: "24px",
                   padding: "32px 20px",
                   textAlign: "center",
                   position: "relative",
                   display: "flex",
                   flexDirection: "column",
+                  boxShadow: pack.highlight ? "0 8px 32px rgba(196,154,216,0.35)" : "none",
                 }}
               >
                 {pack.badge ? (
@@ -541,8 +520,8 @@ export default function Home() {
                       top: "-12px",
                       left: "50%",
                       transform: "translateX(-50%)",
-                      background: pack.highlight ? "var(--lila)" : "var(--violet)",
-                      color: pack.highlight ? "var(--violet)" : "var(--lila)",
+                      background: pack.highlight ? "white" : "linear-gradient(135deg,#E8A0C0,#C49AD8)",
+                      color: pack.highlight ? "var(--text-title)" : "white",
                       borderRadius: "50px",
                       padding: "4px 16px",
                       fontSize: "11px",
@@ -558,7 +537,7 @@ export default function Home() {
                   style={{
                     fontFamily: "'Playfair Display', serif",
                     fontSize: "22px",
-                    color: pack.highlight ? "white" : "var(--violet-deep)",
+                    color: pack.highlight ? "white" : "var(--text-title)",
                     marginBottom: "4px",
                   }}
                 >
@@ -568,7 +547,7 @@ export default function Home() {
                 <p
                   style={{
                     fontSize: "13px",
-                    color: pack.highlight ? "rgba(240,234,248,0.7)" : "var(--violet-soft)",
+                    color: pack.highlight ? "rgba(255,255,255,0.8)" : "var(--text-soft)",
                     marginBottom: "20px",
                   }}
                 >
@@ -580,7 +559,7 @@ export default function Home() {
                     fontSize: "36px",
                     fontWeight: 800,
                     fontFamily: "'Playfair Display', serif",
-                    color: pack.highlight ? "white" : "var(--violet-deep)",
+                    color: pack.highlight ? "white" : "var(--text-title)",
                     marginBottom: "4px",
                   }}
                 >
@@ -590,39 +569,30 @@ export default function Home() {
                 <p
                   style={{
                     fontSize: "12px",
-                    color: pack.highlight ? "rgba(240,234,248,0.6)" : "var(--violet-soft)",
+                    color: pack.highlight ? "rgba(255,255,255,0.7)" : "var(--text-soft)",
                     marginBottom: "28px",
                   }}
                 >
                   {pack.unitaire}
                 </p>
 
-                {pack.highlight ? (
-                  <Link
-                    href={`/commander?pack=${pack.slug}`}
-                    className="inline-block text-center no-underline"
-                    style={{
-                      background: "var(--lila)",
-                      color: "var(--violet)",
-                      border: "none",
-                      borderRadius: "50px",
-                      padding: "12px 24px",
-                      fontWeight: 700,
-                      fontSize: "15px",
-                      cursor: "pointer",
-                      marginTop: "auto",
-                    }}
-                  >
-                    Commander →
-                  </Link>
-                ) : (
-                  <Link
-                    href={`/commander?pack=${pack.slug}`}
-                    className="btn-secondary mt-auto inline-block text-center no-underline"
-                  >
-                    Commander →
-                  </Link>
-                )}
+                <Link
+                  href={`/commander?pack=${pack.slug}`}
+                  className="mt-auto inline-block text-center no-underline"
+                  style={{
+                    background: pack.highlight ? "white" : "linear-gradient(135deg,#E8A0C0,#C49AD8)",
+                    color: pack.highlight ? "var(--text-title)" : "white",
+                    border: "none",
+                    borderRadius: "50px",
+                    padding: "12px 24px",
+                    fontWeight: 700,
+                    fontSize: "15px",
+                    cursor: "pointer",
+                    boxShadow: pack.highlight ? "0 4px 16px rgba(0,0,0,0.1)" : "0 4px 16px rgba(196,154,216,0.3)",
+                  }}
+                >
+                  Commander →
+                </Link>
               </div>
             ))}
           </div>
@@ -632,7 +602,7 @@ export default function Home() {
               textAlign: "center",
               marginTop: "32px",
               fontSize: "13px",
-              color: "var(--violet-soft)",
+              color: "var(--text-soft)",
               display: "flex",
               justifyContent: "center",
               gap: "32px",
@@ -646,9 +616,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 7. Exemple d'histoire */}
-      <section style={{ background: "var(--lila-med)", padding: "80px 24px" }}>
-        <div style={{ maxWidth: "680px", margin: "0 auto" }}>
+      {/* 7. Exemple */}
+      <section style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
+        <div style={{ maxWidth: "640px", margin: "0 auto" }}>
           <div
             style={{
               display: "flex",
@@ -662,8 +632,8 @@ export default function Home() {
               <span
                 key={b}
                 style={{
-                  background: "var(--violet)",
-                  color: "var(--lila)",
+                  background: "linear-gradient(135deg,#E8A0C0,#C49AD8)",
+                  color: "white",
                   borderRadius: "50px",
                   padding: "4px 14px",
                   fontSize: "12px",
@@ -678,8 +648,8 @@ export default function Home() {
           <h2
             style={{
               fontFamily: "'Playfair Display', serif",
-              color: "var(--violet-deep)",
-              fontSize: "clamp(20px, 3vw, 28px)",
+              color: "var(--text-title)",
+              fontSize: "clamp(18px, 2.5vw, 26px)",
               textAlign: "center",
               marginBottom: "32px",
               lineHeight: 1.3,
@@ -690,13 +660,13 @@ export default function Home() {
 
           <div
             style={{
-              background: "var(--lila)",
+              background: "var(--bg-card)",
               borderRadius: "20px",
               padding: "36px 40px",
               fontSize: "15px",
-              color: "var(--violet)",
+              color: "var(--text-body)",
               lineHeight: 1.9,
-              border: "1px solid var(--lila-dark)",
+              border: "1px solid var(--rose-light)",
             }}
           >
             <p style={{ marginBottom: "16px" }}>
@@ -714,11 +684,12 @@ export default function Home() {
               Alors, dans sa tête, la voix de sa grand-mère s&apos;éleva doucement.
             </p>
 
-            <div style={{ borderLeft: "3px solid var(--violet-soft)", paddingLeft: "20px", fontStyle: "italic" }}>
+            <div style={{ borderLeft: "3px solid var(--rose)", paddingLeft: "20px" }}>
               <p
                 style={{
                   fontFamily: "'Playfair Display', serif",
-                  color: "var(--violet-deep)",
+                  fontStyle: "italic",
+                  color: "var(--text-title)",
                   fontSize: "16px",
                   marginBottom: "8px",
                   lineHeight: 1.6,
@@ -727,46 +698,54 @@ export default function Home() {
                 &ldquo;Le Prophète ﷺ nous a enseigné que jamais une aumône n&apos;a appauvri son donneur.
                 Jamais.&rdquo;
               </p>
-              <p style={{ fontSize: "12px", color: "var(--violet-soft)", fontStyle: "normal" }}>Source : At-Tirmidhi</p>
+              <p style={{ fontSize: "12px", color: "var(--text-soft)", fontStyle: "normal" }}>Source : At-Tirmidhi</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* 8. Avis */}
-      <section style={{ background: "var(--lila)", padding: "80px 24px" }}>
+      <section style={{ background: "var(--bg-main)", padding: "80px 24px" }}>
         <div style={{ maxWidth: "900px", margin: "0 auto" }}>
           <h2
             style={{
               textAlign: "center",
               fontFamily: "'Playfair Display', serif",
-              color: "var(--violet-deep)",
+              color: "var(--text-title)",
               fontSize: "clamp(22px, 3vw, 36px)",
               marginBottom: "48px",
             }}
           >
-            Elles ont adoré
+            Ce que disent les premières mamans
           </h2>
 
-          <div className="avis-grid-page">
+          <div className="grid-3">
             {avis.map((a, i) => (
               <div
                 key={i}
                 style={{
-                  background: "var(--lila-med)",
-                  border: "1px solid var(--lila-dark)",
+                  background: "var(--bg-card)",
+                  border: "1px solid var(--rose-light)",
                   borderRadius: "20px",
                   padding: "28px 24px",
                 }}
               >
-                <div style={{ color: "var(--violet)", fontSize: "18px", marginBottom: "12px" }} aria-hidden>
+                <div style={{ color: "var(--rose)", fontSize: "18px", marginBottom: "12px" }} aria-hidden>
                   ★★★★★
                 </div>
-                <p style={{ fontStyle: "italic", fontSize: "14px", color: "var(--violet)", lineHeight: 1.7, marginBottom: "16px" }}>
+                <p
+                  style={{
+                    fontStyle: "italic",
+                    fontSize: "14px",
+                    color: "var(--text-body)",
+                    lineHeight: 1.7,
+                    marginBottom: "16px",
+                  }}
+                >
                   &ldquo;{a.texte}&rdquo;
                 </p>
-                <p style={{ fontWeight: 700, fontSize: "13px", color: "var(--violet-deep)" }}>{a.nom}</p>
-                {a.ville ? <p style={{ fontSize: "12px", color: "var(--violet-soft)" }}>{a.ville}</p> : null}
+                <p style={{ fontWeight: 700, fontSize: "13px", color: "var(--text-title)" }}>{a.nom}</p>
+                {a.ville ? <p style={{ fontSize: "12px", color: "var(--text-soft)" }}>{a.ville}</p> : null}
               </div>
             ))}
           </div>
@@ -776,7 +755,8 @@ export default function Home() {
       {/* Footer */}
       <footer
         style={{
-          background: "var(--violet-deep)",
+          background: "var(--bg-section)",
+          borderTop: "1px solid var(--rose-light)",
           padding: "40px 24px",
           textAlign: "center",
         }}
@@ -786,7 +766,7 @@ export default function Home() {
           alt="Qissali"
           width={160}
           height={80}
-          style={{ height: "60px", width: "auto", marginBottom: "20px", opacity: 0.9 }}
+          style={{ height: "60px", width: "auto", marginBottom: "20px" }}
         />
         <div
           style={{
@@ -809,7 +789,7 @@ export default function Home() {
               key={href}
               href={href}
               style={{
-                color: "rgba(240,234,248,0.6)",
+                color: "var(--text-soft)",
                 fontSize: "13px",
                 textDecoration: "none",
               }}
@@ -818,7 +798,7 @@ export default function Home() {
             </Link>
           ))}
         </div>
-        <p style={{ color: "rgba(240,234,248,0.35)", fontSize: "12px" }}>
+        <p style={{ color: "var(--text-soft)", fontSize: "12px" }}>
           © 2025 Qissali · qissali.fr · Fait avec ❤️ pour nos enfants
         </p>
       </footer>

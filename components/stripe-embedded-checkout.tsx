@@ -64,7 +64,7 @@ export function StripeEmbeddedCheckout({ clientSecret, onError }: Props) {
       )}
       <div
         ref={hostRef}
-        className="min-h-[480px] w-full rounded-xl border border-slate-200/80 bg-white"
+        className="min-h-[480px] w-full rounded-xl border border-qissali-rose-light bg-white"
       />
     </div>
   );

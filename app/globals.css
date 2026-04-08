@@ -5,37 +5,52 @@
 @tailwind utilities;
 
 :root {
-  --lila: #f0eaf8;
-  --lila-med: #e0d0f0;
-  --lila-dark: #d0b8e8;
-  --violet: #6b3fa0;
-  --violet-deep: #4a2070;
-  --violet-soft: #9b6fd0;
-  --white: #ffffff;
+  /* Fonds */
+  --bg-main: #fef6ff;
+  --bg-card: #ffffff;
+  --bg-section: #fdf0f7;
 
-  /* Compatibilité (Modal, autres pages) */
-  --bg-cream: var(--lila);
-  --cream: var(--lila);
-  --text-mid: var(--violet);
-  --text-dark: var(--violet-deep);
-  --text-soft: var(--violet-soft);
-  --text-white: var(--white);
-  --text: var(--violet);
-  --mauve: var(--violet-soft);
-  --mauve-deep: var(--violet);
-  --mauve-light: var(--lila-med);
+  /* Couleurs */
   --rose: #e8a0c0;
-  --rose-light: var(--lila-med);
-  --rose-pale: var(--lila);
-  --rose-deep: var(--violet-deep);
+  --rose-light: #f5d0e4;
+  --rose-pale: #fde8f4;
+  --mauve: #c49ad8;
+  --mauve-mid: #9b6fb8;
+
+  /* Textes */
+  --text-title: #4a2e5a;
+  --text-body: #7a5a8a;
+  --text-soft: #b8a0c8;
+
+  /* Bouton */
+  --btn-bg: linear-gradient(135deg, #e8a0c0, #c49ad8);
+  --btn-text: #ffffff;
+
+  /* Compatibilité (Modal, autres pages, Tailwind) */
+  --lila: var(--bg-main);
+  --lila-med: var(--bg-section);
+  --lila-dark: var(--rose-light);
+  --violet: #9b6fb8;
+  --violet-deep: var(--text-title);
+  --violet-soft: var(--mauve-mid);
+  --white: #ffffff;
+  --bg-cream: var(--bg-main);
+  --cream: var(--bg-main);
+  --text-mid: var(--text-body);
+  --text-dark: var(--text-title);
+  --text-white: #ffffff;
+  --text: var(--text-body);
+  --mauve-deep: var(--text-title);
+  --mauve-light: var(--rose-light);
+  --rose-deep: #d4729e;
   --or: #e8c870;
   --or-deep: #c8a040;
   --bleu: #a0c4e8;
-  --text-light: var(--violet-soft);
-  --dark: var(--violet-deep);
-  --dark-2: var(--violet-deep);
-  --bg-dark: var(--violet-deep);
-  --bg-darkmed: var(--violet-deep);
+  --text-light: var(--text-soft);
+  --dark: var(--text-title);
+  --dark-2: var(--text-title);
+  --bg-dark: var(--bg-section);
+  --bg-darkmed: var(--bg-section);
 }
 
 html {
@@ -43,8 +58,8 @@ html {
 }
 
 body {
-  background-color: var(--lila);
-  color: var(--violet);
+  background-color: var(--bg-main);
+  color: var(--text-body);
   font-family: "Nunito", var(--font-nunito), sans-serif;
   font-size: 16px;
   overflow-x: hidden;
@@ -54,17 +69,16 @@ h1,
 h2,
 h3 {
   font-family: "Playfair Display", var(--font-playfair), serif;
-  color: var(--violet-deep);
+  color: var(--text-title);
 }
 
 .script {
   font-family: "Dancing Script", var(--font-dancing), cursive;
 }
 
-/* Bouton principal */
 .btn-primary {
-  background: var(--violet);
-  color: var(--lila);
+  background: linear-gradient(135deg, #e8a0c0, #c49ad8);
+  color: white;
   border: none;
   border-radius: 50px;
   padding: 14px 36px;
@@ -72,71 +86,56 @@ h3 {
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;
+  box-shadow: 0 4px 20px rgba(196, 154, 216, 0.35);
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(107, 63, 160, 0.25);
 }
 
 .btn-primary:hover {
-  background: var(--violet-deep);
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(107, 63, 160, 0.35);
+  box-shadow: 0 8px 28px rgba(196, 154, 216, 0.45);
 }
 
 .btn-primary:focus-visible {
-  outline: 2px solid var(--lila-dark);
+  outline: 2px solid var(--mauve);
   outline-offset: 3px;
 }
 
-/* Bouton secondaire */
 .btn-secondary {
   background: transparent;
-  color: var(--violet);
-  border: 2px solid var(--violet);
+  color: var(--text-title);
+  border: 2px solid var(--mauve);
   border-radius: 50px;
   padding: 12px 28px;
   font-family: "Nunito", var(--font-nunito), sans-serif;
   font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 15px;
 }
 
 .btn-secondary:hover {
-  background: var(--lila-med);
+  background: var(--rose-pale);
 }
 
 .btn-secondary:focus-visible {
-  outline: 2px solid var(--violet-deep);
+  outline: 2px solid var(--mauve-mid);
   outline-offset: 3px;
 }
 
-/* Grilles page d'accueil */
-.story-two-col {
+.storytelling-grid {
   display: grid;
   grid-template-columns: 42% 58%;
   width: 100%;
 }
 
-.univers-grid-page {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-}
-
-.packs-grid-page {
+.grid-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   align-items: stretch;
 }
 
-.neuro-grid-page {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-}
-
-.avis-grid-page {
+.grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
@@ -148,38 +147,6 @@ h3 {
   justify-content: center;
   gap: 16px;
   flex-wrap: wrap;
-}
-
-@media (max-width: 768px) {
-  .story-two-col {
-    grid-template-columns: 1fr !important;
-  }
-
-  .neuro-grid-page {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .avis-grid-page {
-    grid-template-columns: 1fr;
-  }
-
-  .packs-grid-page {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .steps-flex-home {
-    flex-direction: column;
-  }
-}
-
-@media (max-width: 640px) {
-  .univers-grid-page {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-
-  .packs-grid-page {
-    grid-template-columns: 1fr;
-  }
 }
 
 @keyframes modal-fade-up {
@@ -245,3 +212,23 @@ h3 {
 .hero-delay-6 {
   animation-delay: 0.64s;
 }
+
+@media (max-width: 768px) {
+  .storytelling-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .steps-flex-home {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+}
+
