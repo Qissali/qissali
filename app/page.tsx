@@ -282,24 +282,27 @@ export default function Home() {
 
           <div style={{ fontSize: "15px", color: "var(--text-body)", lineHeight: 1.9, marginBottom: "32px" }}>
             <p style={{ marginBottom: "16px" }}>
-              <strong style={{ color: "var(--text-title)" }}>Un soir, ma fille m&apos;a demandé une histoire.</strong> Pas
-              n&apos;importe laquelle. Une histoire avec elle dedans. Avec son prénom, ses héros, son univers à elle.
+              Un soir, l&apos;une de mes deux filles m&apos;a demandé une histoire. Pas n&apos;importe laquelle. Une
+              histoire avec elle dedans, avec son prénom, ses héros, son univers à elle.
             </p>
             <p style={{ marginBottom: "16px" }}>
-              J&apos;ai cherché. Longtemps. Des livres trop difficiles, trop lointains, trop génériques. Rien qui lui
-              ressemble vraiment. Rien qui parle d&apos;elle tout en parlant de notre foi.
+              J&apos;ai cherché partout. Des livres trop compliqués, trop lointains, trop generiques. Rien qui lui
+              ressemble. Rien qui parle d&apos;elle tout en parlant de notre foi.
             </p>
             <p style={{ marginBottom: "16px" }}>
-              Je voulais lui transmettre l&apos;islam comme je l&apos;ai reçu, moi — dans des histoires. Pas des leçons.
-              Pas des obligations. Des récits qui restent toute une vie, ceux qu&apos;on raconte à ses propres enfants des
-              décennies plus tard.
+              Moi je voulais lui transmettre l&apos;islam comme je l&apos;ai reçu. Dans des histoires. Pas des leçons, pas
+              des récitations imposées. Des récits qui restent, ceux qu&apos;on raconte encore à ses propres enfants des
+              années plus tard.
             </p>
-            <p>
-              Alors j&apos;ai créé Qissali.
-              <strong style={{ color: "var(--text-title)" }}>
-                {" "}
-                Pour mes filles. Et pour toutes les vôtres.
-              </strong>
+            <p style={{ marginBottom: "16px" }}>
+              Avec Qissali l&apos;histoire arrive en quelques minutes dans votre boîte mail. Et si vous avez envie de
+              changer un personnage, d&apos;inventer une suite ou de laisser voguer votre imagination, l&apos;histoire est
+              là pour ça aussi.
+            </p>
+            <p style={{ marginBottom: 0 }}>
+              C&apos;est comme ça qu&apos;est né Qissali.
+              <br />
+              Pour mes filles. Et pour tous les vôtres.
             </p>
           </div>
 
