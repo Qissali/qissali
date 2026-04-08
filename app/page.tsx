@@ -177,12 +177,12 @@ export default function Home() {
         <div style={{ position: "relative", zIndex: 1 }}>
           <Image
             src="/logo-qissali.png"
-            alt="Qissali"
-            width={420}
-            height={210}
+            alt="Qissali — Mon histoire personnalisée"
+            width={612}
+            height={408}
             priority
             style={{
-              height: "clamp(120px, 18vw, 180px)",
+              height: "clamp(180px, 28vw, 320px)",
               width: "auto",
               marginBottom: "32px",
             }}
@@ -767,7 +767,7 @@ export default function Home() {
         <Image
           src="/logo-qissali.png"
           alt="Qissali"
-          width={160}
+          width={120}
           height={80}
           style={{ height: "60px", width: "auto", marginBottom: "20px" }}
         />

@@ -461,7 +461,7 @@ function OrderModalDialog({ open, onClose }) {
               <Image
                 src="/logo-qissali.png"
                 alt="Qissali"
-                width={240}
+                width={90}
                 height={60}
                 className="h-[60px] w-auto object-contain"
               />

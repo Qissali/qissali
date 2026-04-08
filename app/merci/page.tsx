@@ -32,9 +32,9 @@ function MerciShell({
       <Image
         src="/logo-qissali.png"
         alt="Qissali"
-        width={200}
-        height={100}
-        className="mb-4 h-auto w-[min(200px,55vw)]"
+        width={240}
+        height={160}
+        className="mb-4 h-auto w-[min(240px,55vw)]"
       />
       <h1 className="mt-4 font-display text-2xl text-qissali-title md:text-3xl">{title}</h1>
       <div className="mt-6 text-lg leading-relaxed text-qissali-body">{children}</div>
@@ -134,9 +134,9 @@ export default async function MerciPage({ searchParams }: Props) {
       <Image
         src="/logo-qissali.png"
         alt="Qissali"
-        width={200}
-        height={100}
-        className="mb-4 h-auto w-[min(200px,55vw)]"
+        width={240}
+        height={160}
+        className="mb-4 h-auto w-[min(240px,55vw)]"
       />
       <p className="text-7xl md:text-8xl" aria-hidden>
         🌙

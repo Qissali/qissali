@@ -20,8 +20,8 @@ export default function CommanderPage() {
           <Image
             src="/logo-qissali.png"
             alt="Qissali — Retour à l’accueil"
-            width={220}
-            height={110}
+            width={240}
+            height={160}
             className="h-auto w-[min(220px,70vw)]"
           />
         </Link>
