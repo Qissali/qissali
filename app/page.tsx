@@ -258,18 +258,6 @@ export default function Home() {
             Notre histoire
           </p>
 
-          <h2
-            style={{
-              fontFamily: "'Playfair Display', serif",
-              fontSize: "clamp(22px, 3vw, 32px)",
-              color: "var(--text-title)",
-              lineHeight: 1.3,
-              marginBottom: "16px",
-            }}
-          >
-            Qissali, c&apos;est <em style={{ color: "var(--rose)" }}>mon histoire</em> en arabe
-          </h2>
-
           <p style={{ fontSize: "15px", color: "var(--text-body)", lineHeight: 1.8, marginBottom: "32px" }}>
             Qissali est inspiré de l&apos;arabe{" "}
             <span dir="rtl" lang="ar" className="inline-block">
