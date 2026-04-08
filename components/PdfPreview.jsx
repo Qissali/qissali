@@ -5,8 +5,11 @@ export function PdfPreview() {
     <section className="bg-[var(--white)]">
       <div className="mx-auto max-w-[1100px] px-8 py-[90px]">
         <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-2">
-          <div className="pdf-stack">
-            <div className="pdf-card pdf-card-back-rose">
+          <div className="relative mx-auto h-[280px] w-[200px] sm:h-[320px] sm:w-[230px] lg:h-[360px] lg:w-[260px]">
+            <div
+              className="absolute h-full w-full overflow-hidden rounded-[12px] bg-[#fef1f7] shadow-[0_8px_32px_rgba(42,26,46,0.15)]"
+              style={{ transform: "rotate(-3deg) translateY(8px)", zIndex: 1 }}
+            >
               <div className="p-4">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--mauve-deep)]/70">
                   Débat
@@ -19,7 +22,10 @@ export function PdfPreview() {
               </div>
             </div>
 
-            <div className="pdf-card pdf-card-middle-white">
+            <div
+              className="absolute h-full w-full overflow-hidden rounded-[12px] bg-white shadow-[0_8px_32px_rgba(42,26,46,0.15)]"
+              style={{ transform: "rotate(1deg) translateY(4px)", zIndex: 2 }}
+            >
               <div className="p-4">
                 <p className="text-[11px] font-semibold text-[var(--text-mid)]">Qissali</p>
                 <div className="mt-3 space-y-2.5">
@@ -32,7 +38,10 @@ export function PdfPreview() {
               </div>
             </div>
 
-            <div className="pdf-card pdf-card-front-dark text-white">
+            <div
+              className="absolute h-full w-full overflow-hidden rounded-[12px] bg-[#2a1a2e] text-white shadow-[0_8px_32px_rgba(42,26,46,0.15)]"
+              style={{ transform: "rotate(0deg)", zIndex: 3 }}
+            >
               <div className="flex h-full flex-col p-5">
                 <p className="text-xs font-semibold tracking-[0.18em] text-white/75">QISSALI</p>
                 <div className="mt-5 flex flex-1 flex-col items-center justify-center text-center">
@@ -68,50 +77,6 @@ export function PdfPreview() {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .pdf-stack {
-          position: relative;
-          width: 200px;
-          height: 280px;
-          margin: 0 auto;
-        }
-        .pdf-card {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          border-radius: 12px;
-          box-shadow: 0 8px 32px rgba(42, 26, 46, 0.15);
-          overflow: hidden;
-        }
-        .pdf-card-back-rose {
-          transform: rotate(-3deg) translateY(8px);
-          z-index: 1;
-          background: #fef1f7;
-        }
-        .pdf-card-middle-white {
-          transform: rotate(1deg) translateY(4px);
-          z-index: 2;
-          background: white;
-        }
-        .pdf-card-front-dark {
-          transform: rotate(0deg);
-          z-index: 3;
-          background: #2a1a2e;
-        }
-        @media (min-width: 640px) {
-          .pdf-stack {
-            width: 230px;
-            height: 320px;
-          }
-        }
-        @media (min-width: 1024px) {
-          .pdf-stack {
-            width: 260px;
-            height: 360px;
-          }
-        }
-      `}</style>
     </section>
   );
 }

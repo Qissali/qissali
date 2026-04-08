@@ -55,6 +55,11 @@ export async function POST(request: Request) {
     const profils = metadata.profils || "";
     const precisionsNeuro = metadata.precisionsNeuro || "";
     const profilPrincipal = profils.split(",")[0]?.trim() || "";
+    const nbEnfantsMeta = parseInt(
+      metadata.nbEnfants || (metadata.prenom2?.trim() ? "2" : "1"),
+      10
+    );
+    const nbEnfantsValue: 1 | 2 = nbEnfantsMeta === 2 ? 2 : 1;
     let histoire: any = null;
 
     if (session.payment_status !== "paid") {
@@ -112,7 +117,7 @@ export async function POST(request: Request) {
             metadata.univers,
             metadata.valeur,
             metadata.occasion,
-            parseInt(metadata.nbEnfants || (metadata.prenom2?.trim() ? "2" : "1"), 10) || 1,
+            nbEnfantsValue,
             metadata.prenom1,
             metadata.prenom2 || "",
             profils,
@@ -125,7 +130,7 @@ export async function POST(request: Request) {
         metadata.univers,
         metadata.valeur,
         metadata.occasion,
-        parseInt(metadata.nbEnfants || (metadata.prenom2?.trim() ? "2" : "1"), 10) || 1,
+        nbEnfantsValue,
         metadata.prenom1,
         metadata.prenom2 || "",
         profils,

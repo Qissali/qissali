@@ -9,9 +9,7 @@ const NB_ENFANTS_OPTIONS = [1, 2];
 const PROFIL_OPTIONS = ["dys", "tdah", "tsa", "hpi"];
 
 export default function TestNeuro() {
-  if (process.env.NODE_ENV !== "development") {
-    return <div>Non disponible en production</div>;
-  }
+  const isDev = process.env.NODE_ENV === "development";
 
   const [form, setForm] = useState({
     univers: "princesse",
@@ -27,6 +25,10 @@ export default function TestNeuro() {
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(0);
   const [error, setError] = useState("");
+
+  if (!isDev) {
+    return <div>Non disponible en production</div>;
+  }
 
   const updateField = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
