@@ -1,112 +1,68 @@
 import { CommanderModalTrigger } from "@/components/Modal";
+import DecoBackground from "@/components/DecoBackground";
 import Image from "next/image";
 import Link from "next/link";
+import { Fragment } from "react";
 
-const howToSteps = [
-  { step: 1, title: "Tu remplis le formulaire" },
-  { step: 2, title: "On crée l'histoire" },
-  { step: 3, title: "Tu reçois ton PDF" },
+const commentSteps = [
+  {
+    num: "01",
+    titre: "Tu remplis le formulaire",
+    texte: "Prénom, univers, valeur, occasion. 2 minutes.",
+  },
+  {
+    num: "02",
+    titre: "On crée l'histoire",
+    texte: "Une histoire unique avec un hadith intégré naturellement.",
+  },
+  {
+    num: "03",
+    titre: "Tu reçois ton PDF",
+    texte: "Un beau livre à lire, imprimer, offrir. En moins de 5 min.",
+  },
 ] as const;
 
-const universeCards = [
+const universItems = [
   {
-    id: "princesse",
     emoji: "👑",
-    title: "Princesse",
-    gradient: "linear-gradient(160deg, #FFF0F7 0%, #FFE0EF 100%)",
-    hoverBorder: "hover:border-[#E8A0C0]",
+    titre: "Princesse",
+    texte: "Royaumes enchantés, robes étoilées et leçons de cœur.",
+    bg: "linear-gradient(135deg, #FDE8F4, #F5D0E4)",
   },
   {
-    id: "licorne",
     emoji: "🦄",
-    title: "Licorne & Magie",
-    gradient: "linear-gradient(160deg, #F5F0FF 0%, #EDE0FF 100%)",
-    hoverBorder: "hover:border-[var(--mauve)]",
+    titre: "Licorne & Magie",
+    texte: "Crins arc-en-ciel, magie douce et merveilles.",
+    bg: "linear-gradient(135deg, #E8D8F5, #D4B8E8)",
   },
   {
-    id: "super-heros",
     emoji: "🦸",
-    title: "Super-Héros",
-    gradient: "linear-gradient(160deg, #F0F4FF 0%, #E0ECFF 100%)",
-    hoverBorder: "hover:border-[var(--bleu)]",
+    titre: "Super-Héros",
+    texte: "Cape, courage et la vraie force des grands cœurs.",
+    bg: "linear-gradient(135deg, #D8E8F5, #B8D4E8)",
   },
   {
-    id: "animaux",
     emoji: "🐾",
-    title: "Animaux Parlants",
-    gradient: "linear-gradient(160deg, #F0FFF5 0%, #E0FFEC 100%)",
-    hoverBorder: "hover:border-[#90E0A0]",
+    titre: "Animaux Parlants",
+    texte: "Renards sages, lapins curieux, secrets de forêt.",
+    bg: "linear-gradient(135deg, #D8F5E8, #B8E8D4)",
   },
 ] as const;
 
-const packOffers = [
-  {
-    pack: "solo",
-    icon: "📖",
-    title: "Solo",
-    price: "3,90€",
-    subPrice: "1 histoire",
-    badge: null as string | null,
-    bullets: [
-      "1 histoire personnalisée",
-      "1 enfant ou fratrie",
-      "PDF illustré 6 pages",
-      "Livré par email",
-    ],
-    featured: false,
-  },
-  {
-    pack: "duo",
-    icon: "📚",
-    title: "Duo",
-    price: "6,90€",
-    subPrice: "2 histoires · 3,45€ chacune",
-    badge: "-11%",
-    bullets: [
-      "2 histoires personnalisées",
-      "Prénoms différents possibles",
-      "2 PDFs illustrés 6 pages",
-      "Livrés ensemble par email",
-    ],
-    featured: false,
-  },
-  {
-    pack: "trio",
-    icon: "🌟",
-    title: "Trio",
-    price: "8,90€",
-    subPrice: "3 histoires · 2,97€ chacune",
-    badge: "Le plus choisi ✦",
-    bullets: [
-      "3 histoires personnalisées",
-      "Prénoms différents possibles",
-      "3 PDFs illustrés 6 pages",
-      "Livrés ensemble par email",
-    ],
-    featured: true,
-  },
-  {
-    pack: "famille",
-    icon: "👨‍👩‍👧‍👦",
-    title: "Famille",
-    price: "12,90€",
-    subPrice: "5 histoires · 2,58€ chacune",
-    badge: "-34%",
-    bullets: [
-      "5 histoires personnalisées",
-      "Prénoms différents possibles",
-      "5 PDFs illustrés 6 pages",
-      "Livrés ensemble par email",
-    ],
-    featured: false,
-  },
+const pdfOfferBullets = [
+  "Histoire complète personnalisée",
+  "Prénom partout dans le texte",
+  "Hadith intégré naturellement",
+  "PDF illustré 6 pages",
+  "Livraison email en moins de 5 min",
 ] as const;
 
-const packPriceTable = [
-  { pack: "Solo", stories: "1", total: "3,90€", unit: "3,90€" },
-  { pack: "Duo", stories: "2", total: "6,90€", unit: "3,45€" },
-  { pack: "Trio", stories: "3", total: "8,90€", unit: "2,97€" },
-  { pack: "Famille", stories: "5", total: "12,90€", unit: "2,58€" },
+const audioOfferBullets = [
+  "Tout le contenu PDF inclus",
+  "Histoire audio ~10 min",
+  "Voix douce et naturelle",
+  "Format MP3",
+  "Parfait pour le soir",
 ] as const;
 
 const testimonials = [
@@ -136,303 +92,611 @@ const testimonials = [
 export default function Home() {
   return (
     <main className="min-h-screen">
-      {/* Header — CTA (ex-bas de page), logo à la place du texte arabe */}
+      {/* Hero */}
       <section
-        className="relative overflow-hidden px-8 pb-20 pt-16 text-center sm:pb-24 sm:pt-20"
         style={{
-          background: "linear-gradient(135deg, var(--rose-deep), var(--mauve-deep))",
+          position: "relative",
+          background: "var(--gradient-hero)",
+          minHeight: "90vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "80px 24px",
+          overflow: "hidden",
         }}
       >
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.45]"
-          aria-hidden
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at center, rgba(255,255,255,0.22) 1px, transparent 1px)",
-            backgroundSize: "22px 22px",
-          }}
-        />
-        <div className="relative z-10 mx-auto max-w-3xl">
-          <h1 className="sr-only">Qissali — Histoires islamiques personnalisées</h1>
+        <DecoBackground variant="hero" />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <h1 className="sr-only" style={{ color: "#fff" }}>
+            Qissali — Histoires islamiques personnalisées
+          </h1>
           <Image
             src="/logo-qissali.png"
             alt="Qissali"
             width={400}
             height={200}
             priority
-            className="mx-auto h-[100px] w-auto max-w-[min(400px,88vw)] object-contain drop-shadow-md sm:h-[120px] lg:h-[140px]"
+            style={{
+              height: "160px",
+              width: "auto",
+              maxWidth: "min(400px, 92vw)",
+              marginBottom: "24px",
+              objectFit: "contain",
+            }}
           />
-          <h2 className="mt-8 font-display text-[28px] font-normal leading-tight text-white sm:text-[36px] lg:text-[44px]">
-            Offre-lui une histoire{" "}
-            <span className="italic text-[var(--or)]">qu&apos;il n&apos;oubliera jamais</span>
-          </h2>
-          <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-[rgba(255,255,255,0.75)]">
-            Son prénom. Son univers. Ses valeurs. Une histoire rien que pour lui, livrée par email en
-            moins de 5 minutes.
+          <p
+            style={{
+              fontFamily: "'Nunito', sans-serif",
+              fontSize: "clamp(16px, 2.5vw, 20px)",
+              color: "rgba(255,255,255,0.85)",
+              maxWidth: "540px",
+              margin: "0 auto 16px",
+              lineHeight: 1.7,
+            }}
+          >
+            Une histoire avec son prénom, son univers, les valeurs de l&apos;islam — transmises avec
+            douceur.
           </p>
           <CommanderModalTrigger
-            className="mt-10 inline-flex items-center justify-center rounded-[50px] bg-white px-12 py-4 text-base font-extrabold text-[var(--rose-deep)] transition hover:-translate-y-1 hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-0 active:scale-100 sm:px-14 sm:py-5 sm:text-[17px]"
-            style={{ boxShadow: "0 8px 28px rgba(0,0,0,0.2)" }}
+            className="btn-primary"
+            style={{ fontSize: "17px", padding: "16px 40px", marginTop: "8px" }}
           >
-            Créer l&apos;histoire de mon enfant
+            ✨ Créer l&apos;histoire de mon enfant
           </CommanderModalTrigger>
-          <p className="mt-6 text-sm leading-relaxed text-[rgba(255,255,255,0.5)]">
-            PDF livré par email · à partir de 3,90€ · Cadeau parfait pour l&apos;Aïd, un anniversaire
-            ou juste comme ça
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "13px", marginTop: "16px" }}>
+            Livré par email · à partir de 3,90€
           </p>
+          <div
+            style={{
+              marginTop: "48px",
+              color: "rgba(255,255,255,0.3)",
+              fontSize: "12px",
+              letterSpacing: "2px",
+              textTransform: "uppercase",
+            }}
+          >
+            ↓ Découvrir
+          </div>
         </div>
       </section>
 
-      {/* Notre histoire — fond violet + récit (paysage) */}
+      {/* Storytelling paysage */}
       <section
-        className="storytelling-section border-b border-[rgba(196,154,216,0.35)]"
+        className="storytelling-grid border-b border-[rgba(196,154,216,0.35)]"
         aria-labelledby="notre-histoire-titre"
       >
-        <div className="storytelling-left">
-          <div>
-            <p className="storytelling-label">Notre histoire</p>
-            <h2 id="notre-histoire-titre" className="storytelling-title">
-              Qissali, c&apos;est mon histoire en arabe
+        <div
+          style={{
+            background: "linear-gradient(160deg, #2A1A3E 0%, #4A2A70 100%)",
+            padding: "64px 48px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <DecoBackground variant="dark" />
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <p
+              style={{
+                fontSize: "11px",
+                letterSpacing: "3px",
+                textTransform: "uppercase",
+                color: "var(--mauve)",
+                marginBottom: "20px",
+              }}
+            >
+              Notre histoire
+            </p>
+            <h2
+              id="notre-histoire-titre"
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontSize: "clamp(22px, 3vw, 32px)",
+                color: "#ffffff",
+                lineHeight: 1.3,
+                marginBottom: "20px",
+              }}
+            >
+              Qissali, c&apos;est
+              <em style={{ color: "var(--rose-light)" }}> mon histoire </em>
+              en arabe
             </h2>
-            <p className="storytelling-subtitle">
+            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.7)", lineHeight: 1.8 }}>
               Qissali vient de l&apos;arabe{" "}
               <span dir="rtl" lang="ar" className="inline-block">
                 قصتي
               </span>{" "}
-              — qui signifie tout simplement mon histoire. Parce que chaque enfant mérite une histoire
+              — qui signifie simplement &quot;mon histoire&quot;. Parce que chaque enfant mérite une histoire
               rien que pour lui.
             </p>
           </div>
-          <blockquote className="storytelling-quote">
-            <p>
+          <div
+            style={{
+              position: "relative",
+              zIndex: 1,
+              borderLeft: "2px solid var(--mauve)",
+              paddingLeft: "20px",
+              marginTop: "auto",
+            }}
+          >
+            <p
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: "italic",
+                color: "var(--rose-light)",
+                fontSize: "15px",
+                lineHeight: 1.6,
+                marginBottom: "8px",
+              }}
+            >
               &ldquo;Le plus grand trésor d&apos;une princesse, ma chérie, ce n&apos;est pas sa couronne.
               C&apos;est son cœur.&rdquo;
             </p>
-            <cite className="storytelling-quote-source">Extrait d&apos;une histoire Qissali</cite>
-          </blockquote>
-        </div>
-        <div className="storytelling-right">
-          <div className="storytelling-text">
-            <p>
-              Un soir, ma fille m&apos;a demandé une histoire. Pas n&apos;importe laquelle. Une histoire
-              avec elle dedans. Avec son prénom, son univers, ses héros préférés.
-            </p>
-            <p>
-              J&apos;ai cherché. Longtemps. Des livres en arabe trop difficiles pour elle. Des histoires
-              islamiques en anglais qu&apos;elle ne comprenait pas. Du contenu générique, sans âme, sans
-              personnalisation, sans cette petite étincelle qui fait qu&apos;un enfant écoute avec les
-              yeux grands ouverts.
-            </p>
-            <p>
-              Et pourtant, j&apos;avais tellement envie de lui transmettre notre foi d&apos;une façon qui
-              lui ressemble. Pas des leçons. Pas des récitations. Des histoires. Celles qui restent,
-              celles qu&apos;on raconte à ses propres enfants des années plus tard.
-            </p>
-            <p>
-              Alors j&apos;ai créé Qissali. Pour que mes filles entendent une histoire où elles sont les
-              héroïnes. Où leur prénom résonne à chaque page. Où la générosité, le courage, la confiance
-              en Allah arrivent naturellement, dans la bouche d&apos;un personnage qu&apos;elles aiment,
-              au moment où ça compte vraiment.
+            <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", letterSpacing: "1px" }}>
+              Extrait d&apos;une histoire Qissali
             </p>
           </div>
-          <p className="storytelling-tags">
-            Conçu pour transmettre · Unique pour chaque enfant · Un moment partagé
-          </p>
+        </div>
+
+        <div
+          style={{
+            background: "var(--bg-cream)",
+            padding: "64px 56px",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <DecoBackground variant="light" />
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <div
+              style={{
+                fontSize: "15px",
+                color: "var(--text-mid)",
+                lineHeight: 1.9,
+                fontFamily: "'Nunito', sans-serif",
+              }}
+            >
+              <p style={{ marginBottom: "20px" }}>
+                <strong style={{ color: "var(--text-dark)" }}>Un soir, ma fille m&apos;a demandé une histoire.</strong>{" "}
+                Pas n&apos;importe laquelle. Une histoire avec elle dedans. Avec son prénom, ses héros, son univers à
+                elle.
+              </p>
+              <p style={{ marginBottom: "20px" }}>
+                J&apos;ai cherché. Longtemps. Des livres trop difficiles, trop lointains, trop génériques. Rien qui lui
+                ressemble vraiment. Rien qui parle d&apos;elle tout en parlant de notre foi.
+              </p>
+              <p style={{ marginBottom: "20px" }}>
+                Je voulais lui transmettre l&apos;islam comme je l&apos;ai reçu, moi — dans des histoires. Pas des
+                leçons. Pas des obligations. Des récits qui restent toute une vie. Ceux qu&apos;on raconte à ses propres
+                enfants des décennies plus tard.
+              </p>
+              <p style={{ marginBottom: "32px" }}>
+                Alors j&apos;ai créé Qissali. Pour mes filles. Et pour toutes les vôtres.
+              </p>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "0",
+                borderTop: "1px solid var(--rose-light)",
+                paddingTop: "24px",
+                flexWrap: "wrap",
+              }}
+            >
+              {[
+                { label: "Conçue pour transmettre", sub: "Hadith au bon moment" },
+                { label: "Unique pour chaque enfant", sub: "Son prénom partout" },
+                { label: "Un moment à partager", sub: "Débat + défi semaine" },
+              ].map((item, i) => (
+                <div
+                  key={item.label}
+                  style={{
+                    flex: "1 1 160px",
+                    paddingRight: i < 2 ? "24px" : "0",
+                    borderRight: i < 2 ? "1px solid var(--rose-light)" : "none",
+                    paddingLeft: i > 0 ? "24px" : "0",
+                    marginBottom: "16px",
+                  }}
+                >
+                  <p style={{ fontWeight: 700, fontSize: "13px", color: "var(--text-dark)", marginBottom: "4px" }}>
+                    {item.label}
+                  </p>
+                  <p style={{ fontSize: "12px", color: "var(--text-soft)" }}>{item.sub}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Comment ça marche */}
-      <section id="decouvrir" className="bg-[var(--white)]">
-        <div className="mx-auto max-w-[1100px] px-8 py-[100px]">
-          <header className="text-center">
-            <h2 className="font-display text-[28px] font-normal leading-tight text-[var(--text)] sm:text-3xl md:text-4xl">
-              Comment ça marche
-            </h2>
-          </header>
-          <div className="mt-14 flex flex-col items-stretch gap-6 md:flex-row md:gap-6">
-            {howToSteps.map((item) => (
-              <article
-                key={item.step}
-                className="flex min-w-0 flex-1 flex-col items-center rounded-[24px] border border-[rgba(232,160,192,0.2)] bg-[var(--rose-pale)] px-6 py-9 text-center transition duration-300 hover:-translate-y-[6px] hover:shadow-lg hover:shadow-[#9B6EC8]/20"
-              >
-                <div
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] text-lg font-bold text-white shadow-sm"
-                  aria-hidden
-                >
-                  {item.step}
+      <section
+        id="decouvrir"
+        style={{
+          background: "var(--bg-darkmed)",
+          padding: "80px 24px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <DecoBackground variant="dark" />
+        <div style={{ position: "relative", zIndex: 1, maxWidth: "900px", margin: "0 auto" }}>
+          <p
+            style={{
+              textAlign: "center",
+              fontSize: "11px",
+              letterSpacing: "3px",
+              textTransform: "uppercase",
+              color: "var(--mauve)",
+              marginBottom: "12px",
+            }}
+          >
+            Comment ça marche
+          </p>
+          <h2
+            style={{
+              textAlign: "center",
+              color: "#ffffff",
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "clamp(24px, 3vw, 36px)",
+              marginBottom: "56px",
+            }}
+          >
+            Simple comme une histoire du soir
+          </h2>
+
+          <div className="steps-row">
+            {commentSteps.map((step, i) => (
+              <Fragment key={step.num}>
+                <div style={{ flex: "1 1 200px", textAlign: "center", maxWidth: "280px" }}>
+                  <div
+                    style={{
+                      width: "52px",
+                      height: "52px",
+                      borderRadius: "50%",
+                      background: "var(--gradient-cta)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      margin: "0 auto 16px",
+                      fontFamily: "'Playfair Display', serif",
+                      fontWeight: 700,
+                      fontSize: "18px",
+                      color: "white",
+                    }}
+                  >
+                    {step.num}
+                  </div>
+                  <h3
+                    style={{
+                      color: "#ffffff",
+                      fontSize: "16px",
+                      marginBottom: "8px",
+                      fontFamily: "'Nunito', sans-serif",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {step.titre}
+                  </h3>
+                  <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "14px", lineHeight: 1.6 }}>{step.texte}</p>
                 </div>
-                <h3 className="mt-5 text-lg font-bold text-[var(--text)]">{item.title}</h3>
-              </article>
+                {i < 2 ? <div className="steps-arrow hidden md:block">→</div> : null}
+              </Fragment>
             ))}
           </div>
         </div>
       </section>
 
       {/* Les univers */}
-      <section className="bg-gradient-to-b from-[var(--cream)] to-[var(--rose-pale)]">
-        <div className="mx-auto max-w-[1100px] px-8 py-[100px]">
-          <header className="text-center">
-            <h2 className="font-display text-[28px] font-normal leading-tight text-[var(--text)] sm:text-3xl md:text-4xl">
-              Les univers
-            </h2>
-          </header>
-          <ul className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-4">
-            {universeCards.map((card) => (
-              <li key={card.id} className="min-w-0">
-                <CommanderModalTrigger
-                  aria-label={`Commander une histoire — ${card.title}`}
-                  className={`flex h-full w-full flex-col items-center rounded-2xl border-2 border-transparent p-8 text-center shadow-sm transition duration-300 hover:-translate-y-2 hover:shadow-md hover:shadow-[#9B6EC8]/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-deep)] ${card.hoverBorder}`}
-                  style={{ background: card.gradient }}
+      <section
+        style={{
+          background: "var(--bg-cream)",
+          padding: "80px 24px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <DecoBackground variant="light" />
+        <div style={{ position: "relative", zIndex: 1, maxWidth: "1000px", margin: "0 auto" }}>
+          <p
+            style={{
+              textAlign: "center",
+              fontSize: "11px",
+              letterSpacing: "3px",
+              textTransform: "uppercase",
+              color: "var(--mauve)",
+              marginBottom: "12px",
+            }}
+          >
+            Les univers
+          </p>
+          <h2
+            style={{
+              textAlign: "center",
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "clamp(24px, 3vw, 36px)",
+              color: "var(--text-dark)",
+              marginBottom: "48px",
+            }}
+          >
+            Chaque enfant a son monde magique
+          </h2>
+
+          <div className="univers-grid">
+            {universItems.map((u) => (
+              <CommanderModalTrigger
+                key={u.titre}
+                aria-label={`Commander une histoire — ${u.titre}`}
+                className="rounded-[20px] border-2 border-transparent p-8 text-center shadow-sm transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_32px_rgba(196,154,216,0.2)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-deep)]"
+                style={{ background: u.bg, cursor: "pointer" }}
+              >
+                <div style={{ fontSize: "44px", marginBottom: "16px" }} aria-hidden>
+                  {u.emoji}
+                </div>
+                <h3
+                  style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: "17px",
+                    color: "var(--text-dark)",
+                    marginBottom: "10px",
+                  }}
                 >
-                  <span className="text-5xl sm:text-6xl" role="img" aria-hidden>
-                    {card.emoji}
-                  </span>
-                  <h3 className="mt-5 text-lg font-bold text-[var(--text)]">{card.title}</h3>
-                </CommanderModalTrigger>
-              </li>
+                  {u.titre}
+                </h3>
+                <p style={{ fontSize: "13px", color: "var(--text-mid)", lineHeight: 1.6 }}>{u.texte}</p>
+              </CommanderModalTrigger>
             ))}
-          </ul>
+          </div>
         </div>
       </section>
 
       {/* Neuroatypie */}
-      <section className="border-y border-[rgba(196,154,216,0.25)] bg-gradient-to-br from-[var(--mauve-light)]/35 via-[var(--rose-pale)] to-[var(--cream)]">
-        <div className="mx-auto max-w-[1100px] px-8 py-[72px]">
-          <div className="mx-auto max-w-[720px] text-center">
-            <p className="text-[13px] font-medium uppercase tracking-[4px] text-[var(--mauve)]">
-              Neuroatypie
-            </p>
-            <h2 className="mt-4 font-display text-[26px] font-normal leading-tight text-[var(--text)] sm:text-3xl md:text-[2rem]">
-              Une histoire qui peut suivre{" "}
-              <span className="italic text-[var(--rose-deep)]">ton enfant</span>, pas l&apos;inverse
-            </h2>
-            <p className="mt-5 text-[15px] leading-relaxed text-[var(--text-mid)]">
-              Chaque enfant apprend à son rythme. Si le tien est Dys, TDAH, autiste (TSA), à haut potentiel ou
-              a d&apos;autres besoins particuliers, tu peux le dire au moment de la commande : nous adaptons le
-              texte pour qu&apos;il reste lisible, rassurant et en lien avec l&apos;islam — sans étiqueter,
-              sans juger.
-            </p>
-            <Link
-              href="/commander"
-              className="mt-8 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[var(--rose-deep)] to-[var(--mauve-deep)] px-8 py-3.5 text-sm font-semibold text-white shadow-md shadow-[#9B6EC8]/35 transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-deep)]"
+      <section
+        className="border-y border-[rgba(196,154,216,0.25)]"
+        style={{
+          background: "linear-gradient(135deg, var(--mauve-light) 0%, var(--rose-pale) 50%, var(--bg-cream) 100%)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <DecoBackground variant="light" />
+        <div className="relative z-[1] mx-auto max-w-[720px] px-8 py-[72px] text-center">
+          <p className="text-[13px] font-medium uppercase tracking-[4px] text-[var(--mauve)]">Neuroatypie</p>
+          <h2 className="mt-4 font-display text-[26px] font-normal leading-tight text-[var(--text-dark)] sm:text-3xl md:text-[2rem]">
+            Une histoire qui peut suivre <span className="italic text-[var(--rose-deep)]">ton enfant</span>, pas
+            l&apos;inverse
+          </h2>
+          <p className="mt-5 text-[15px] leading-relaxed text-[var(--text-mid)]">
+            Chaque enfant apprend à son rythme. Si le tien est Dys, TDAH, autiste (TSA), à haut potentiel ou a
+            d&apos;autres besoins particuliers, tu peux le dire au moment de la commande : nous adaptons le texte pour
+            qu&apos;il reste lisible, rassurant et en lien avec l&apos;islam — sans étiqueter, sans juger.
+          </p>
+          <Link href="/commander" className="btn-primary mt-8 inline-flex no-underline">
+            Commander avec profil neuroatypique
+          </Link>
+        </div>
+      </section>
+
+      {/* Offres PDF + Audio bientôt */}
+      <section
+        style={{
+          background: "var(--bg-darkmed)",
+          padding: "80px 24px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <DecoBackground variant="dark" />
+        <div style={{ position: "relative", zIndex: 1, maxWidth: "800px", margin: "0 auto" }}>
+          <p
+            style={{
+              textAlign: "center",
+              fontSize: "11px",
+              letterSpacing: "3px",
+              textTransform: "uppercase",
+              color: "var(--mauve)",
+              marginBottom: "12px",
+            }}
+          >
+            Nos offres
+          </p>
+          <h2
+            style={{
+              textAlign: "center",
+              color: "white",
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "clamp(24px, 3vw, 36px)",
+              marginBottom: "12px",
+            }}
+          >
+            Simple et transparent
+          </h2>
+          <p style={{ textAlign: "center", color: "rgba(255,255,255,0.5)", fontSize: "14px", marginBottom: "48px" }}>
+            Pas d&apos;abonnement. Tu paies, tu reçois.
+          </p>
+
+          <div className="offres-row">
+            <div
+              style={{
+                flex: 1,
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(232,160,192,0.3)",
+                borderRadius: "24px",
+                padding: "40px 32px",
+                textAlign: "center",
+              }}
             >
-              Commander avec profil neuroatypique
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Packs */}
-      <section className="border-t border-[rgba(232,160,192,0.35)] bg-[var(--white)]">
-        <div className="mx-auto max-w-[1100px] px-8 py-[100px]">
-          <header className="text-center">
-            <h2 className="font-display text-[28px] font-normal leading-tight text-[var(--text)] sm:text-3xl md:text-4xl">
-              Choisissez votre pack
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-[var(--text-mid)]">
-              Plus vous commandez, plus vous économisez.
-            </p>
-          </header>
-
-          <ul className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 lg:gap-5">
-            {packOffers.map((p) => (
-              <li key={p.pack} className="flex min-w-0">
-                <article
-                  className={`flex h-full w-full flex-col rounded-[24px] bg-white p-7 ${
-                    p.featured
-                      ? "border-2 border-[var(--rose)] shadow-lg shadow-[#9B6EC8]/30 ring-1 ring-[rgba(232,160,192,0.35)]"
-                      : "border border-[rgba(232,160,192,0.45)] shadow-sm"
-                  }`}
-                >
-                  {p.badge ? (
-                    <div className="mb-3 flex min-h-[28px] justify-center">
-                      <span
-                        className={`rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide ${
-                          p.featured
-                            ? "bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] text-xs uppercase text-white shadow-md"
-                            : "bg-[var(--mauve-light)]/90 text-[var(--mauve-deep)]"
-                        }`}
-                      >
-                        {p.badge}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="mb-3 min-h-[28px]" aria-hidden />
-                  )}
-                  <span className="text-4xl" aria-hidden>
-                    {p.icon}
-                  </span>
-                  <h3 className="mt-3 text-xl font-bold text-[var(--text)]">{p.title}</h3>
-                  <p className="font-display mt-3 text-[40px] font-bold leading-none text-[var(--or)] sm:text-[44px]">
-                    {p.price}
+              <div style={{ fontSize: "36px", marginBottom: "16px" }} aria-hidden>
+                📖
+              </div>
+              <h3
+                style={{
+                  color: "white",
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: "22px",
+                  marginBottom: "8px",
+                }}
+              >
+                PDF Illustré
+              </h3>
+              <div
+                style={{
+                  fontSize: "44px",
+                  fontWeight: 800,
+                  color: "var(--rose)",
+                  fontFamily: "'Playfair Display', serif",
+                  marginBottom: "4px",
+                }}
+              >
+                3,90€
+              </div>
+              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px", marginBottom: "32px" }}>par histoire</p>
+              <div style={{ textAlign: "left", marginBottom: "32px" }}>
+                {pdfOfferBullets.map((item) => (
+                  <p
+                    key={item}
+                    style={{
+                      color: "rgba(255,255,255,0.7)",
+                      fontSize: "14px",
+                      marginBottom: "10px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                    }}
+                  >
+                    <span style={{ color: "var(--rose)" }} aria-hidden>
+                      ✦
+                    </span>
+                    {item}
                   </p>
-                  <p className="mt-2 text-sm text-[var(--text-mid)]">{p.subPrice}</p>
-                  <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-left text-[13px] leading-snug text-[var(--text-mid)]">
-                    {p.bullets.map((line) => (
-                      <li key={line} className="flex gap-2">
-                        <span className="text-[var(--rose-deep)]" aria-hidden>
-                          ·
-                        </span>
-                        <span>{line}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href={`/commander?pack=${p.pack}`}
-                    className="mt-8 inline-flex w-full items-center justify-center rounded-full border-2 border-[var(--mauve)]/35 bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] py-3.5 text-sm font-bold text-white shadow-md shadow-[#9B6EC8]/25 transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-deep)]"
-                  >
-                    Commander →
-                  </Link>
-                </article>
-              </li>
-            ))}
-          </ul>
-
-          <div className="mx-auto mt-14 max-w-[640px] overflow-hidden rounded-2xl" style={{ background: "#FDF0F7" }}>
-            <table className="w-full border-collapse text-left text-[12px] text-[var(--text-mid)] sm:text-[13px]">
-              <thead>
-                <tr className="border-b border-[rgba(232,160,192,0.35)] text-[var(--text)]">
-                  <th className="px-4 py-3 font-semibold sm:px-5">Pack</th>
-                  <th className="px-2 py-3 font-semibold sm:px-3">Histoires</th>
-                  <th className="px-2 py-3 font-semibold sm:px-3">Prix total</th>
-                  <th className="px-4 py-3 font-semibold sm:px-5">Prix unitaire</th>
-                </tr>
-              </thead>
-              <tbody>
-                {packPriceTable.map((row) => (
-                  <tr
-                    key={row.pack}
-                    className="border-b border-[rgba(232,160,192,0.2)] last:border-0"
-                  >
-                    <td className="px-4 py-2.5 sm:px-5">{row.pack}</td>
-                    <td className="px-2 py-2.5 sm:px-3">{row.stories}</td>
-                    <td className="px-2 py-2.5 sm:px-3">{row.total}</td>
-                    <td className="px-4 py-2.5 sm:px-5">{row.unit}</td>
-                  </tr>
                 ))}
-              </tbody>
-            </table>
+              </div>
+              <Link href="/commander" className="btn-primary inline-flex w-full justify-center no-underline">
+                Commander →
+              </Link>
+            </div>
+
+            <div
+              style={{
+                flex: 1,
+                background: "rgba(255,255,255,0.03)",
+                border: "1px dashed rgba(196,154,216,0.25)",
+                borderRadius: "24px",
+                padding: "40px 32px",
+                textAlign: "center",
+                opacity: 0.7,
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  top: "20px",
+                  right: "20px",
+                  background: "rgba(196,154,216,0.2)",
+                  border: "1px solid rgba(196,154,216,0.4)",
+                  borderRadius: "50px",
+                  padding: "4px 14px",
+                  fontSize: "11px",
+                  color: "var(--mauve)",
+                  letterSpacing: "1px",
+                  textTransform: "uppercase",
+                }}
+              >
+                Bientôt
+              </div>
+              <div style={{ fontSize: "36px", marginBottom: "16px" }} aria-hidden>
+                🎧
+              </div>
+              <h3
+                style={{
+                  color: "rgba(255,255,255,0.6)",
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: "22px",
+                  marginBottom: "8px",
+                }}
+              >
+                PDF + Audio
+              </h3>
+              <div
+                style={{
+                  fontSize: "44px",
+                  fontWeight: 800,
+                  color: "rgba(232,160,192,0.4)",
+                  fontFamily: "'Playfair Display', serif",
+                  marginBottom: "4px",
+                  textDecoration: "line-through",
+                }}
+              >
+                7,90€
+              </div>
+              <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "13px", marginBottom: "32px" }}>par histoire</p>
+              <div style={{ textAlign: "left", marginBottom: "32px" }}>
+                {audioOfferBullets.map((item) => (
+                  <p
+                    key={item}
+                    style={{
+                      color: "rgba(255,255,255,0.35)",
+                      fontSize: "14px",
+                      marginBottom: "10px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                    }}
+                  >
+                    <span style={{ color: "rgba(196,154,216,0.3)" }} aria-hidden>
+                      ✦
+                    </span>
+                    {item}
+                  </p>
+                ))}
+              </div>
+              <button
+                type="button"
+                disabled
+                style={{
+                  width: "100%",
+                  padding: "14px",
+                  border: "1px solid rgba(196,154,216,0.25)",
+                  borderRadius: "50px",
+                  background: "transparent",
+                  color: "rgba(255,255,255,0.3)",
+                  fontSize: "15px",
+                  cursor: "not-allowed",
+                }}
+              >
+                Bientôt disponible
+              </button>
+            </div>
           </div>
 
-          <ul className="mx-auto mt-10 flex max-w-[720px] flex-col gap-3 text-center text-[13px] text-[var(--text-mid)] sm:text-[14px] md:flex-row md:flex-wrap md:justify-center md:gap-x-8 md:gap-y-2">
-            <li className="flex items-center justify-center gap-2">
-              <span aria-hidden>🛡️</span>
-              <span>Satisfait ou remboursé 48h</span>
-            </li>
-            <li className="flex items-center justify-center gap-2">
-              <span aria-hidden>🔒</span>
-              <span>Paiement sécurisé Stripe</span>
-            </li>
-            <li className="flex items-center justify-center gap-2">
-              <span aria-hidden>💌</span>
-              <span>Livraison par email en moins de 5 minutes</span>
-            </li>
-          </ul>
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: "32px",
+              color: "rgba(255,255,255,0.4)",
+              fontSize: "13px",
+              display: "flex",
+              justifyContent: "center",
+              gap: "24px",
+              flexWrap: "wrap",
+            }}
+          >
+            <span>🔒 Paiement sécurisé Stripe</span>
+            <span>🛡️ Satisfait ou remboursé 48h</span>
+            <span>💌 Email en moins de 5 min</span>
+          </div>
         </div>
       </section>
 
-      {/* Extrait d&apos;histoire (sans titre de section) */}
-      <section className="bg-[var(--white)]">
+      {/* Extrait */}
+      <section className="bg-[var(--text-white)]">
         <div className="mx-auto max-w-[640px] px-8 py-[100px]">
           <div
             className="rounded-[24px] border border-[var(--rose-light)] bg-[var(--rose-pale)] p-10 text-left"
@@ -447,7 +711,7 @@ export default function Home() {
                 Aïd
               </span>
             </div>
-            <h3 className="mt-6 font-display text-[22px] font-normal leading-snug text-[var(--text)] sm:text-2xl">
+            <h3 className="mt-6 font-display text-[22px] font-normal leading-snug text-[var(--text-dark)] sm:text-2xl">
               L&apos;histoire de Nour et le plus grand trésor du royaume
             </h3>
             <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-[var(--text-mid)]">
@@ -463,7 +727,7 @@ export default function Home() {
               <p>Alors, dans sa tête, la voix de sa grand-mère s&apos;éleva doucement.</p>
             </div>
             <blockquote className="mt-8 border-l-[3px] border-[var(--mauve)] bg-[var(--mauve-light)]/80 px-4 py-4">
-              <p className="font-display text-[15px] italic leading-relaxed text-[var(--text)]">
+              <p className="font-display text-[15px] italic leading-relaxed text-[var(--text-dark)]">
                 &quot;Le Prophète ﷺ nous a enseigné que jamais une aumône n&apos;a appauvri son donneur.
                 Jamais.&quot;
               </p>
@@ -473,26 +737,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Témoignages — dernière section avant le footer */}
+      {/* Témoignages */}
       <section className="bg-[var(--rose-pale)]">
         <div className="mx-auto max-w-[1100px] px-8 py-[100px]">
           <header className="text-center">
-            <p className="text-[13px] font-medium uppercase tracking-[4px] text-[var(--mauve)]">
-              Elles ont adoré
-            </p>
-            <h2 className="mt-4 font-display text-[28px] font-normal leading-tight text-[var(--text)] sm:text-3xl md:text-4xl">
-              Ce que disent les premières{" "}
-              <span className="italic text-[var(--rose-deep)]">mamans</span>
+            <p className="text-[13px] font-medium uppercase tracking-[4px] text-[var(--mauve)]">Elles ont adoré</p>
+            <h2 className="mt-4 font-display text-[28px] font-normal leading-tight text-[var(--text-dark)] sm:text-3xl md:text-4xl">
+              Ce que disent les premières <span className="italic text-[var(--rose-deep)]">mamans</span>
             </h2>
           </header>
           <ul className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
             {testimonials.map(({ quote, avatar, name, city }) => (
               <li key={name}>
-                <article className="flex h-full flex-col rounded-[20px] border border-[var(--rose-light)]/60 bg-[var(--white)] p-[28px] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md">
+                <article className="flex h-full flex-col rounded-[20px] border border-[var(--rose-light)]/60 bg-[var(--text-white)] p-[28px] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md">
                   <p className="text-lg text-[var(--or)]" aria-label="5 sur 5 étoiles">
                     ★★★★★
                   </p>
-                  <blockquote className="mt-4 flex-1 font-display text-[17px] italic leading-relaxed text-[var(--text)]">
+                  <blockquote className="mt-4 flex-1 font-display text-[17px] italic leading-relaxed text-[var(--text-dark)]">
                     &quot;{quote}&quot;
                   </blockquote>
                   <div className="mt-6 flex items-center gap-3">
@@ -503,7 +764,7 @@ export default function Home() {
                       {avatar}
                     </div>
                     <div>
-                      <p className="font-bold text-[var(--text)]">{name}</p>
+                      <p className="font-bold text-[var(--text-dark)]">{name}</p>
                       <p className="text-sm text-[var(--text-mid)]">{city}</p>
                     </div>
                   </div>
@@ -514,8 +775,56 @@ export default function Home() {
         </div>
       </section>
 
+      {/* CTA final */}
+      <section
+        style={{
+          background: "var(--gradient-hero)",
+          padding: "100px 24px",
+          textAlign: "center",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <DecoBackground variant="hero" />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <p
+            className="script"
+            style={{
+              fontSize: "22px",
+              color: "var(--rose-light)",
+              marginBottom: "16px",
+            }}
+            dir="rtl"
+          >
+            بسم الله
+          </p>
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "clamp(28px, 4vw, 48px)",
+              color: "white",
+              marginBottom: "16px",
+              lineHeight: 1.2,
+            }}
+          >
+            Offre-lui une histoire
+            <br />
+            <em style={{ color: "var(--rose)" }}>qu&apos;il n&apos;oubliera jamais</em>
+          </h2>
+          <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "16px", marginBottom: "40px" }}>
+            Son prénom. Son univers. Ses valeurs. Une histoire rien que pour lui.
+          </p>
+          <CommanderModalTrigger className="btn-primary" style={{ fontSize: "18px", padding: "18px 48px" }}>
+            ✨ Créer l&apos;histoire de mon enfant
+          </CommanderModalTrigger>
+          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "13px", marginTop: "20px" }}>
+            à partir de 3,90€ · PDF livré par email
+          </p>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="bg-[var(--dark)] px-8 py-12 text-center">
+      <footer className="bg-[var(--bg-dark)] px-8 py-12 text-center">
         <Image
           src="/logo-qissali.png"
           alt="Qissali"

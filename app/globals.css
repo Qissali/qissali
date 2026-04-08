@@ -1,25 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Nunito:wght@300;400;500;600;700&family=Dancing+Script:wght@500;600&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --rose: #E8A0C0;
-  --rose-deep: #D4729E;
-  --rose-light: #F5D0E4;
-  --rose-pale: #FDF0F7;
-  --mauve: #C49AD8;
-  --mauve-deep: #9B6EC8;
-  --mauve-light: #E8D5F5;
-  --bleu: #A0C4E8;
-  --or: #E8C870;
-  --or-deep: #C8A040;
-  --cream: #FEF6FF;
-  --dark: #2A1A2E;
-  --dark-2: #3D2845;
-  --text: #4A2E5A;
-  --text-mid: #7A5A8A;
-  --text-light: #A888B8;
-  --white: #FFFBFF;
+  /* Fonds */
+  --bg-cream: #fef6ff;
+  --bg-light: #fdf0f7;
+  --bg-dark: #1a0a2e;
+  --bg-darkmed: #2a1a3e;
+  --bg-med: #3d2060;
+
+  /* Primaires */
+  --rose: #e8a0c0;
+  --rose-light: #f5d0e4;
+  --rose-pale: #fde8f4;
+  --mauve: #c49ad8;
+  --mauve-light: #e8d8f5;
+  --mauve-deep: #7b4fa6;
+  --or: #e8c870;
+  --or-light: #f5e4a8;
+
+  /* Textes */
+  --text-dark: #2a1a3e;
+  --text-mid: #5a3a6a;
+  --text-soft: #9a7aaa;
+  --text-white: #ffffff;
+
+  /* Gradients */
+  --gradient-hero: linear-gradient(160deg, #1a0a2e 0%, #3d2060 50%, #2a1a3e 100%);
+  --gradient-card: linear-gradient(135deg, #fde8f4 0%, #e8d8f5 100%);
+  --gradient-cta: linear-gradient(135deg, #e8a0c0 0%, #c49ad8 100%);
+
+  /* Legacy names (composants existants) */
+  --cream: var(--bg-cream);
+  --text: var(--text-mid);
+  --white: var(--text-white);
+  --dark: var(--bg-dark);
+  --dark-2: var(--bg-darkmed);
+  --rose-deep: #d4729e;
+  --bleu: #a0c4e8;
+  --text-light: var(--text-soft);
+  --or-deep: #c8a040;
 }
 
 html {
@@ -27,10 +50,106 @@ html {
 }
 
 body {
-  font-family: 'Nunito', sans-serif;
-  background: var(--cream);
-  color: var(--text);
+  font-family: "Nunito", var(--font-nunito), sans-serif;
+  font-size: 16px;
+  color: var(--text-mid);
+  background-color: var(--bg-cream);
   overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Playfair Display", var(--font-playfair), serif;
+  color: var(--text-dark);
+}
+
+.script {
+  font-family: "Dancing Script", var(--font-dancing), cursive;
+}
+
+/* Boutons */
+.btn-primary {
+  background: var(--gradient-cta);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 32px;
+  font-family: "Nunito", var(--font-nunito), sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(196, 154, 216, 0.4);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(196, 154, 216, 0.5);
+}
+
+.btn-primary:focus-visible {
+  outline: 2px solid var(--mauve-light);
+  outline-offset: 3px;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--mauve-deep);
+  border: 2px solid var(--mauve);
+  border-radius: 50px;
+  padding: 12px 28px;
+  font-family: "Nunito", var(--font-nunito), sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--mauve-light);
+  border-color: var(--mauve-deep);
+}
+
+.btn-secondary:focus-visible {
+  outline: 2px solid var(--mauve-deep);
+  outline-offset: 3px;
+}
+
+.storytelling-grid {
+  display: grid;
+  grid-template-columns: 42% 58%;
+  min-height: 560px;
+  position: relative;
+  width: 100%;
+}
+
+.univers-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.steps-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.steps-arrow {
+  color: var(--mauve);
+  font-size: 24px;
+  padding-top: 14px;
+  opacity: 0.6;
+}
+
+.offres-row {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
 }
 
 @keyframes modal-fade-up {
@@ -97,106 +216,30 @@ body {
   animation-delay: 0.64s;
 }
 
-/* Notre histoire — section paysage (violet + texte long) */
-.storytelling-section {
-  display: grid;
-  grid-template-columns: 40% 60%;
-  min-height: 500px;
-  width: 100%;
-}
-
-.storytelling-left {
-  background: linear-gradient(135deg, #2a1a3e 0%, #4a2e6e 100%);
-  padding: 64px 48px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 32px;
-}
-
-.storytelling-right {
-  background: #fef6ff;
-  padding: 64px 48px;
-}
-
-.storytelling-label {
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #c49ad8;
-  margin-bottom: 16px;
-}
-
-.storytelling-title {
-  font-family: var(--font-playfair), "Playfair Display", Georgia, serif;
-  font-size: 28px;
-  font-weight: 400;
-  color: #fff;
-  line-height: 1.3;
-  margin-bottom: 16px;
-}
-
-.storytelling-subtitle {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.75);
-  line-height: 1.7;
-}
-
-.storytelling-quote {
-  font-style: italic;
-  color: #f5d0e4;
-  font-size: 14px;
-  line-height: 1.6;
-  border-left: 2px solid #c49ad8;
-  padding-left: 16px;
-  margin-top: auto;
-}
-
-.storytelling-quote p {
-  margin: 0;
-}
-
-.storytelling-quote-source {
-  display: block;
-  margin-top: 12px;
-  font-style: normal;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.storytelling-text {
-  font-size: 15px;
-  color: #5a3a5a;
-  line-height: 1.8;
-}
-
-.storytelling-text p {
-  margin-bottom: 16px;
-}
-
-.storytelling-text p:last-child {
-  margin-bottom: 0;
-}
-
-.storytelling-tags {
-  margin-top: 32px;
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: #c49ad8;
-}
-
 @media (max-width: 768px) {
-  .storytelling-section {
-    grid-template-columns: 1fr;
+  .storytelling-grid {
+    grid-template-columns: 1fr !important;
   }
 
-  .storytelling-left {
-    padding: 40px 24px;
-    min-height: 300px;
+  .storytelling-grid > div {
+    padding: 40px 24px !important;
   }
 
-  .storytelling-right {
-    padding: 40px 24px;
+  .univers-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .steps-row {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .steps-arrow {
+    transform: rotate(90deg);
+    padding-top: 0;
+  }
+
+  .offres-row {
+    flex-direction: column !important;
   }
 }
