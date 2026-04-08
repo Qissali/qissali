@@ -49,6 +49,9 @@ export async function POST(request: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
+    const metadata = (session.metadata ?? {}) as Record<string, string>;
+    const profils = metadata.profils || "";
+    const precisionsNeuro = metadata.precisionsNeuro || "";
 
     if (session.payment_status !== "paid") {
       return NextResponse.json({ received: true, ignored: "payment not paid" });
@@ -56,7 +59,10 @@ export async function POST(request: Request) {
 
     // fulfillOrderFromSession : PDF + emails ; si getStory() est null → emails admin/client
     // « histoire en préparation » (pas de remboursement automatique, livraison manuelle).
-    const result = await fulfillOrderFromSession(session);
+    const result = await fulfillOrderFromSession(session, {
+      profils,
+      precisionsNeuro,
+    });
     if (!result.ok) {
       console.error("fulfillOrderFromSession:", result.reason);
       return NextResponse.json({ error: result.reason }, { status: 500 });

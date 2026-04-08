@@ -25,7 +25,9 @@ export function getStory(
   occasion: string,
   nbEnfants: 1 | 2,
   prenom1?: string,
-  prenom2?: string
+  prenom2?: string,
+  profils?: string,
+  precisionsNeuro?: string
 ): StoryEntry | null;
 
 export function getStoryOrDefault(
@@ -34,7 +36,9 @@ export function getStoryOrDefault(
   occasion: string,
   nbEnfants: 1 | 2,
   prenom1?: string,
-  prenom2?: string
+  prenom2?: string,
+  profils?: string,
+  precisionsNeuro?: string
 ): StoryEntry;
 
 export function getAvailableStories(): string[];

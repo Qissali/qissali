@@ -11,6 +11,8 @@ export type StoryMetadata = {
   /** Âges saisis au checkout (métadonnées Stripe), ex. "7" */
   age_enfant1?: string;
   age_enfant2?: string;
+  profils?: string;
+  precisionsNeuro?: string;
 };
 
 export function prenomDisplay(meta: Pick<StoryMetadata, "prenom1" | "prenom2">): string {

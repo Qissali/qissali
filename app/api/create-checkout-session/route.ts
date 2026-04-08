@@ -18,6 +18,8 @@ type Body = {
   genre2?: string;
   age_enfant1?: string;
   age_enfant2?: string;
+  profils?: string;
+  precisionsNeuro?: string;
   /** Checkout intégré sur le site (iframe Stripe + portefeuilles dans l’UI) */
   embedded?: boolean;
 };
@@ -67,6 +69,8 @@ export async function POST(req: Request) {
   const genre2 = str(body.genre2);
   const age_enfant1 = str(body.age_enfant1).trim();
   const age_enfant2 = str(body.age_enfant2).trim();
+  const profils = str(body.profils).trim();
+  const precisionsNeuro = str(body.precisionsNeuro).trim();
   const embedded = body.embedded === true;
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -102,6 +106,8 @@ export async function POST(req: Request) {
     genre_enfant2: genre2 || "",
     age_enfant1: age_enfant1 || "",
     age_enfant2: age_enfant2 || "",
+    profils: profils || "",
+    precisionsNeuro: precisionsNeuro || "",
   };
 
   const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [

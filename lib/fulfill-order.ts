@@ -29,6 +29,8 @@ function sessionToMetadata(
     email: metadata.email?.trim() || "",
     age_enfant1: metadata.age_enfant1?.trim() || "",
     age_enfant2: metadata.age_enfant2?.trim() || "",
+    profils: metadata.profils?.trim() || "",
+    precisionsNeuro: metadata.precisionsNeuro?.trim() || "",
   };
 }
 
@@ -59,7 +61,8 @@ function safePdfFilename(prenomLabel: string): string {
  * Utilisé par l’email (pièce jointe) et la route /api/order-pdf.
  */
 export function buildPdfFromCheckoutSession(
-  session: Stripe.Checkout.Session
+  session: Stripe.Checkout.Session,
+  options?: { profils?: string; precisionsNeuro?: string }
 ):
   | { ok: true; base64: string; filename: string }
   | { ok: false; reason: string } {
@@ -67,6 +70,8 @@ export function buildPdfFromCheckoutSession(
   if (!meta) {
     return { ok: false, reason: "Metadata invalides ou prenom1 manquant." };
   }
+  if (options?.profils !== undefined) meta.profils = options.profils;
+  if (options?.precisionsNeuro !== undefined) meta.precisionsNeuro = options.precisionsNeuro;
   const nbEnfants = meta.prenom2.trim() ? 2 : 1;
   const story = getStoryOrDefault(
     meta.univers,
@@ -74,7 +79,9 @@ export function buildPdfFromCheckoutSession(
     meta.occasion,
     nbEnfants,
     meta.prenom1,
-    meta.prenom2
+    meta.prenom2,
+    meta.profils || "",
+    meta.precisionsNeuro || ""
   );
   const base64 = generateStoryPDF({
     prenom1: meta.prenom1,
@@ -97,12 +104,15 @@ export function buildPdfFromCheckoutSession(
  * Après paiement confirmé (webhook) : PDF + emails client et admin.
  */
 export async function fulfillOrderFromSession(
-  session: Stripe.Checkout.Session
+  session: Stripe.Checkout.Session,
+  options?: { profils?: string; precisionsNeuro?: string }
 ): Promise<{ ok: true } | { ok: false; reason: string }> {
   const meta = sessionToMetadata(session.metadata as Record<string, string> | null);
   if (!meta) {
     return { ok: false, reason: "Metadata invalides ou prenom1 manquant." };
   }
+  if (options?.profils !== undefined) meta.profils = options.profils;
+  if (options?.precisionsNeuro !== undefined) meta.precisionsNeuro = options.precisionsNeuro;
 
   const clientEmail =
     meta.email ||
@@ -126,7 +136,9 @@ export async function fulfillOrderFromSession(
     meta.occasion,
     nbEnfants,
     meta.prenom1,
-    meta.prenom2
+    meta.prenom2,
+    meta.profils || "",
+    meta.precisionsNeuro || ""
   );
 
   if (storyResolved === null) {
@@ -172,7 +184,10 @@ export async function fulfillOrderFromSession(
     return { ok: true };
   }
 
-  const built = buildPdfFromCheckoutSession(session);
+  const built = buildPdfFromCheckoutSession(session, {
+    profils: meta.profils || "",
+    precisionsNeuro: meta.precisionsNeuro || "",
+  });
   if (!built.ok) {
     return { ok: false, reason: built.reason };
   }
