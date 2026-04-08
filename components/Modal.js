@@ -34,6 +34,14 @@ const OCCASIONS = [
   "Sans occasion",
 ];
 
+const PROFILS = [
+  { id: "aucun", label: "Pas de profil neuroatypique" },
+  { id: "dys", label: "Dys (dyslexie, dyscalculie, dyspraxie...)" },
+  { id: "tdah", label: "TDAH" },
+  { id: "tsa", label: "Autisme / TSA" },
+  { id: "hpi", label: "Haut potentiel (HPI/HQI)" },
+];
+
 function isValidEmail(v) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v).trim());
 }
@@ -113,6 +121,10 @@ function OrderModalDialog({ open, onClose }) {
   const [genre2, setGenre2] = useState("");
   const [siblingLink, setSiblingLink] = useState("");
 
+  const [neuroEnabled, setNeuroEnabled] = useState(false);
+  const [profils, setProfils] = useState([]);
+  const [precisionsNeuro, setPrecisionsNeuro] = useState("");
+
   const [universe, setUniverse] = useState("");
   const [valeur, setValeur] = useState("");
   const [occasion, setOccasion] = useState("");
@@ -148,6 +160,9 @@ function OrderModalDialog({ open, onClose }) {
     setOccasion("");
     setFormat("pdf");
     setEmail("");
+    setNeuroEnabled(false);
+    setProfils([]);
+    setPrecisionsNeuro("");
     setErrors({});
   }, []);
 
@@ -246,6 +261,18 @@ function OrderModalDialog({ open, onClose }) {
     return u ? u.label : universe;
   }, [universe]);
 
+  const hasNeuroProfile = useMemo(
+    () => neuroEnabled && profils.some((p) => p !== "aucun"),
+    [neuroEnabled, profils]
+  );
+
+  const profilsLabel = useMemo(() => {
+    if (!hasNeuroProfile) return "";
+    return PROFILS.filter((p) => p.id !== "aucun" && profils.includes(p.id))
+      .map((p) => p.label)
+      .join(", ");
+  }, [hasNeuroProfile, profils]);
+
   const recapLines = useMemo(() => {
     const u = UNIVERSES.find((x) => x.id === universe);
     const fmt =
@@ -278,9 +305,12 @@ function OrderModalDialog({ open, onClose }) {
     lines.push(
       { k: "Univers", v: u ? `${u.emoji} ${u.label}` : "—" },
       { k: "Valeur", v: valeur || "—" },
-      { k: "Occasion", v: occasion || "—" },
-      { k: "Format", v: fmt }
+      { k: "Occasion", v: occasion || "—" }
     );
+    if (hasNeuroProfile && profilsLabel) {
+      lines.push({ k: "Neuroatypie", v: profilsLabel });
+    }
+    lines.push({ k: "Format", v: fmt });
     return lines;
   }, [
     childCount,
@@ -295,6 +325,8 @@ function OrderModalDialog({ open, onClose }) {
     valeur,
     occasion,
     format,
+    hasNeuroProfile,
+    profilsLabel,
   ]);
 
   const displayName =
@@ -329,6 +361,10 @@ function OrderModalDialog({ open, onClose }) {
             childCount === 2 && genre2 ? genreLibelle(genre2) : "",
           age_enfant1: String(child1Age).trim(),
           age_enfant2: childCount === 2 ? String(child2Age).trim() : "",
+          profils: hasNeuroProfile
+            ? profils.filter((p) => p !== "aucun").join(",")
+            : "",
+          precisionsNeuro: hasNeuroProfile ? String(precisionsNeuro).trim() : "",
           embedded: canUseEmbeddedCheckout,
         }),
       });
@@ -725,6 +761,106 @@ function OrderModalDialog({ open, onClose }) {
                     </>
                   )}
 
+                  <div>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[var(--rose-light)] bg-[var(--cream)]/80 p-4 transition hover:border-[var(--mauve)]/40">
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--rose-light)] text-[var(--mauve-deep)] focus:ring-[var(--mauve)]"
+                        checked={neuroEnabled}
+                        onChange={(e) => {
+                          const on = e.target.checked;
+                          setNeuroEnabled(on);
+                          if (!on) {
+                            setProfils([]);
+                            setPrecisionsNeuro("");
+                          }
+                        }}
+                      />
+                      <span className="text-sm leading-snug text-[var(--text)]">
+                        <span className="font-semibold text-[var(--mauve-deep)]">
+                          Adapter l&apos;histoire
+                        </span>{" "}
+                        à un profil neuroatypique ou à des besoins particuliers{" "}
+                        <span className="text-[var(--text-mid)]">
+                          (Dys, TDAH, TSA, HPI… — optionnel)
+                        </span>
+                      </span>
+                    </label>
+
+                    {neuroEnabled && (
+                      <div className="mt-4 rounded-2xl border border-[var(--rose-light)] bg-[var(--rose-pale)]/50 p-4">
+                        <p className="text-sm font-semibold text-[var(--mauve-deep)]">
+                          Neuroatypie
+                        </p>
+                        <p className="mt-1 text-sm font-medium text-[var(--text)]">
+                          Profil ou besoins particuliers ?
+                          <span className="font-normal text-[var(--text-mid)]">
+                            {" "}
+                            (pour personnaliser l&apos;histoire)
+                          </span>
+                        </p>
+                        <p className="mt-1 text-xs text-[var(--text-mid)]">
+                          Ces informations restent privées et servent uniquement à adapter
+                          l&apos;histoire.
+                        </p>
+                        <div className="mt-3 flex flex-col gap-2">
+                          {PROFILS.map(({ id, label }) => {
+                            const selected = profils.includes(id);
+                            return (
+                              <button
+                                key={id}
+                                type="button"
+                                onClick={() => {
+                                  setProfils((prev) => {
+                                    if (id === "aucun") {
+                                      setPrecisionsNeuro("");
+                                      return prev.includes("aucun") ? [] : ["aucun"];
+                                    }
+                                    const withoutAucun = prev.filter((p) => p !== "aucun");
+                                    const next = withoutAucun.includes(id)
+                                      ? withoutAucun.filter((p) => p !== id)
+                                      : [...withoutAucun, id];
+                                    if (next.length === 0) setPrecisionsNeuro("");
+                                    return next;
+                                  });
+                                }}
+                                className={`${chipBase} w-full text-left ${
+                                  selected
+                                    ? "border-[var(--mauve)] bg-[var(--rose-pale)] text-[var(--mauve-deep)]"
+                                    : "border-[var(--rose-light)] bg-white text-[var(--text-mid)] hover:border-[var(--mauve)]/50"
+                                }`}
+                              >
+                                {label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {hasNeuroProfile && (
+                          <div className="mt-3">
+                            <label
+                              htmlFor="m-precisions-neuro"
+                              className="mb-2 block text-sm font-medium text-[var(--text)]"
+                            >
+                              Précisions (optionnel)
+                            </label>
+                            <textarea
+                              id="m-precisions-neuro"
+                              rows={3}
+                              maxLength={200}
+                              value={precisionsNeuro}
+                              onChange={(e) => setPrecisionsNeuro(e.target.value)}
+                              placeholder="Ex : dyslexie sévère, TDAH avec hyperactivité…"
+                              className="w-full resize-y rounded-2xl border border-[var(--rose-light)] bg-white px-4 py-3 text-sm text-[var(--text)] outline-none focus:border-[var(--mauve)] focus:ring-2 focus:ring-[var(--mauve)]/30"
+                            />
+                          </div>
+                        )}
+                        <p className="mt-3 text-xs text-[var(--text-mid)]">
+                          🔒 Non stockées : utilisées seulement pour l&apos;histoire commandée.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="flex flex-col gap-3 border-t border-[var(--rose-light)] pt-6 sm:flex-row sm:justify-end">
                     <button
                       type="button"
@@ -769,6 +905,12 @@ function OrderModalDialog({ open, onClose }) {
                     {errors.universe && (
                       <p className="mt-2 text-sm text-red-600">
                         {errors.universe}
+                      </p>
+                    )}
+                    {hasNeuroProfile && (
+                      <p className="mt-2 text-sm text-[var(--mauve-deep)]">
+                        ✨ Nous adaptons l&apos;histoire à la neuroatypie indiquée (
+                        {profilsLabel}). Ta sélection sera prise en compte.
                       </p>
                     )}
                   </div>

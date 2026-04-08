@@ -65,6 +65,7 @@ export function CommanderForm() {
   const [child2Age, setChild2Age] = useState("");
   const [genre2, setGenre2] = useState<Genre | "">("");
   const [siblingLink, setSiblingLink] = useState<SiblingLink | "">("");
+  const [neuroEnabled, setNeuroEnabled] = useState(false);
   const [profils, setProfils] = useState<string[]>([]);
   const [precisionsNeuro, setPrecisionsNeuro] = useState("");
 
@@ -159,8 +160,8 @@ export function CommanderForm() {
   }, [universe]);
 
   const hasNeuroProfile = useMemo(
-    () => profils.some((p) => p !== "aucun"),
-    [profils]
+    () => neuroEnabled && profils.some((p) => p !== "aucun"),
+    [neuroEnabled, profils]
   );
 
   const profilsLabel = useMemo(() => {
@@ -204,8 +205,10 @@ export function CommanderForm() {
             childCount === 2 && genre2 ? genreLibelle(genre2) : "",
           age_enfant1: child1Age.trim(),
           age_enfant2: childCount === 2 ? child2Age.trim() : "",
-          profils: profils.join(","),
-          precisionsNeuro: precisionsNeuro.trim(),
+          profils: neuroEnabled
+            ? profils.filter((p) => p !== "aucun").join(",")
+            : "",
+          precisionsNeuro: neuroEnabled ? precisionsNeuro.trim() : "",
           embedded: canUseEmbeddedCheckout,
         }),
       });
@@ -330,14 +333,7 @@ export function CommanderForm() {
         {/* STEP 1 */}
         {step === 1 && (
           <div className="space-y-8">
-            <div>
-              <h2 className="font-display text-xl text-qissali-mauve">Étape 1 — L&apos;enfant</h2>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                Inclut la partie{" "}
-                <span className="font-medium text-qissali-mauve">neuroatypie</span> (optionnelle) : si tu
-                coches un profil, l&apos;histoire pourra être adaptée.
-              </p>
-            </div>
+            <h2 className="font-display text-xl text-qissali-mauve">Étape 1 — L&apos;enfant</h2>
 
             <div>
               <p className="mb-3 text-sm font-medium text-slate-700">Histoire solo ou fratrie ?</p>
@@ -551,75 +547,100 @@ export function CommanderForm() {
               </>
             )}
 
-            <div className="rounded-xl border border-qissali-rose/25 bg-qissali-cream/40 p-4">
-              <p className="text-sm font-semibold text-qissali-mauve">Neuroatypie</p>
-              <p className="mt-1 text-sm font-medium text-slate-700">
-                Votre enfant a-t-il un profil neuroatypique ou des besoins particuliers ?
-                <span className="font-normal text-slate-500">
-                  {" "}
-                  (optionnel — pour personnaliser l&apos;histoire)
+            <div>
+              <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-qissali-rose/30 bg-qissali-cream/30 p-4 transition hover:border-qissali-mauve/40">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 shrink-0 rounded border-qissali-rose/50 text-qissali-mauve focus:ring-qissali-mauve"
+                  checked={neuroEnabled}
+                  onChange={(e) => {
+                    const on = e.target.checked;
+                    setNeuroEnabled(on);
+                    if (!on) {
+                      setProfils([]);
+                      setPrecisionsNeuro("");
+                    }
+                  }}
+                />
+                <span className="text-sm leading-snug text-slate-700">
+                  <span className="font-medium text-qissali-mauve">Adapter l&apos;histoire</span> à un profil
+                  neuroatypique ou à des besoins particuliers{" "}
+                  <span className="text-slate-500">(Dys, TDAH, TSA, HPI… — optionnel)</span>
                 </span>
-              </p>
-              <p className="mt-1 text-xs text-slate-500">
-                Ces informations restent privées et servent uniquement à adapter l&apos;histoire.
-              </p>
+              </label>
 
-              <div className="mt-3 flex flex-col gap-2">
-                {PROFILS.map(({ id, label }) => {
-                  const selected = profils.includes(id);
-                  return (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => {
-                        setProfils((prev) => {
-                          if (id === "aucun") {
-                            setPrecisionsNeuro("");
-                            return prev.includes("aucun") ? [] : ["aucun"];
-                          }
-                          const withoutAucun = prev.filter((p) => p !== "aucun");
-                          const next = withoutAucun.includes(id)
-                            ? withoutAucun.filter((p) => p !== id)
-                            : [...withoutAucun, id];
-                          if (next.length === 0) setPrecisionsNeuro("");
-                          return next;
-                        });
-                      }}
-                      className={`${chipBtn} w-full text-left ${
-                        selected
-                          ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
-                          : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
+              {neuroEnabled && (
+                <div className="mt-4 rounded-xl border border-qissali-rose/25 bg-qissali-cream/40 p-4">
+                  <p className="text-sm font-semibold text-qissali-mauve">Neuroatypie</p>
+                  <p className="mt-1 text-sm font-medium text-slate-700">
+                    Votre enfant a-t-il un profil neuroatypique ou des besoins particuliers ?
+                    <span className="font-normal text-slate-500">
+                      {" "}
+                      (pour personnaliser l&apos;histoire)
+                    </span>
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Ces informations restent privées et servent uniquement à adapter l&apos;histoire.
+                  </p>
 
-              {hasNeuroProfile && (
-                <div className="mt-3">
-                  <label
-                    htmlFor="precisions-neuro"
-                    className="mb-2 block text-sm font-medium text-slate-700"
-                  >
-                    Vous pouvez préciser si vous le souhaitez
-                  </label>
-                  <textarea
-                    id="precisions-neuro"
-                    rows={3}
-                    maxLength={200}
-                    value={precisionsNeuro}
-                    onChange={(e) => setPrecisionsNeuro(e.target.value)}
-                    placeholder="Ex : dyslexie sévère, TDAH avec hyperactivité, TSA sans trouble du langage..."
-                    className="w-full resize-y rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 text-slate-800 outline-none focus:border-qissali-mauve focus:ring-2 focus:ring-qissali-mauve/30"
-                  />
+                  <div className="mt-3 flex flex-col gap-2">
+                    {PROFILS.map(({ id, label }) => {
+                      const selected = profils.includes(id);
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => {
+                            setProfils((prev) => {
+                              if (id === "aucun") {
+                                setPrecisionsNeuro("");
+                                return prev.includes("aucun") ? [] : ["aucun"];
+                              }
+                              const withoutAucun = prev.filter((p) => p !== "aucun");
+                              const next = withoutAucun.includes(id)
+                                ? withoutAucun.filter((p) => p !== id)
+                                : [...withoutAucun, id];
+                              if (next.length === 0) setPrecisionsNeuro("");
+                              return next;
+                            });
+                          }}
+                          className={`${chipBtn} w-full text-left ${
+                            selected
+                              ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
+                              : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {hasNeuroProfile && (
+                    <div className="mt-3">
+                      <label
+                        htmlFor="precisions-neuro"
+                        className="mb-2 block text-sm font-medium text-slate-700"
+                      >
+                        Vous pouvez préciser si vous le souhaitez
+                      </label>
+                      <textarea
+                        id="precisions-neuro"
+                        rows={3}
+                        maxLength={200}
+                        value={precisionsNeuro}
+                        onChange={(e) => setPrecisionsNeuro(e.target.value)}
+                        placeholder="Ex : dyslexie sévère, TDAH avec hyperactivité, TSA sans trouble du langage..."
+                        className="w-full resize-y rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 text-slate-800 outline-none focus:border-qissali-mauve focus:ring-2 focus:ring-qissali-mauve/30"
+                      />
+                    </div>
+                  )}
+
+                  <p className="mt-3 text-xs text-slate-500">
+                    🔒 Ces informations ne sont pas stockées et servent uniquement à l&apos;histoire
+                  </p>
                 </div>
               )}
-
-              <p className="mt-3 text-xs text-slate-500">
-                🔒 Ces informations ne sont pas stockées et servent uniquement à l&apos;histoire
-              </p>
             </div>
 
             <div className="flex flex-col gap-3 border-t border-qissali-rose/20 pt-6 sm:flex-row sm:justify-end">
