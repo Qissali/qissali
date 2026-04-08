@@ -106,13 +106,32 @@ const pdfPlanBullets = [
   "Livraison par email",
 ] as const;
 
-const audioPlanBullets = [
-  "Tout le contenu PDF inclus",
-  "Histoire audio environ 10 min",
+const audioComingSoonBullets = [
+  "Histoire audio ~10 min",
   "Voix douce et naturelle",
-  "Format MP3 téléchargeable",
+  "Format MP3",
   "Parfait pour l'endormissement",
-  "Livraison par email",
+] as const;
+
+const notreHistoireBlocs = [
+  {
+    icon: "🌙",
+    lines: [
+      "Un soir, ma fille m'a demandé",
+      "une histoire avec elle dedans.",
+    ],
+  },
+  {
+    icon: "🔍",
+    lines: [
+      "J'ai cherché longtemps.",
+      "Je n'ai rien trouvé qui lui ressemble.",
+    ],
+  },
+  {
+    icon: "✨",
+    lines: ["Alors j'ai créé Qissali.", "Pour elle. Pour toutes les autres."],
+  },
 ] as const;
 
 const testimonials = [
@@ -185,128 +204,37 @@ export default function Home() {
             Livraison par email en moins de 5 minutes · à partir de 3,90€
           </p>
         </div>
-        <div className="relative z-10 flex flex-col items-center pb-10">
-          <div className="hero-fade-up hero-delay-6">
-            <a
-              href="#decouvrir"
-              className="flex animate-bounce flex-col items-center gap-2 text-[var(--text-mid)] transition hover:text-[var(--mauve-deep)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve)]"
-            >
-              <span
-                className="block h-12 w-px rounded-full bg-gradient-to-b from-[var(--mauve)] via-[var(--mauve)]/50 to-transparent"
-                aria-hidden
-              />
-              <span className="text-xs font-medium uppercase tracking-widest">
-                Découvrir
-              </span>
-            </a>
-          </div>
-        </div>
       </section>
 
-      {/* Notre histoire */}
-      <section className="relative overflow-hidden bg-[var(--dark)]">
-        <div
-          className="pointer-events-none absolute inset-0"
-          aria-hidden
-          style={{
-            background: `
-              radial-gradient(ellipse 60% 50% at 15% 20%, rgba(232, 160, 192, 0.12) 0%, transparent 55%),
-              radial-gradient(ellipse 55% 45% at 85% 75%, rgba(196, 154, 216, 0.14) 0%, transparent 50%),
-              radial-gradient(ellipse 45% 40% at 50% 50%, rgba(232, 160, 192, 0.06) 0%, transparent 60%)
-            `,
-          }}
-        />
-        <div className="relative z-10 mx-auto max-w-[1100px] px-8 py-[100px]">
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-[80px]">
-            <div>
-              <p className="text-[13px] font-medium uppercase tracking-[4px] text-[var(--rose-light)]">
-                Notre histoire
-              </p>
-              <h2 className="mt-4 font-display text-[32px] font-normal leading-tight text-[var(--white)] sm:text-[38px] lg:text-[44px]">
-                Qissali, c&apos;est{" "}
-                <span className="italic text-[var(--rose-deep)]">mon histoire</span> en arabe
-              </h2>
-              <div className="mt-8 space-y-6 text-[17px] leading-relaxed text-[rgba(255,255,255,0.65)]">
-                <p>
-                  Qissali vient de l&apos;arabe قصتي — qui signifie tout simplement &quot;mon histoire&quot;.
-                  Parce que chaque enfant mérite une histoire rien que pour lui.
-                </p>
-                <p>
-                  Un soir, ma fille m&apos;a demandé une histoire. Pas n&apos;importe laquelle. Une histoire
-                  avec elle dedans. Avec son prénom, son univers, ses héros préférés.
-                </p>
-                <p>
-                  J&apos;ai cherché. Longtemps. Des livres en arabe trop difficiles pour elle. Des histoires
-                  islamiques en anglais qu&apos;elle ne comprenait pas. Du contenu générique, sans âme, sans
-                  personnalisation, sans cette petite étincelle qui fait qu&apos;un enfant écoute avec les
-                  yeux grands ouverts.
-                </p>
-                <p>
-                  Et pourtant, j&apos;avais tellement envie de lui transmettre notre foi d&apos;une façon qui
-                  lui ressemble. Pas des leçons. Pas des récitations. Des histoires. Celles qui restent,
-                  celles qu&apos;on raconte à ses propres enfants des années plus tard.
-                </p>
-                <p>
-                  Alors j&apos;ai créé Qissali. Pour que mes filles entendent une histoire où elles sont les
-                  héroïnes. Où leur prénom résonne à chaque page. Où la générosité, le courage, la confiance
-                  en Allah arrivent naturellement, dans la bouche d&apos;un personnage qu&apos;elles aiment,
-                  au moment où ça compte vraiment.
+      {/* Notre histoire — storytelling court */}
+      <section className="border-b border-[rgba(196,154,216,0.35)] bg-white">
+        <div className="mx-auto max-w-[1100px] px-8 py-[72px] sm:py-[88px]">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6 lg:gap-8">
+            {notreHistoireBlocs.map((bloc) => (
+              <div
+                key={bloc.icon}
+                className="flex flex-col items-center px-2 text-center"
+              >
+                <span className="text-4xl sm:text-[2.75rem]" aria-hidden>
+                  {bloc.icon}
+                </span>
+                <p
+                  className="mt-4 max-w-[280px] text-[15px] font-normal leading-relaxed sm:text-[16px]"
+                  style={{ color: "#7A5A8A" }}
+                >
+                  {bloc.lines.map((line, i) => (
+                    <span key={line}>
+                      {line}
+                      {i < bloc.lines.length - 1 ? (
+                        <>
+                          <br />
+                        </>
+                      ) : null}
+                    </span>
+                  ))}
                 </p>
               </div>
-              <blockquote className="mt-10 border-l-[3px] border-[var(--rose)] bg-[rgba(255,255,255,0.05)] py-5 pl-6 pr-4">
-                <p className="font-display text-lg italic leading-relaxed text-[var(--rose-light)] sm:text-xl">
-                  &quot;Le plus grand trésor d&apos;une princesse, ma chérie, ce n&apos;est pas sa couronne.
-                  C&apos;est son cœur.&quot;
-                </p>
-                <p className="mt-4 text-[12px] font-medium uppercase tracking-wider text-[var(--mauve)]">
-                  Extrait d&apos;une histoire Qissali
-                </p>
-              </blockquote>
-            </div>
-            <div className="flex flex-col gap-6">
-              <article
-                className="rounded-[20px] border border-[rgba(232,160,192,0.15)] bg-[rgba(255,255,255,0.06)] p-6 transition-transform duration-300 hover:translate-x-[6px] sm:p-7"
-              >
-                <h3 className="text-lg font-bold text-[var(--white)]">
-                  <span className="mr-2" aria-hidden>
-                    🌙
-                  </span>
-                  Conçu pour transmettre
-                </h3>
-                <p className="mt-3 text-[15px] leading-relaxed text-[rgba(255,255,255,0.65)]">
-                  Chaque histoire intègre un hadith ou un verset au moment clé, naturellement, dans la bouche
-                  d&apos;un personnage aimé.
-                </p>
-              </article>
-              <article
-                className="rounded-[20px] border border-[rgba(232,160,192,0.15)] bg-[rgba(255,255,255,0.06)] p-6 transition-transform duration-300 hover:translate-x-[6px] sm:p-7"
-              >
-                <h3 className="text-lg font-bold text-[var(--white)]">
-                  <span className="mr-2" aria-hidden>
-                    ✨
-                  </span>
-                  Unique pour chaque enfant
-                </h3>
-                <p className="mt-3 text-[15px] leading-relaxed text-[rgba(255,255,255,0.65)]">
-                  Le prénom de ton enfant est partout dans l&apos;histoire. Il n&apos;écoute plus une histoire,
-                  il vit la sienne.
-                </p>
-              </article>
-              <article
-                className="rounded-[20px] border border-[rgba(232,160,192,0.15)] bg-[rgba(255,255,255,0.06)] p-6 transition-transform duration-300 hover:translate-x-[6px] sm:p-7"
-              >
-                <h3 className="text-lg font-bold text-[var(--white)]">
-                  <span className="mr-2" aria-hidden>
-                    💬
-                  </span>
-                  Un moment partagé
-                </h3>
-                <p className="mt-3 text-[15px] leading-relaxed text-[rgba(255,255,255,0.65)]">
-                  Chaque histoire se termine par un débat ouvert avec l&apos;enfant et un défi de la semaine
-                  pour ancrer les valeurs dans le réel.
-                </p>
-              </article>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -323,10 +251,10 @@ export default function Home() {
               <span className="italic text-[var(--rose-deep)]">soir</span>
             </h2>
           </header>
-          <div className="mt-14 flex flex-col gap-8 lg:flex-row lg:items-stretch lg:gap-0">
+          <div className="mt-14 flex flex-col items-start gap-6 md:flex-row md:items-start md:gap-6">
             {howToSteps.map((item, index) => (
               <Fragment key={item.step}>
-                <article className="flex min-w-0 flex-1 flex-col items-center rounded-[24px] border border-[rgba(232,160,192,0.2)] bg-[var(--rose-pale)] px-6 py-9 text-center transition duration-300 hover:-translate-y-[6px] hover:shadow-lg hover:shadow-[#9B6EC8]/20">
+                <article className="flex min-w-0 w-full flex-1 flex-col items-center rounded-[24px] border border-[rgba(232,160,192,0.2)] bg-[var(--rose-pale)] px-6 py-9 text-center transition duration-300 hover:-translate-y-[6px] hover:shadow-lg hover:shadow-[#9B6EC8]/20 md:w-auto">
                   <span className="text-4xl sm:text-5xl" role="img" aria-hidden>
                     {item.emoji}
                   </span>
@@ -343,7 +271,7 @@ export default function Home() {
                 </article>
                 {index < howToSteps.length - 1 ? (
                   <div
-                    className="hidden shrink-0 self-center px-3 text-2xl font-light leading-none text-[var(--mauve)]/45 lg:flex lg:items-center"
+                    className="hidden shrink-0 self-center px-1 text-2xl font-light leading-none text-[var(--mauve)]/45 md:flex md:items-center md:pt-10"
                     aria-hidden
                   >
                     →
@@ -367,7 +295,7 @@ export default function Home() {
               <span className="italic text-[var(--rose-deep)]">magique</span>
             </h2>
           </header>
-          <ul className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-4">
             {universeCards.map((card) => (
               <li key={card.id} className="min-w-0">
                 <CommanderModalTrigger
@@ -509,9 +437,9 @@ export default function Home() {
               Pas d&apos;abonnement. Tu paies, tu reçois ton histoire. C&apos;est tout.
             </p>
           </header>
-          <div className="mx-auto mt-14 grid max-w-[720px] grid-cols-1 gap-8 md:grid-cols-2 md:gap-8">
+          <div className="mx-auto mt-14 flex max-w-[900px] flex-col items-stretch gap-6 md:flex-row md:gap-6">
             {/* PDF Illustré */}
-            <article className="flex flex-col rounded-[24px] border border-[rgba(232,160,192,0.15)] bg-[rgba(255,255,255,0.04)] p-8">
+            <article className="flex min-w-0 flex-1 flex-col rounded-[24px] border border-[rgba(232,160,192,0.15)] bg-[rgba(255,255,255,0.04)] p-8">
               <span className="text-4xl" aria-hidden>
                 📄
               </span>
@@ -538,38 +466,45 @@ export default function Home() {
                 Commander →
               </CommanderModalTrigger>
             </article>
-            {/* PDF + Audio */}
-            <article className="relative flex flex-col rounded-[24px] border border-[var(--rose)]/35 bg-[rgba(232,160,192,0.15)] p-8">
-              <div className="-mt-2 mb-2 flex justify-center">
-                <span className="rounded-full bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-white shadow-lg">
-                  ✦ Le plus choisi
+            {/* PDF + Audio — bientôt */}
+            <article
+              className="relative flex min-w-0 flex-1 flex-col rounded-[24px] border border-dashed p-8 opacity-75"
+              style={{
+                borderColor: "#C49AD8",
+                background: "#F9F5FF",
+              }}
+            >
+              <div className="mb-3 flex justify-center">
+                <span className="rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#7A5A8A]" style={{ background: "#EDE5F7" }}>
+                  Bientôt disponible
                 </span>
               </div>
               <span className="text-4xl" aria-hidden>
-                ✨
+                🎧
               </span>
-              <h3 className="mt-4 text-xl font-bold text-[var(--white)]">PDF + Audio</h3>
-              <p className="mt-3 text-[15px] leading-relaxed text-[rgba(255,255,255,0.75)]">
-                L&apos;histoire racontée par une voix chaleureuse, parfaite pour les histoires du soir.
+              <h3 className="mt-4 text-xl font-bold text-[#5a3d6b]">PDF + Audio</h3>
+              <p className="font-display mt-2 text-[48px] font-bold leading-none text-[#9B7CAD] line-through decoration-[#7A5A8A]/50">
+                7,90€
               </p>
-              <p className="font-display text-[48px] font-bold leading-none text-[var(--or)]">7,90€</p>
-              <p className="mt-1 text-sm text-[rgba(255,255,255,0.45)]">par histoire</p>
-              <ul className="mt-6 flex flex-col gap-3 text-left text-[14px] leading-snug text-[rgba(255,255,255,0.85)]">
-                {audioPlanBullets.map((line) => (
+              <p className="mt-2 text-sm text-[#7A5A8A]/90">Disponible très prochainement</p>
+              <ul className="mt-6 flex flex-col gap-2.5 text-left text-[14px] leading-snug text-[#7A5A8A]/65">
+                {audioComingSoonBullets.map((line) => (
                   <li key={line} className="flex gap-2">
-                    <span className="text-[var(--rose-light)]" aria-hidden>
+                    <span className="text-[#C49AD8]" aria-hidden>
                       ·
                     </span>
                     <span>{line}</span>
                   </li>
                 ))}
               </ul>
-              <CommanderModalTrigger
-                aria-label="Commander — PDF + Audio"
-                className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] py-3.5 text-sm font-bold text-white shadow-md shadow-[#9B6EC8]/35 transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-light)]"
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                className="mt-8 inline-flex w-full cursor-not-allowed items-center justify-center rounded-full border-2 border-[#C49AD8]/50 bg-white/60 py-3.5 text-sm font-bold text-[#7A5A8A] opacity-60 pointer-events-none"
               >
-                Commander →
-              </CommanderModalTrigger>
+                Bientôt disponible →
+              </button>
             </article>
           </div>
         </div>
