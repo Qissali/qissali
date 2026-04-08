@@ -271,11 +271,11 @@ export default function Home() {
           </h2>
 
           <p style={{ fontSize: "15px", color: "var(--text-body)", lineHeight: 1.8, marginBottom: "32px" }}>
-            Qissali vient de l&apos;arabe{" "}
+            Qissali est inspiré de l&apos;arabe{" "}
             <span dir="rtl" lang="ar" className="inline-block">
               قصتي
             </span>{" "}
-            — qui signifie &quot;mon histoire&quot;. Parce que chaque enfant mérite une histoire rien que pour lui.
+            (qissati) — qui signifie &quot;mon histoire&quot;. Parce que chaque enfant mérite une histoire rien que pour lui.
           </p>
 
           <div style={{ height: "1px", background: "var(--rose-light)", marginBottom: "32px" }} />
