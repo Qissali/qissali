@@ -81,7 +81,7 @@ export default function Home() {
       {/* 1. Hero */}
       <section
         style={{
-          background: "var(--bg-main)",
+          background: "var(--bg-section)",
           minHeight: "90vh",
           display: "flex",
           flexDirection: "column",
@@ -94,7 +94,7 @@ export default function Home() {
         }}
       >
         <svg
-          style={{ position: "absolute", right: "5%", top: "8%", opacity: 0.08 }}
+          style={{ position: "absolute", right: "5%", top: "8%", opacity: 0.06 }}
           width="140"
           height="140"
           viewBox="0 0 100 100"
@@ -107,7 +107,7 @@ export default function Home() {
         </svg>
 
         <svg
-          style={{ position: "absolute", right: "3%", bottom: "15%", opacity: 0.07 }}
+          style={{ position: "absolute", right: "3%", bottom: "15%", opacity: 0.06 }}
           width="50"
           height="70"
           viewBox="0 0 60 80"
@@ -123,7 +123,7 @@ export default function Home() {
           />
           <line x1="30" y1="20" x2="30" y2="60" stroke="#E8A0C0" strokeWidth="0.8" opacity="0.6" />
           <path d="M12 60 L15 68 L45 68 L48 60 Z" fill="none" stroke="#E8A0C0" strokeWidth="1.5" />
-          <ellipse cx="30" cy="42" rx="6" ry="8" fill="#E8A0C0" opacity="0.15" />
+          <ellipse cx="30" cy="42" rx="6" ry="8" fill="#E8A0C0" opacity="0.06" />
         </svg>
 
         <svg
@@ -160,7 +160,7 @@ export default function Home() {
               position: "absolute",
               left: s.x,
               top: s.y,
-              opacity: 0.15,
+              opacity: 0.06,
             }}
             width={s.s * 2}
             height={s.s * 2}
@@ -225,102 +225,105 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. Storytelling */}
-      <section className="storytelling-grid">
+      {/* 2. Notre histoire — encart unique */}
+      <section style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
         <div
+          className="storytelling-card"
           style={{
-            background: "var(--bg-section)",
-            padding: "64px 48px",
+            maxWidth: "780px",
+            margin: "0 auto",
+            background: "#FFFFFF",
+            borderRadius: "24px",
+            border: "1px solid var(--rose-light)",
+            boxShadow: "0 4px 24px rgba(196,154,216,0.10)",
+            padding: "56px 64px",
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between",
-            borderRight: "1px solid var(--rose-light)",
+            gap: 0,
           }}
         >
-          <div>
-            <p
-              style={{
-                fontSize: "11px",
-                letterSpacing: "3px",
-                textTransform: "uppercase",
-                color: "var(--mauve-mid)",
-                marginBottom: "20px",
-              }}
-            >
-              Notre histoire
+          <p
+            style={{
+              fontSize: "11px",
+              letterSpacing: "3px",
+              textTransform: "uppercase",
+              color: "var(--mauve-mid)",
+              marginBottom: "16px",
+            }}
+          >
+            Notre histoire
+          </p>
+
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "clamp(22px, 3vw, 32px)",
+              color: "var(--text-title)",
+              lineHeight: 1.3,
+              marginBottom: "16px",
+            }}
+          >
+            Qissali, c&apos;est <em style={{ color: "var(--rose)" }}>mon histoire</em> en arabe
+          </h2>
+
+          <p style={{ fontSize: "15px", color: "var(--text-body)", lineHeight: 1.8, marginBottom: "32px" }}>
+            Qissali vient de l&apos;arabe{" "}
+            <span dir="rtl" lang="ar" className="inline-block">
+              قصتي
+            </span>{" "}
+            — qui signifie &quot;mon histoire&quot;. Parce que chaque enfant mérite une histoire rien que pour lui.
+          </p>
+
+          <div style={{ height: "1px", background: "var(--rose-light)", marginBottom: "32px" }} />
+
+          <div style={{ fontSize: "15px", color: "var(--text-body)", lineHeight: 1.9, marginBottom: "32px" }}>
+            <p style={{ marginBottom: "16px" }}>
+              <strong style={{ color: "var(--text-title)" }}>Un soir, ma fille m&apos;a demandé une histoire.</strong> Pas
+              n&apos;importe laquelle. Une histoire avec elle dedans. Avec son prénom, ses héros, son univers à elle.
             </p>
-
-            <h2
-              style={{
-                fontFamily: "'Playfair Display', serif",
-                fontSize: "clamp(20px, 2.5vw, 30px)",
-                color: "var(--text-title)",
-                lineHeight: 1.35,
-                marginBottom: "20px",
-              }}
-            >
-              Qissali, c&apos;est
-              <em style={{ color: "var(--rose)" }}> mon histoire </em>
-              en arabe
-            </h2>
-
-            <p style={{ fontSize: "14px", color: "var(--text-body)", lineHeight: 1.8 }}>
-              Qissali vient de l&apos;arabe{" "}
-              <span dir="rtl" lang="ar" className="inline-block">
-                قصتي
-              </span>{" "}
-              — qui signifie &quot;mon histoire&quot;. Parce que chaque enfant mérite une histoire rien que pour lui.
+            <p style={{ marginBottom: "16px" }}>
+              J&apos;ai cherché. Longtemps. Des livres trop difficiles, trop lointains, trop génériques. Rien qui lui
+              ressemble vraiment. Rien qui parle d&apos;elle tout en parlant de notre foi.
+            </p>
+            <p style={{ marginBottom: "16px" }}>
+              Je voulais lui transmettre l&apos;islam comme je l&apos;ai reçu, moi — dans des histoires. Pas des leçons.
+              Pas des obligations. Des récits qui restent toute une vie, ceux qu&apos;on raconte à ses propres enfants des
+              décennies plus tard.
+            </p>
+            <p>
+              Alors j&apos;ai créé Qissali.
+              <strong style={{ color: "var(--text-title)" }}>
+                {" "}
+                Pour mes filles. Et pour toutes les vôtres.
+              </strong>
             </p>
           </div>
 
-          <div
-            style={{
-              borderLeft: "2px solid var(--rose)",
-              paddingLeft: "20px",
-              marginTop: "40px",
-            }}
-          >
+          <div style={{ height: "1px", background: "var(--rose-light)", marginBottom: "32px" }} />
+
+          <div style={{ borderLeft: "3px solid var(--rose)", paddingLeft: "24px" }}>
             <p
               style={{
                 fontFamily: "'Playfair Display', serif",
                 fontStyle: "italic",
                 color: "var(--text-title)",
-                fontSize: "15px",
+                fontSize: "17px",
                 lineHeight: 1.6,
-                marginBottom: "8px",
+                marginBottom: "10px",
               }}
             >
               &ldquo;Le plus grand trésor d&apos;une princesse, ma chérie, ce n&apos;est pas sa couronne. C&apos;est son
               cœur.&rdquo;
             </p>
-            <p style={{ fontSize: "11px", color: "var(--text-soft)", letterSpacing: "1px" }}>
+            <p style={{ fontSize: "12px", color: "var(--text-soft)", letterSpacing: "0.5px" }}>
               Extrait d&apos;une histoire Qissali
             </p>
-          </div>
-        </div>
-
-        <div style={{ background: "var(--bg-main)", padding: "64px 56px" }}>
-          <div style={{ fontSize: "15px", color: "var(--text-body)", lineHeight: 1.9 }}>
-            <p style={{ marginBottom: "20px" }}>
-              <strong style={{ color: "var(--text-title)" }}>Un soir, ma fille m&apos;a demandé une histoire.</strong>{" "}
-              Pas n&apos;importe laquelle. Une histoire avec elle dedans. Avec son prénom, ses héros, son univers à elle.
-            </p>
-            <p style={{ marginBottom: "20px" }}>
-              J&apos;ai cherché. Longtemps. Des livres trop difficiles, trop lointains, trop génériques. Rien qui lui
-              ressemble vraiment. Rien qui parle d&apos;elle tout en parlant de notre foi.
-            </p>
-            <p style={{ marginBottom: "20px" }}>
-              Je voulais lui transmettre l&apos;islam comme je l&apos;ai reçu, moi — dans des histoires. Pas des leçons.
-              Pas des obligations. Des récits qui restent toute une vie, ceux qu&apos;on raconte à ses propres enfants des
-              décennies plus tard.
-            </p>
-            <p>Alors j&apos;ai créé Qissali. Pour mes filles. Et pour toutes les vôtres.</p>
           </div>
         </div>
       </section>
 
       {/* 3. Comment ça marche */}
-      <section id="decouvrir" style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
+      <section id="decouvrir" style={{ background: "#FFFFFF", padding: "80px 24px" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center" }}>
           <h2
             style={{
@@ -388,7 +391,7 @@ export default function Home() {
       </section>
 
       {/* 4. Les univers */}
-      <section style={{ background: "var(--bg-main)", padding: "80px 24px" }}>
+      <section style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
         <div style={{ maxWidth: "900px", margin: "0 auto" }}>
           <h2
             style={{
@@ -412,7 +415,7 @@ export default function Home() {
       </section>
 
       {/* 5. Neuroatypie */}
-      <section style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
+      <section style={{ background: "#FFFFFF", padding: "80px 24px" }}>
         <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center" }}>
           <h2
             style={{
@@ -473,7 +476,7 @@ export default function Home() {
       </section>
 
       {/* 6. Les packs */}
-      <section style={{ background: "var(--bg-main)", padding: "80px 24px" }}>
+      <section style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
         <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
           <h2
             style={{
@@ -617,7 +620,7 @@ export default function Home() {
       </section>
 
       {/* 7. Exemple */}
-      <section style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
+      <section style={{ background: "#FFFFFF", padding: "80px 24px" }}>
         <div style={{ maxWidth: "640px", margin: "0 auto" }}>
           <div
             style={{
@@ -705,7 +708,7 @@ export default function Home() {
       </section>
 
       {/* 8. Avis */}
-      <section style={{ background: "var(--bg-main)", padding: "80px 24px" }}>
+      <section style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
         <div style={{ maxWidth: "900px", margin: "0 auto" }}>
           <h2
             style={{
@@ -755,7 +758,7 @@ export default function Home() {
       {/* Footer */}
       <footer
         style={{
-          background: "var(--bg-section)",
+          background: "#FFFFFF",
           borderTop: "1px solid var(--rose-light)",
           padding: "40px 24px",
           textAlign: "center",

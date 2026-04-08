@@ -213,6 +213,13 @@ h3 {
   animation-delay: 0.64s;
 }
 
+@media (max-width: 640px) {
+  .storytelling-card {
+    padding: 36px 24px !important;
+    border-radius: 16px !important;
+  }
+}
+
 @media (max-width: 768px) {
   .storytelling-grid {
     grid-template-columns: 1fr !important;
