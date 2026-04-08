@@ -167,27 +167,6 @@ const packPriceTable = [
   { pack: "Famille", stories: "5", total: "12,90€", unit: "2,58€" },
 ] as const;
 
-const notreHistoireBlocs = [
-  {
-    icon: "🌙",
-    lines: [
-      "Un soir, ma fille m'a demandé",
-      "une histoire avec elle dedans.",
-    ],
-  },
-  {
-    icon: "🔍",
-    lines: [
-      "J'ai cherché longtemps.",
-      "Je n'ai rien trouvé qui lui ressemble.",
-    ],
-  },
-  {
-    icon: "✨",
-    lines: ["Alors j'ai créé Qissali.", "Pour elle. Pour toutes les autres."],
-  },
-] as const;
-
 const testimonials = [
   {
     quote:
@@ -255,36 +234,61 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Notre histoire — storytelling court */}
-      <section className="border-b border-[rgba(196,154,216,0.35)] bg-white">
-        <div className="mx-auto max-w-[1100px] px-8 py-[72px] sm:py-[88px]">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6 lg:gap-8">
-            {notreHistoireBlocs.map((bloc) => (
-              <div
-                key={bloc.icon}
-                className="flex flex-col items-center px-2 text-center"
-              >
-                <span className="text-4xl sm:text-[2.75rem]" aria-hidden>
-                  {bloc.icon}
-                </span>
-                <p
-                  className="mt-4 max-w-[280px] text-[15px] font-normal leading-relaxed sm:text-[16px]"
-                  style={{ color: "#7A5A8A" }}
-                >
-                  {bloc.lines.map((line, i) => (
-                    <span key={line}>
-                      {line}
-                      {i < bloc.lines.length - 1 ? (
-                        <>
-                          <br />
-                        </>
-                      ) : null}
-                    </span>
-                  ))}
-                </p>
-              </div>
-            ))}
+      {/* Notre histoire — fond violet + récit (paysage) */}
+      <section
+        className="storytelling-section border-b border-[rgba(196,154,216,0.35)]"
+        aria-labelledby="notre-histoire-titre"
+      >
+        <div className="storytelling-left">
+          <div>
+            <p className="storytelling-label">Notre histoire</p>
+            <h2 id="notre-histoire-titre" className="storytelling-title">
+              Qissali, c&apos;est mon histoire en arabe
+            </h2>
+            <p className="storytelling-subtitle">
+              Qissali vient de l&apos;arabe{" "}
+              <span dir="rtl" lang="ar" className="inline-block">
+                قصتي
+              </span>{" "}
+              — qui signifie tout simplement mon histoire. Parce que chaque enfant mérite une histoire
+              rien que pour lui.
+            </p>
           </div>
+          <blockquote className="storytelling-quote">
+            <p>
+              &ldquo;Le plus grand trésor d&apos;une princesse, ma chérie, ce n&apos;est pas sa couronne.
+              C&apos;est son cœur.&rdquo;
+            </p>
+            <cite className="storytelling-quote-source">Extrait d&apos;une histoire Qissali</cite>
+          </blockquote>
+        </div>
+        <div className="storytelling-right">
+          <div className="storytelling-text">
+            <p>
+              Un soir, ma fille m&apos;a demandé une histoire. Pas n&apos;importe laquelle. Une histoire
+              avec elle dedans. Avec son prénom, son univers, ses héros préférés.
+            </p>
+            <p>
+              J&apos;ai cherché. Longtemps. Des livres en arabe trop difficiles pour elle. Des histoires
+              islamiques en anglais qu&apos;elle ne comprenait pas. Du contenu générique, sans âme, sans
+              personnalisation, sans cette petite étincelle qui fait qu&apos;un enfant écoute avec les
+              yeux grands ouverts.
+            </p>
+            <p>
+              Et pourtant, j&apos;avais tellement envie de lui transmettre notre foi d&apos;une façon qui
+              lui ressemble. Pas des leçons. Pas des récitations. Des histoires. Celles qui restent,
+              celles qu&apos;on raconte à ses propres enfants des années plus tard.
+            </p>
+            <p>
+              Alors j&apos;ai créé Qissali. Pour que mes filles entendent une histoire où elles sont les
+              héroïnes. Où leur prénom résonne à chaque page. Où la générosité, le courage, la confiance
+              en Allah arrivent naturellement, dans la bouche d&apos;un personnage qu&apos;elles aiment,
+              au moment où ça compte vraiment.
+            </p>
+          </div>
+          <p className="storytelling-tags">
+            Conçu pour transmettre · Unique pour chaque enfant · Un moment partagé
+          </p>
         </div>
       </section>
 

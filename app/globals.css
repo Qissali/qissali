@@ -96,3 +96,107 @@ body {
 .hero-delay-6 {
   animation-delay: 0.64s;
 }
+
+/* Notre histoire — section paysage (violet + texte long) */
+.storytelling-section {
+  display: grid;
+  grid-template-columns: 40% 60%;
+  min-height: 500px;
+  width: 100%;
+}
+
+.storytelling-left {
+  background: linear-gradient(135deg, #2a1a3e 0%, #4a2e6e 100%);
+  padding: 64px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.storytelling-right {
+  background: #fef6ff;
+  padding: 64px 48px;
+}
+
+.storytelling-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #c49ad8;
+  margin-bottom: 16px;
+}
+
+.storytelling-title {
+  font-family: var(--font-playfair), "Playfair Display", Georgia, serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: #fff;
+  line-height: 1.3;
+  margin-bottom: 16px;
+}
+
+.storytelling-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.7;
+}
+
+.storytelling-quote {
+  font-style: italic;
+  color: #f5d0e4;
+  font-size: 14px;
+  line-height: 1.6;
+  border-left: 2px solid #c49ad8;
+  padding-left: 16px;
+  margin-top: auto;
+}
+
+.storytelling-quote p {
+  margin: 0;
+}
+
+.storytelling-quote-source {
+  display: block;
+  margin-top: 12px;
+  font-style: normal;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.storytelling-text {
+  font-size: 15px;
+  color: #5a3a5a;
+  line-height: 1.8;
+}
+
+.storytelling-text p {
+  margin-bottom: 16px;
+}
+
+.storytelling-text p:last-child {
+  margin-bottom: 0;
+}
+
+.storytelling-tags {
+  margin-top: 32px;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #c49ad8;
+}
+
+@media (max-width: 768px) {
+  .storytelling-section {
+    grid-template-columns: 1fr;
+  }
+
+  .storytelling-left {
+    padding: 40px 24px;
+    min-height: 300px;
+  }
+
+  .storytelling-right {
+    padding: 40px 24px;
+  }
+}
