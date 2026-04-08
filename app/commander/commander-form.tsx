@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { StripeEmbeddedCheckout } from "@/components/stripe-embedded-checkout";
 
 const UNIVERSES = [
@@ -35,47 +36,82 @@ const PROFILS = [
   { id: "hpi", label: "Haut potentiel (HPI/HQI)" },
 ] as const;
 
+const PACKS = {
+  solo: { label: "Solo", nbHistoires: 1, prix: 390 },
+  duo: { label: "Duo", nbHistoires: 2, prix: 690 },
+  trio: { label: "Trio", nbHistoires: 3, prix: 890 },
+  famille: { label: "Famille", nbHistoires: 5, prix: 1290 },
+} as const;
+
+type PackKey = keyof typeof PACKS;
 type SiblingLink = "soeurs" | "freres" | "mixte";
-
 type Genre = "fille" | "garcon";
-
-type FormatId = "pdf" | "pdf-audio";
 
 function genreLibelle(g: Genre): "Fille" | "Garçon" {
   return g === "fille" ? "Fille" : "Garçon";
 }
 
-const FORMATS: { id: FormatId; label: string; price: string }[] = [
-  { id: "pdf", label: "PDF illustré", price: "3,90€" },
-  { id: "pdf-audio", label: "PDF + Audio", price: "7,90€" },
-];
+function centsToEuroLabel(cents: number): string {
+  return `${(cents / 100).toFixed(2).replace(".", ",")}€`;
+}
 
 function isValidEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 }
 
-export function CommanderForm() {
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+export type HistoireFormState = {
+  id: number;
+  nbEnfants: 1 | 2;
+  prenom1: string;
+  age1: string;
+  prenom2: string;
+  age2: string;
+  lien: SiblingLink | "";
+  genre1: Genre | "";
+  genre2: Genre | "";
+  univers: (typeof UNIVERSES)[number]["id"] | "";
+  valeur: (typeof VALEURS)[number]["value"] | "";
+  occasion: (typeof OCCASIONS)[number]["value"] | "";
+  neuroEnabled: boolean;
+  profils: string[];
+  precisionsNeuro: string;
+  message: string;
+};
 
-  const [childCount, setChildCount] = useState<1 | 2>(1);
-  const [child1Name, setChild1Name] = useState("");
-  const [child1Age, setChild1Age] = useState("");
-  const [genre1, setGenre1] = useState<Genre | "">("");
-  const [child2Name, setChild2Name] = useState("");
-  const [child2Age, setChild2Age] = useState("");
-  const [genre2, setGenre2] = useState<Genre | "">("");
-  const [siblingLink, setSiblingLink] = useState<SiblingLink | "">("");
-  const [neuroEnabled, setNeuroEnabled] = useState(false);
-  const [profils, setProfils] = useState<string[]>([]);
-  const [precisionsNeuro, setPrecisionsNeuro] = useState("");
+function emptyHistoire(id: number): HistoireFormState {
+  return {
+    id,
+    nbEnfants: 1,
+    prenom1: "",
+    age1: "",
+    prenom2: "",
+    age2: "",
+    lien: "",
+    genre1: "",
+    genre2: "",
+    univers: "",
+    valeur: "",
+    occasion: "",
+    neuroEnabled: false,
+    profils: [],
+    precisionsNeuro: "",
+    message: "",
+  };
+}
 
-  const [universe, setUniverse] = useState<(typeof UNIVERSES)[number]["id"] | "">("");
-  const [valeur, setValeur] = useState<(typeof VALEURS)[number]["value"] | "">("");
-  const [occasion, setOccasion] = useState<(typeof OCCASIONS)[number]["value"] | "">("");
+function CommanderFormInner() {
+  const searchParams = useSearchParams();
+  const packParam = (searchParams.get("pack") || "solo") as string;
+  const pack = PACKS[packParam as PackKey] ?? PACKS.solo;
+  const packKey = (packParam in PACKS ? packParam : "solo") as PackKey;
 
-  const [format, setFormat] = useState<FormatId>("pdf");
+  const [histoires, setHistoires] = useState<HistoireFormState[]>(() =>
+    Array.from({ length: pack.nbHistoires }, (_, i) => emptyHistoire(i + 1))
+  );
+  const [currentHistoire, setCurrentHistoire] = useState(0);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [phase, setPhase] = useState<"story" | "payment">("story");
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -90,6 +126,19 @@ export function CommanderForm() {
     []
   );
 
+  const h = histoires[currentHistoire] ?? histoires[0];
+
+  const patchHistoire = useCallback(
+    (updates: Partial<HistoireFormState>) => {
+      setHistoires((prev) => {
+        const next = [...prev];
+        next[currentHistoire] = { ...next[currentHistoire], ...updates };
+        return next;
+      });
+    },
+    [currentHistoire]
+  );
+
   const clearError = useCallback((key: string) => {
     setErrors((e) => {
       const next = { ...e };
@@ -98,46 +147,50 @@ export function CommanderForm() {
     });
   }, []);
 
+  const hasNeuroProfile = useMemo(
+    () => h.neuroEnabled && h.profils.some((p) => p !== "aucun"),
+    [h.neuroEnabled, h.profils]
+  );
+
+  const profilsLabel = useMemo(() => {
+    if (!hasNeuroProfile) return "";
+    return PROFILS.filter((p) => p.id !== "aucun" && h.profils.includes(p.id))
+      .map((p) => p.label)
+      .join(", ");
+  }, [hasNeuroProfile, h.profils]);
+
+  const universeLabelFor = useCallback((u: HistoireFormState["univers"]) => {
+    const found = UNIVERSES.find((x) => x.id === u);
+    return found ? `${found.emoji} ${found.label}` : "—";
+  }, []);
+
   const validateStep1 = useCallback(() => {
     const e: Record<string, string> = {};
-    if (!child1Name.trim()) e.child1Name = "Indique le prénom.";
-    const a1 = parseInt(child1Age, 10);
-    if (Number.isNaN(a1) || a1 < 2 || a1 > 12) {
-      e.child1Age = "Âge entre 2 et 12 ans.";
-    }
-    if (!genre1) e.genre1 = "Indique si l’enfant est une fille ou un garçon.";
-    if (childCount === 2) {
-      if (!child2Name.trim()) e.child2Name = "Indique le prénom.";
-      const a2 = parseInt(child2Age, 10);
-      if (Number.isNaN(a2) || a2 < 2 || a2 > 12) {
-        e.child2Age = "Âge entre 2 et 12 ans.";
-      }
-      if (!genre2) e.genre2 = "Indique le genre du deuxième enfant.";
-      if (!siblingLink) e.siblingLink = "Choisis le lien entre les enfants.";
+    if (!h.prenom1.trim()) e.child1Name = "Indique le prénom.";
+    const a1 = parseInt(h.age1, 10);
+    if (Number.isNaN(a1) || a1 < 2 || a1 > 12) e.child1Age = "Âge entre 2 et 12 ans.";
+    if (!h.genre1) e.genre1 = "Indique si l’enfant est une fille ou un garçon.";
+    if (h.nbEnfants === 2) {
+      if (!h.prenom2.trim()) e.child2Name = "Indique le prénom.";
+      const a2 = parseInt(h.age2, 10);
+      if (Number.isNaN(a2) || a2 < 2 || a2 > 12) e.child2Age = "Âge entre 2 et 12 ans.";
+      if (!h.genre2) e.genre2 = "Indique le genre du deuxième enfant.";
+      if (!h.lien) e.siblingLink = "Choisis le lien entre les enfants.";
     }
     setErrors(e);
     return Object.keys(e).length === 0;
-  }, [
-    child1Name,
-    child1Age,
-    genre1,
-    child2Name,
-    child2Age,
-    genre2,
-    childCount,
-    siblingLink,
-  ]);
-
-  const validateStep2 = useCallback(() => {
-    const e: Record<string, string> = {};
-    if (!universe) e.universe = "Choisis un univers.";
-    if (!valeur) e.valeur = "Choisis une valeur.";
-    if (!occasion) e.occasion = "Choisis une occasion.";
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  }, [universe, valeur, occasion]);
+  }, [h]);
 
   const validateStep3 = useCallback(() => {
+    const e: Record<string, string> = {};
+    if (!h.univers) e.universe = "Choisis un univers.";
+    if (!h.valeur) e.valeur = "Choisis une valeur.";
+    if (!h.occasion) e.occasion = "Choisis une occasion.";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  }, [h]);
+
+  const validatePayment = useCallback(() => {
     const e: Record<string, string> = {};
     if (!email.trim()) e.email = "Indique ton email.";
     else if (!isValidEmail(email)) e.email = "Email invalide.";
@@ -145,70 +198,97 @@ export function CommanderForm() {
     return Object.keys(e).length === 0;
   }, [email]);
 
-  const goNext = () => {
-    if (step === 1 && validateStep1()) setStep(2);
-    else if (step === 2 && validateStep2()) setStep(3);
+  const globalProgress = useMemo(() => {
+    const total = pack.nbHistoires * 3;
+    const done = currentHistoire * 3 + (currentStep - 1);
+    return Math.min(100, Math.round((done / total) * 100));
+  }, [pack.nbHistoires, currentHistoire, currentStep]);
+
+  const handleNextStoryStep = () => {
+    if (currentStep === 1 && validateStep1()) setCurrentStep(2);
+    else if (currentStep === 2) setCurrentStep(3);
+    else if (currentStep === 3 && validateStep3()) {
+      if (currentHistoire < pack.nbHistoires - 1) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setCurrentHistoire((c) => c + 1);
+        setCurrentStep(1);
+      } else {
+        setPhase("payment");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
   };
 
-  const goBack = () => {
-    if (step > 1) setStep((s) => (s === 2 ? 1 : 2) as 1 | 2 | 3);
+  const handlePrev = () => {
+    if (phase === "payment") {
+      setPhase("story");
+      setCurrentHistoire(pack.nbHistoires - 1);
+      setCurrentStep(3);
+      return;
+    }
+    if (currentStep > 1) setCurrentStep((s) => (s === 2 ? 1 : 2) as 1 | 2 | 3);
+    else if (currentHistoire > 0) {
+      setCurrentHistoire((c) => c - 1);
+      setCurrentStep(3);
+    }
   };
-
-  const universeLabel = useMemo(() => {
-    const u = UNIVERSES.find((x) => x.id === universe);
-    return u ? `${u.emoji} ${u.label}` : "—";
-  }, [universe]);
-
-  const hasNeuroProfile = useMemo(
-    () => neuroEnabled && profils.some((p) => p !== "aucun"),
-    [neuroEnabled, profils]
-  );
-
-  const profilsLabel = useMemo(() => {
-    if (!hasNeuroProfile) return "";
-    return PROFILS.filter((p) => p.id !== "aucun" && profils.includes(p.id))
-      .map((p) => p.label)
-      .join(", ");
-  }, [hasNeuroProfile, profils]);
-
-  const formatLabel = useMemo(() => {
-    const f = FORMATS.find((x) => x.id === format);
-    return f ? `${f.label} — ${f.price}` : "—";
-  }, [format]);
 
   const handlePay = async (ev: React.FormEvent) => {
     ev.preventDefault();
-    if (!validateStep3()) return;
+    if (!validatePayment()) return;
 
-    const universLabel = UNIVERSES.find((u) => u.id === universe)?.label ?? universe;
+    const payloadHistoires = histoires.map((story) => {
+      const u = UNIVERSES.find((x) => x.id === story.univers);
+      const universLabel = u?.label ?? "";
+      const profilsStr = story.neuroEnabled
+        ? story.profils.filter((p) => p !== "aucun").join(",")
+        : "";
+      return {
+        prenom1: story.prenom1.trim(),
+        prenom2: story.nbEnfants === 2 ? story.prenom2.trim() : "",
+        age_enfant1: story.age1.trim(),
+        age_enfant2: story.nbEnfants === 2 ? story.age2.trim() : "",
+        genre1: story.genre1 ? genreLibelle(story.genre1) : "",
+        genre2: story.nbEnfants === 2 && story.genre2 ? genreLibelle(story.genre2) : "",
+        type_histoire: story.nbEnfants === 1 ? "solo" : "fratrie",
+        lien: story.lien || "",
+        univers: universLabel,
+        valeur: story.valeur,
+        occasion: story.occasion,
+        profils: profilsStr,
+        precisionsNeuro: story.neuroEnabled ? story.precisionsNeuro.trim() : "",
+        message: story.message.trim(),
+      };
+    });
+
+    const first = payloadHistoires[0];
+    if (!first?.prenom1) return;
 
     setCheckoutLoading(true);
     clearError("checkout");
     try {
-      const montant = format === "pdf" ? 390 : 790;
       const res = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: email.trim(),
-          montant,
-          prenom1: child1Name.trim(),
-          prenom2: childCount === 2 ? child2Name.trim() : "",
-          univers: universLabel,
-          valeur,
-          occasion,
-          format,
-          message: message.trim(),
-          typeHistoire: childCount === 1 ? "solo" : "fratrie",
-          genre1: genre1 ? genreLibelle(genre1) : "",
-          genre2:
-            childCount === 2 && genre2 ? genreLibelle(genre2) : "",
-          age_enfant1: child1Age.trim(),
-          age_enfant2: childCount === 2 ? child2Age.trim() : "",
-          profils: neuroEnabled
-            ? profils.filter((p) => p !== "aucun").join(",")
-            : "",
-          precisionsNeuro: neuroEnabled ? precisionsNeuro.trim() : "",
+          prix: pack.prix,
+          pack: packKey,
+          format: "pdf",
+          histoires: payloadHistoires,
+          prenom1: first.prenom1,
+          prenom2: first.prenom2,
+          univers: first.univers,
+          valeur: first.valeur,
+          occasion: first.occasion,
+          message: first.message,
+          typeHistoire: first.type_histoire,
+          genre1: first.genre1,
+          genre2: first.genre2,
+          age_enfant1: first.age_enfant1,
+          age_enfant2: first.age_enfant2,
+          profils: first.profils,
+          precisionsNeuro: first.precisionsNeuro,
           embedded: canUseEmbeddedCheckout,
         }),
       });
@@ -231,16 +311,13 @@ export function CommanderForm() {
         setEmbeddedClientSecret(data.clientSecret);
         return;
       }
-
       if (data.url) {
         window.location.href = data.url;
         return;
       }
-
       setErrors((e) => ({
         ...e,
-        checkout:
-          "Réponse serveur invalide (pas d’URL ni de session de paiement intégrée).",
+        checkout: "Réponse serveur invalide.",
       }));
     } catch {
       setErrors((e) => ({
@@ -252,66 +329,71 @@ export function CommanderForm() {
     }
   };
 
-  const formShellClass =
-    "rounded-2xl border border-qissali-rose/30 bg-white/70 p-6 shadow-lg shadow-qissali-mauve/10 backdrop-blur-sm sm:p-8";
+  const recapLine = (story: HistoireFormState, index: number) => {
+    const pr = story.prenom1.trim() || "…";
+    const u = UNIVERSES.find((x) => x.id === story.univers)?.label ?? "…";
+    const v = story.valeur || "…";
+    const o = story.occasion || "";
+    return `Histoire ${index + 1} : ${pr} · ${u} · ${v}${o ? ` · ${o}` : ""}`;
+  };
 
   const chipBtn =
     "rounded-xl border-2 px-4 py-3 text-center text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-qissali-mauve";
 
+  const formShellClass =
+    "rounded-2xl border border-qissali-rose/30 bg-white/70 p-6 shadow-lg shadow-qissali-mauve/10 backdrop-blur-sm sm:p-8";
+
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="mb-10">
-        <p className="text-center font-display text-sm uppercase tracking-[0.15em] text-qissali-mauve">
-          Commande
+      {/* Header fixe */}
+      <div className="sticky top-0 z-20 -mx-4 mb-6 border-b border-qissali-rose/20 bg-qissali-cream/95 px-4 py-3 backdrop-blur-sm sm:-mx-0 sm:rounded-t-2xl">
+        <p className="text-center text-sm font-semibold text-qissali-mauve">
+          Pack {pack.label} · Histoire {currentHistoire + 1}/{pack.nbHistoires}
         </p>
-        <h1 className="mt-2 text-center font-display text-3xl font-normal text-qissali-mauve md:text-4xl">
+        <div className="mt-2 flex justify-center gap-2">
+          {Array.from({ length: pack.nbHistoires }).map((_, i) => (
+            <div
+              key={i}
+              className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold ${
+                i < currentHistoire
+                  ? "bg-qissali-rose text-white"
+                  : i === currentHistoire
+                    ? "bg-qissali-mauve text-white"
+                    : "bg-slate-200 text-slate-500"
+              }`}
+            >
+              {i < currentHistoire ? "✓" : i + 1}
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-qissali-rose/25">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-qissali-rose to-qissali-mauve transition-all duration-500"
+            style={{ width: `${globalProgress}%` }}
+          />
+        </div>
+      </div>
+
+      <div className="mb-8 text-center">
+        <p className="font-display text-sm uppercase tracking-[0.15em] text-qissali-mauve">Commande</p>
+        <h1 className="mt-2 font-display text-3xl font-normal text-qissali-mauve md:text-4xl">
           Personnalise ton histoire
         </h1>
       </div>
 
-      {/* Barre de progression */}
-      <div className="mb-10" aria-label="Progression du formulaire">
-        <div className="flex gap-2">
-          {([1, 2, 3] as const).map((s) => (
-            <div
-              key={s}
-              className={`h-2 flex-1 rounded-full transition-colors ${
-                step >= s ? "bg-gradient-to-r from-qissali-rose to-qissali-mauve" : "bg-qissali-rose/25"
-              }`}
-            />
-          ))}
-        </div>
-        <div className="mt-3 flex justify-between text-xs text-slate-500">
-          <span className={step === 1 ? "font-semibold text-qissali-mauve" : ""}>
-            L&apos;enfant
-          </span>
-          <span className={step === 2 ? "font-semibold text-qissali-mauve" : ""}>
-            L&apos;histoire
-          </span>
-          <span className={step === 3 ? "font-semibold text-qissali-mauve" : ""}>
-            Livraison
-          </span>
-        </div>
-      </div>
-
       {embeddedClientSecret ? (
         <div className={formShellClass}>
-          <h2 className="mb-2 font-display text-xl text-qissali-mauve">
-            Paiement sécurisé
-          </h2>
+          <h2 className="mb-2 font-display text-xl text-qissali-mauve">Paiement sécurisé</h2>
           <p className="mb-4 text-sm text-slate-600">
-            Carte bancaire, Apple Pay ou Google Pay selon l&apos;appareil — le formulaire
-            Stripe s&apos;affiche ci-dessous, sans quitter le site.
+            Carte bancaire, Apple Pay ou Google Pay selon l&apos;appareil — le formulaire Stripe
+            s&apos;affiche ci-dessous.
           </p>
           <StripeEmbeddedCheckout
             clientSecret={embeddedClientSecret}
             onError={(msg) => setErrors((prev) => ({ ...prev, checkout: msg }))}
           />
           {errors.checkout && (
-            <p
-              className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-              role="alert"
-            >
+            <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
               {errors.checkout}
             </p>
           )}
@@ -329,606 +411,532 @@ export function CommanderForm() {
           </div>
         </div>
       ) : (
-        <form onSubmit={handlePay} className={formShellClass}>
-        {/* STEP 1 */}
-        {step === 1 && (
-          <div className="space-y-8">
-            <h2 className="font-display text-xl text-qissali-mauve">Étape 1 — L&apos;enfant</h2>
+        <form onSubmit={phase === "payment" ? handlePay : (e) => e.preventDefault()} className={formShellClass}>
+          {phase === "story" && (
+            <>
+              {currentStep === 1 && (
+                <div className="space-y-8">
+                  <h2 className="font-display text-xl text-qissali-mauve">Étape 1 — L&apos;enfant</h2>
 
-            <div>
-              <p className="mb-3 text-sm font-medium text-slate-700">Histoire solo ou fratrie ?</p>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setChildCount(1);
-                    clearError("siblingLink");
-                    clearError("genre2");
-                    setSiblingLink("");
-                    setChild2Name("");
-                    setChild2Age("");
-                    setGenre2("");
-                  }}
-                  className={`${chipBtn} flex-1 ${
-                    childCount === 1
-                      ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
-                      : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
-                  }`}
-                >
-                  Un seul enfant
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setChildCount(2);
-                    clearError("siblingLink");
-                  }}
-                  className={`${chipBtn} flex-1 ${
-                    childCount === 2
-                      ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
-                      : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
-                  }`}
-                >
-                  Deux enfants (fratrie)
-                </button>
-              </div>
-            </div>
-
-            <div className="grid gap-6 sm:grid-cols-2">
-              <div>
-                <label htmlFor="c1-name" className="mb-2 block text-sm font-medium text-slate-700">
-                  Prénom enfant 1 <span className="text-qissali-rose">*</span>
-                </label>
-                <input
-                  id="c1-name"
-                  type="text"
-                  autoComplete="given-name"
-                  value={child1Name}
-                  onChange={(e) => {
-                    setChild1Name(e.target.value);
-                    clearError("child1Name");
-                  }}
-                  className="w-full rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 text-slate-800 outline-none ring-qissali-mauve/30 transition focus:border-qissali-mauve focus:ring-2"
-                />
-                {errors.child1Name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.child1Name}</p>
-                )}
-              </div>
-              <div>
-                <label htmlFor="c1-age" className="mb-2 block text-sm font-medium text-slate-700">
-                  Âge enfant 1 <span className="text-qissali-rose">*</span>
-                </label>
-                <input
-                  id="c1-age"
-                  type="number"
-                  min={2}
-                  max={12}
-                  inputMode="numeric"
-                  value={child1Age}
-                  onChange={(e) => {
-                    setChild1Age(e.target.value);
-                    clearError("child1Age");
-                  }}
-                  className="w-full rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 text-slate-800 outline-none focus:border-qissali-mauve focus:ring-2 focus:ring-qissali-mauve/30"
-                />
-                {errors.child1Age && (
-                  <p className="mt-1 text-sm text-red-600">{errors.child1Age}</p>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <p className="mb-3 text-sm font-medium text-slate-700">
-                Genre <span className="text-qissali-rose">*</span>
-              </p>
-              <div className="flex gap-3">
-                {(["fille", "garcon"] as const).map((g) => (
-                  <button
-                    key={g}
-                    type="button"
-                    onClick={() => {
-                      setGenre1(g);
-                      clearError("genre1");
-                    }}
-                    className={`${chipBtn} flex-1 ${
-                      genre1 === g
-                        ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
-                        : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
-                    }`}
-                  >
-                    {g === "fille" ? "Fille" : "Garçon"}
-                  </button>
-                ))}
-              </div>
-              {errors.genre1 && <p className="mt-2 text-sm text-red-600">{errors.genre1}</p>}
-            </div>
-
-            {childCount === 2 && (
-              <>
-                <div className="grid gap-6 sm:grid-cols-2">
                   <div>
-                    <label htmlFor="c2-name" className="mb-2 block text-sm font-medium text-slate-700">
-                      Prénom enfant 2 <span className="text-qissali-rose">*</span>
-                    </label>
-                    <input
-                      id="c2-name"
-                      type="text"
-                      value={child2Name}
-                      onChange={(e) => {
-                        setChild2Name(e.target.value);
-                        clearError("child2Name");
-                      }}
-                      className="w-full rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 outline-none focus:border-qissali-mauve focus:ring-2 focus:ring-qissali-mauve/30"
-                    />
-                    {errors.child2Name && (
-                      <p className="mt-1 text-sm text-red-600">{errors.child2Name}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label htmlFor="c2-age" className="mb-2 block text-sm font-medium text-slate-700">
-                      Âge enfant 2 <span className="text-qissali-rose">*</span>
-                    </label>
-                    <input
-                      id="c2-age"
-                      type="number"
-                      min={2}
-                      max={12}
-                      inputMode="numeric"
-                      value={child2Age}
-                      onChange={(e) => {
-                        setChild2Age(e.target.value);
-                        clearError("child2Age");
-                      }}
-                      className="w-full rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 outline-none focus:border-qissali-mauve focus:ring-2 focus:ring-qissali-mauve/30"
-                    />
-                    {errors.child2Age && (
-                      <p className="mt-1 text-sm text-red-600">{errors.child2Age}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <p className="mb-3 text-sm font-medium text-slate-700">
-                    Genre enfant 2 <span className="text-qissali-rose">*</span>
-                  </p>
-                  <div className="flex gap-3">
-                    {(["fille", "garcon"] as const).map((g) => (
+                    <p className="mb-3 text-sm font-medium text-slate-700">Histoire solo ou fratrie ?</p>
+                    <div className="flex flex-col gap-3 sm:flex-row">
                       <button
-                        key={g}
                         type="button"
                         onClick={() => {
-                          setGenre2(g);
+                          patchHistoire({
+                            nbEnfants: 1,
+                            prenom2: "",
+                            age2: "",
+                            genre2: "",
+                            lien: "",
+                          });
+                          clearError("siblingLink");
                           clearError("genre2");
                         }}
                         className={`${chipBtn} flex-1 ${
-                          genre2 === g
+                          h.nbEnfants === 1
                             ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
                             : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
                         }`}
                       >
-                        {g === "fille" ? "Fille" : "Garçon"}
+                        Un seul enfant
                       </button>
-                    ))}
-                  </div>
-                  {errors.genre2 && <p className="mt-2 text-sm text-red-600">{errors.genre2}</p>}
-                </div>
-
-                <div>
-                  <p className="mb-3 text-sm font-medium text-slate-700">Lien entre les enfants</p>
-                  <div className="flex flex-wrap gap-3">
-                    {(
-                      [
-                        { id: "soeurs" as const, label: "Sœurs" },
-                        { id: "freres" as const, label: "Frères" },
-                        { id: "mixte" as const, label: "Mixte" },
-                      ] as const
-                    ).map(({ id, label }) => (
                       <button
-                        key={id}
                         type="button"
                         onClick={() => {
-                          setSiblingLink(id);
+                          patchHistoire({ nbEnfants: 2 });
                           clearError("siblingLink");
                         }}
-                        className={`${chipBtn} flex-1 min-w-[100px] ${
-                          siblingLink === id
-                            ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
+                        className={`${chipBtn} flex-1 ${
+                          h.nbEnfants === 2
+                            ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
                             : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
                         }`}
                       >
-                        {label}
+                        Deux enfants (fratrie)
                       </button>
-                    ))}
+                    </div>
                   </div>
-                  {errors.siblingLink && (
-                    <p className="mt-2 text-sm text-red-600">{errors.siblingLink}</p>
+
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Prénom enfant 1 <span className="text-qissali-rose">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={h.prenom1}
+                        onChange={(e) => {
+                          patchHistoire({ prenom1: e.target.value });
+                          clearError("child1Name");
+                        }}
+                        className="w-full rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 text-slate-800 outline-none focus:border-qissali-mauve focus:ring-2"
+                      />
+                      {errors.child1Name && <p className="mt-1 text-sm text-red-600">{errors.child1Name}</p>}
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-sm font-medium text-slate-700">
+                        Âge enfant 1 <span className="text-qissali-rose">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        min={2}
+                        max={12}
+                        value={h.age1}
+                        onChange={(e) => {
+                          patchHistoire({ age1: e.target.value });
+                          clearError("child1Age");
+                        }}
+                        className="w-full rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 outline-none focus:border-qissali-mauve focus:ring-2"
+                      />
+                      {errors.child1Age && <p className="mt-1 text-sm text-red-600">{errors.child1Age}</p>}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="mb-3 text-sm font-medium text-slate-700">
+                      Genre <span className="text-qissali-rose">*</span>
+                    </p>
+                    <div className="flex gap-3">
+                      {(["fille", "garcon"] as const).map((g) => (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() => {
+                            patchHistoire({ genre1: g });
+                            clearError("genre1");
+                          }}
+                          className={`${chipBtn} flex-1 ${
+                            h.genre1 === g
+                              ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
+                              : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                          }`}
+                        >
+                          {g === "fille" ? "Fille" : "Garçon"}
+                        </button>
+                      ))}
+                    </div>
+                    {errors.genre1 && <p className="mt-2 text-sm text-red-600">{errors.genre1}</p>}
+                  </div>
+
+                  {h.nbEnfants === 2 && (
+                    <>
+                      <div className="grid gap-6 sm:grid-cols-2">
+                        <div>
+                          <label className="mb-2 block text-sm font-medium text-slate-700">
+                            Prénom enfant 2 <span className="text-qissali-rose">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={h.prenom2}
+                            onChange={(e) => {
+                              patchHistoire({ prenom2: e.target.value });
+                              clearError("child2Name");
+                            }}
+                            className="w-full rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 outline-none focus:border-qissali-mauve focus:ring-2"
+                          />
+                          {errors.child2Name && <p className="mt-1 text-sm text-red-600">{errors.child2Name}</p>}
+                        </div>
+                        <div>
+                          <label className="mb-2 block text-sm font-medium text-slate-700">
+                            Âge enfant 2 <span className="text-qissali-rose">*</span>
+                          </label>
+                          <input
+                            type="number"
+                            min={2}
+                            max={12}
+                            value={h.age2}
+                            onChange={(e) => {
+                              patchHistoire({ age2: e.target.value });
+                              clearError("child2Age");
+                            }}
+                            className="w-full rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 outline-none focus:border-qissali-mauve focus:ring-2"
+                          />
+                          {errors.child2Age && <p className="mt-1 text-sm text-red-600">{errors.child2Age}</p>}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="mb-3 text-sm font-medium text-slate-700">
+                          Genre enfant 2 <span className="text-qissali-rose">*</span>
+                        </p>
+                        <div className="flex gap-3">
+                          {(["fille", "garcon"] as const).map((g) => (
+                            <button
+                              key={g}
+                              type="button"
+                              onClick={() => {
+                                patchHistoire({ genre2: g });
+                                clearError("genre2");
+                              }}
+                              className={`${chipBtn} flex-1 ${
+                                h.genre2 === g
+                                  ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve shadow-inner"
+                                  : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                              }`}
+                            >
+                              {g === "fille" ? "Fille" : "Garçon"}
+                            </button>
+                          ))}
+                        </div>
+                        {errors.genre2 && <p className="mt-2 text-sm text-red-600">{errors.genre2}</p>}
+                      </div>
+                      <div>
+                        <p className="mb-3 text-sm font-medium text-slate-700">Lien entre les enfants</p>
+                        <div className="flex flex-wrap gap-3">
+                          {(
+                            [
+                              { id: "soeurs" as const, label: "Sœurs" },
+                              { id: "freres" as const, label: "Frères" },
+                              { id: "mixte" as const, label: "Mixte" },
+                            ] as const
+                          ).map(({ id, label }) => (
+                            <button
+                              key={id}
+                              type="button"
+                              onClick={() => {
+                                patchHistoire({ lien: id });
+                                clearError("siblingLink");
+                              }}
+                              className={`${chipBtn} min-w-[100px] flex-1 ${
+                                h.lien === id
+                                  ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
+                                  : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                              }`}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                        {errors.siblingLink && <p className="mt-2 text-sm text-red-600">{errors.siblingLink}</p>}
+                      </div>
+                    </>
                   )}
+
+                  <div className="flex flex-col gap-3 border-t border-qissali-rose/20 pt-6 sm:flex-row sm:justify-between">
+                    <Link
+                      href="/"
+                      className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-center text-sm font-medium text-qissali-mauve transition hover:bg-qissali-mauve/10"
+                    >
+                      ← Accueil
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={handleNextStoryStep}
+                      className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-qissali-rose to-qissali-mauve px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:brightness-105"
+                    >
+                      Suivant
+                    </button>
+                  </div>
                 </div>
-              </>
-            )}
+              )}
 
-            <div>
-              <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-qissali-rose/30 bg-qissali-cream/30 p-4 transition hover:border-qissali-mauve/40">
-                <input
-                  type="checkbox"
-                  className="mt-1 h-4 w-4 shrink-0 rounded border-qissali-rose/50 text-qissali-mauve focus:ring-qissali-mauve"
-                  checked={neuroEnabled}
-                  onChange={(e) => {
-                    const on = e.target.checked;
-                    setNeuroEnabled(on);
-                    if (!on) {
-                      setProfils([]);
-                      setPrecisionsNeuro("");
-                    }
-                  }}
-                />
-                <span className="text-sm leading-snug text-slate-700">
-                  <span className="font-medium text-qissali-mauve">Adapter l&apos;histoire</span> à un profil
-                  neuroatypique ou à des besoins particuliers{" "}
-                  <span className="text-slate-500">(Dys, TDAH, TSA, HPI… — optionnel)</span>
-                </span>
-              </label>
+              {currentStep === 2 && (
+                <div className="space-y-8">
+                  <h2 className="font-display text-xl text-qissali-mauve">Étape 2 — Profil neuro (optionnel)</h2>
 
-              {neuroEnabled && (
-                <div className="mt-4 rounded-xl border border-qissali-rose/25 bg-qissali-cream/40 p-4">
-                  <p className="text-sm font-semibold text-qissali-mauve">Neuroatypie</p>
-                  <p className="mt-1 text-sm font-medium text-slate-700">
-                    Votre enfant a-t-il un profil neuroatypique ou des besoins particuliers ?
-                    <span className="font-normal text-slate-500">
-                      {" "}
-                      (pour personnaliser l&apos;histoire)
+                  <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-qissali-rose/30 bg-qissali-cream/30 p-4">
+                    <input
+                      type="checkbox"
+                      className="mt-1 h-4 w-4 shrink-0 rounded border-qissali-rose/50 text-qissali-mauve focus:ring-qissali-mauve"
+                      checked={h.neuroEnabled}
+                      onChange={(e) => {
+                        const on = e.target.checked;
+                        patchHistoire({
+                          neuroEnabled: on,
+                          profils: on ? h.profils : [],
+                          precisionsNeuro: on ? h.precisionsNeuro : "",
+                        });
+                      }}
+                    />
+                    <span className="text-sm text-slate-700">
+                      <span className="font-medium text-qissali-mauve">Adapter l&apos;histoire</span> à un profil
+                      neuroatypique (Dys, TDAH, TSA, HPI…)
                     </span>
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    Ces informations restent privées et servent uniquement à adapter l&apos;histoire.
-                  </p>
+                  </label>
 
-                  <div className="mt-3 flex flex-col gap-2">
-                    {PROFILS.map(({ id, label }) => {
-                      const selected = profils.includes(id);
-                      return (
+                  {h.neuroEnabled && (
+                    <div className="rounded-xl border border-qissali-rose/25 bg-qissali-cream/40 p-4">
+                      <div className="mt-3 flex flex-col gap-2">
+                        {PROFILS.map(({ id, label }) => {
+                          const selected = h.profils.includes(id);
+                          return (
+                            <button
+                              key={id}
+                              type="button"
+                              onClick={() => {
+                                setHistoires((prev) => {
+                                  const cur = { ...prev[currentHistoire] };
+                                  if (id === "aucun") {
+                                    cur.profils = cur.profils.includes("aucun") ? [] : ["aucun"];
+                                    cur.precisionsNeuro = "";
+                                  } else {
+                                    const w = cur.profils.filter((p) => p !== "aucun");
+                                    cur.profils = w.includes(id) ? w.filter((p) => p !== id) : [...w, id];
+                                    if (cur.profils.length === 0) cur.precisionsNeuro = "";
+                                  }
+                                  const next = [...prev];
+                                  next[currentHistoire] = cur;
+                                  return next;
+                                });
+                              }}
+                              className={`${chipBtn} w-full text-left ${
+                                selected
+                                  ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
+                                  : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                              }`}
+                            >
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {hasNeuroProfile && (
+                        <textarea
+                          rows={3}
+                          maxLength={200}
+                          value={h.precisionsNeuro}
+                          onChange={(e) => patchHistoire({ precisionsNeuro: e.target.value })}
+                          placeholder="Précisions éventuelles…"
+                          className="mt-3 w-full resize-y rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 text-sm outline-none focus:border-qissali-mauve focus:ring-2"
+                        />
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-3 border-t border-qissali-rose/20 pt-6 sm:flex-row sm:justify-between">
+                    <button
+                      type="button"
+                      onClick={handlePrev}
+                      className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-mauve transition hover:bg-qissali-mauve/10"
+                    >
+                      ← Retour
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep(3)}
+                      className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-qissali-rose to-qissali-mauve px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:brightness-105"
+                    >
+                      Suivant
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 3 && (
+                <div className="space-y-8">
+                  <h2 className="font-display text-xl text-qissali-mauve">Étape 3 — L&apos;histoire</h2>
+
+                  <div>
+                    <p className="mb-3 text-sm font-medium text-slate-700">Univers</p>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                      {UNIVERSES.map(({ id, emoji, label }) => (
                         <button
                           key={id}
                           type="button"
                           onClick={() => {
-                            setProfils((prev) => {
-                              if (id === "aucun") {
-                                setPrecisionsNeuro("");
-                                return prev.includes("aucun") ? [] : ["aucun"];
-                              }
-                              const withoutAucun = prev.filter((p) => p !== "aucun");
-                              const next = withoutAucun.includes(id)
-                                ? withoutAucun.filter((p) => p !== id)
-                                : [...withoutAucun, id];
-                              if (next.length === 0) setPrecisionsNeuro("");
-                              return next;
-                            });
+                            patchHistoire({ univers: id });
+                            clearError("universe");
                           }}
-                          className={`${chipBtn} w-full text-left ${
-                            selected
+                          className={`${chipBtn} flex flex-col items-center gap-1 py-4 ${
+                            h.univers === id
                               ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
                               : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
                           }`}
                         >
-                          {label}
+                          <span className="text-3xl" aria-hidden>
+                            {emoji}
+                          </span>
+                          <span>{label}</span>
                         </button>
-                      );
-                    })}
+                      ))}
+                    </div>
+                    {errors.universe && <p className="mt-2 text-sm text-red-600">{errors.universe}</p>}
+                    {hasNeuroProfile && (
+                      <p className="mt-2 text-sm text-qissali-mauve">
+                        ✨ Adaptation pour : {profilsLabel}
+                      </p>
+                    )}
                   </div>
 
-                  {hasNeuroProfile && (
-                    <div className="mt-3">
-                      <label
-                        htmlFor="precisions-neuro"
-                        className="mb-2 block text-sm font-medium text-slate-700"
-                      >
-                        Vous pouvez préciser si vous le souhaitez
-                      </label>
-                      <textarea
-                        id="precisions-neuro"
-                        rows={3}
-                        maxLength={200}
-                        value={precisionsNeuro}
-                        onChange={(e) => setPrecisionsNeuro(e.target.value)}
-                        placeholder="Ex : dyslexie sévère, TDAH avec hyperactivité, TSA sans trouble du langage..."
-                        className="w-full resize-y rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 text-slate-800 outline-none focus:border-qissali-mauve focus:ring-2 focus:ring-qissali-mauve/30"
-                      />
+                  <div>
+                    <p className="mb-3 text-sm font-medium text-slate-700">Valeur</p>
+                    <div className="flex flex-col gap-2">
+                      {VALEURS.map(({ value, chip }) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => {
+                            patchHistoire({ valeur: value });
+                            clearError("valeur");
+                          }}
+                          className={`${chipBtn} w-full text-left ${
+                            h.valeur === value
+                              ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
+                              : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                          }`}
+                        >
+                          {chip}
+                        </button>
+                      ))}
+                    </div>
+                    {errors.valeur && <p className="mt-2 text-sm text-red-600">{errors.valeur}</p>}
+                  </div>
+
+                  <div>
+                    <p className="mb-3 text-sm font-medium text-slate-700">Occasion</p>
+                    <div className="flex flex-col gap-2">
+                      {OCCASIONS.map(({ value, chip }) => (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => {
+                            patchHistoire({ occasion: value });
+                            clearError("occasion");
+                          }}
+                          className={`${chipBtn} w-full text-left ${
+                            h.occasion === value
+                              ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
+                              : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
+                          }`}
+                        >
+                          {chip}
+                        </button>
+                      ))}
+                    </div>
+                    {errors.occasion && <p className="mt-2 text-sm text-red-600">{errors.occasion}</p>}
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">
+                      Message <span className="text-slate-400">(optionnel)</span>
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={h.message}
+                      onChange={(e) => patchHistoire({ message: e.target.value })}
+                      className="w-full resize-y rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 text-sm outline-none focus:border-qissali-mauve focus:ring-2"
+                    />
+                  </div>
+
+                  {currentHistoire < pack.nbHistoires - 1 && (
+                    <div className="rounded-xl border border-qissali-mauve/25 bg-qissali-cream/80 p-4">
+                      <p className="text-sm text-slate-700">
+                        ✓ Histoire {currentHistoire + 1} : {h.prenom1.trim() || "…"} ·{" "}
+                        {UNIVERSES.find((x) => x.id === h.univers)?.label ?? "…"} · {h.valeur || "…"}
+                      </p>
                     </div>
                   )}
 
-                  <p className="mt-3 text-xs text-slate-500">
-                    🔒 Ces informations ne sont pas stockées et servent uniquement à l&apos;histoire
-                  </p>
+                  <div className="flex flex-col gap-3 border-t border-qissali-rose/20 pt-6 sm:flex-row sm:justify-between">
+                    <button
+                      type="button"
+                      onClick={handlePrev}
+                      className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-mauve transition hover:bg-qissali-mauve/10"
+                    >
+                      ← Retour
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNextStoryStep}
+                      className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-qissali-rose to-qissali-mauve px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:brightness-105"
+                    >
+                      {currentHistoire < pack.nbHistoires - 1
+                        ? `Histoire ${currentHistoire + 2} →`
+                        : "Voir le récapitulatif"}
+                    </button>
+                  </div>
                 </div>
               )}
-            </div>
+            </>
+          )}
 
-            <div className="flex flex-col gap-3 border-t border-qissali-rose/20 pt-6 sm:flex-row sm:justify-end">
-              <Link
-                href="/"
-                className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-center text-sm font-medium text-qissali-mauve transition hover:bg-qissali-mauve/10"
-              >
-                ← Accueil
-              </Link>
-              <button
-                type="button"
-                onClick={goNext}
-                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-qissali-rose to-qissali-mauve px-8 py-3 text-sm font-semibold text-white shadow-md shadow-qissali-mauve/20 transition hover:brightness-105"
-              >
-                Suivant
-              </button>
-            </div>
-          </div>
-        )}
+          {phase === "payment" && (
+            <div className="space-y-8">
+              <h2 className="font-display text-xl text-qissali-mauve">Récapitulatif & paiement</h2>
 
-        {/* STEP 2 */}
-        {step === 2 && (
-          <div className="space-y-8">
-            <h2 className="font-display text-xl text-qissali-mauve">Étape 2 — L&apos;histoire</h2>
-
-            <div>
-              <p className="mb-3 text-sm font-medium text-slate-700">Univers (un seul choix)</p>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {UNIVERSES.map(({ id, emoji, label }) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => {
-                      setUniverse(id);
-                      clearError("universe");
-                    }}
-                    className={`${chipBtn} flex flex-col items-center gap-1 py-4 ${
-                      universe === id
-                        ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
-                        : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
-                    }`}
-                  >
-                    <span className="text-3xl" aria-hidden>
-                      {emoji}
-                    </span>
-                    <span>{label}</span>
-                  </button>
+              <ul className="space-y-2 rounded-xl border border-qissali-rose/25 bg-qissali-cream/50 p-4 text-sm text-slate-800">
+                {histoires.map((story, i) => (
+                  <li key={story.id}>{recapLine(story, i)}</li>
                 ))}
+              </ul>
+
+              <div>
+                <label htmlFor="email-pay" className="mb-2 block text-sm font-medium text-slate-700">
+                  Email de livraison <span className="text-qissali-rose">*</span>
+                </label>
+                <input
+                  id="email-pay"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    clearError("email");
+                  }}
+                  className="w-full rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 outline-none focus:border-qissali-mauve focus:ring-2"
+                />
+                {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
               </div>
-              {errors.universe && (
-                <p className="mt-2 text-sm text-red-600">{errors.universe}</p>
-              )}
-              {hasNeuroProfile && (
-                <p className="mt-2 text-sm text-qissali-mauve">
-                  ✨ Nous adaptons l&apos;histoire à la neuroatypie indiquée ({profilsLabel}). Votre sélection
-                  sera prise en compte.
+
+              <div>
+                <p className="mb-3 text-sm font-medium text-slate-700">Format</p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div
+                    className={`${chipBtn} flex flex-col items-start border-qissali-mauve bg-qissali-cream py-4 text-left text-qissali-mauve`}
+                  >
+                    <span className="font-semibold">PDF illustré</span>
+                    <span className="mt-1 font-display text-2xl italic text-qissali-rose">Inclus</span>
+                  </div>
+                  <div
+                    className={`${chipBtn} flex cursor-not-allowed flex-col items-start border-dashed border-slate-300 bg-slate-100 py-4 text-left opacity-60`}
+                  >
+                    <span className="font-semibold text-slate-500">PDF + Audio</span>
+                    <span className="mt-1 text-xs text-slate-500">Bientôt disponible</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between rounded-xl border border-qissali-mauve/20 bg-white px-4 py-3">
+                <span className="text-sm font-medium text-slate-600">Total pack {pack.label}</span>
+                <span className="font-display text-2xl font-bold text-qissali-mauve">
+                  {centsToEuroLabel(pack.prix)}
+                </span>
+              </div>
+
+              {errors.checkout && (
+                <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+                  {errors.checkout}
                 </p>
               )}
-            </div>
 
-            <div>
-              <p className="mb-3 text-sm font-medium text-slate-700">Valeur (un seul choix)</p>
-              <div className="flex flex-col gap-2">
-                {VALEURS.map(({ value, chip }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => {
-                      setValeur(value);
-                      clearError("valeur");
-                    }}
-                    className={`${chipBtn} w-full text-left ${
-                      valeur === value
-                        ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
-                        : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
-                    }`}
-                  >
-                    {chip}
-                  </button>
-                ))}
-              </div>
-              {errors.valeur && <p className="mt-2 text-sm text-red-600">{errors.valeur}</p>}
-            </div>
-
-            <div>
-              <p className="mb-3 text-sm font-medium text-slate-700">Occasion (un seul choix)</p>
-              <div className="flex flex-col gap-2">
-                {OCCASIONS.map(({ value, chip }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => {
-                      setOccasion(value);
-                      clearError("occasion");
-                    }}
-                    className={`${chipBtn} w-full text-left ${
-                      occasion === value
-                        ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
-                        : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
-                    }`}
-                  >
-                    {chip}
-                  </button>
-                ))}
-              </div>
-              {errors.occasion && (
-                <p className="mt-2 text-sm text-red-600">{errors.occasion}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-3 border-t border-qissali-rose/20 pt-6 sm:flex-row sm:justify-between">
-              <button
-                type="button"
-                onClick={goBack}
-                className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-mauve transition hover:bg-qissali-mauve/10"
-              >
-                ← Retour
-              </button>
-              <button
-                type="button"
-                onClick={goNext}
-                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-qissali-rose to-qissali-mauve px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:brightness-105"
-              >
-                Suivant
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 3 */}
-        {step === 3 && (
-          <div className="space-y-8">
-            <h2 className="font-display text-xl text-qissali-mauve">Étape 3 — Livraison</h2>
-
-            <div>
-              <p className="mb-3 text-sm font-medium text-slate-700">Format</p>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {FORMATS.map(({ id, label, price }) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setFormat(id)}
-                    className={`${chipBtn} flex flex-col items-start py-4 text-left ${
-                      format === id
-                        ? "border-qissali-mauve bg-qissali-cream text-qissali-mauve"
-                        : "border-qissali-rose/40 bg-white text-slate-600 hover:border-qissali-mauve/50"
-                    }`}
-                  >
-                    <span className="font-semibold">{label}</span>
-                    <span className="mt-1 font-display text-2xl italic text-qissali-rose">{price}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-700">
-                Email <span className="text-qissali-rose">*</span>
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  clearError("email");
-                }}
-                className="w-full rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 outline-none focus:border-qissali-mauve focus:ring-2 focus:ring-qissali-mauve/30"
-              />
-              {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="msg" className="mb-2 block text-sm font-medium text-slate-700">
-                Message personnalisé <span className="text-slate-400">(optionnel)</span>
-              </label>
-              <textarea
-                id="msg"
-                rows={4}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Une dédicace, une consigne pour l’histoire…"
-                className="w-full resize-y rounded-xl border border-qissali-rose/40 bg-white px-4 py-3 text-slate-800 outline-none focus:border-qissali-mauve focus:ring-2 focus:ring-qissali-mauve/30"
-              />
-            </div>
-
-            <div className="rounded-xl border border-qissali-mauve/20 bg-qissali-cream/80 p-5">
-              <h3 className="mb-4 font-display text-lg text-qissali-mauve">Récapitulatif</h3>
-              <dl className="space-y-2 text-sm text-slate-700">
-                <div className="flex justify-between gap-4">
-                  <dt className="text-slate-500">Type</dt>
-                  <dd className="text-right font-medium">
-                    {childCount === 1 ? "Solo (un enfant)" : "Fratrie (deux enfants)"}
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-slate-500">Enfant(s)</dt>
-                  <dd className="text-right font-medium">
-                    {child1Name.trim()} ({child1Age} ans
-                    {genre1 ? `, ${genreLibelle(genre1)}` : ""})
-                    {childCount === 2 && (
-                      <>
-                        {" "}
-                        · {child2Name.trim()} ({child2Age} ans
-                        {genre2 ? `, ${genreLibelle(genre2)}` : ""})
-                      </>
-                    )}
-                  </dd>
-                </div>
-                {childCount === 2 && siblingLink && (
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-slate-500">Lien</dt>
-                    <dd className="text-right">
-                      {siblingLink === "soeurs"
-                        ? "Sœurs"
-                        : siblingLink === "freres"
-                          ? "Frères"
-                          : "Mixte"}
-                    </dd>
-                  </div>
-                )}
-                <div className="flex justify-between gap-4">
-                  <dt className="text-slate-500">Univers</dt>
-                  <dd className="text-right">{universeLabel}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-slate-500">Valeur</dt>
-                  <dd className="text-right">{valeur || "—"}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-slate-500">Occasion</dt>
-                  <dd className="text-right">{occasion || "—"}</dd>
-                </div>
-                {hasNeuroProfile && (
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-slate-500">Neuroatypie</dt>
-                    <dd className="text-right">{profilsLabel}</dd>
-                  </div>
-                )}
-                <div className="flex justify-between gap-4 border-t border-qissali-rose/20 pt-3">
-                  <dt className="text-slate-500">Format</dt>
-                  <dd className="text-right font-semibold text-qissali-mauve">{formatLabel}</dd>
-                </div>
-              </dl>
-            </div>
-
-            {errors.checkout && (
-              <p
-                className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
-                role="alert"
-              >
-                {errors.checkout}
+              <p className="text-center text-sm text-slate-600">
+                {canUseEmbeddedCheckout
+                  ? "Paiement Stripe sur cette page."
+                  : "Redirection vers Stripe pour le paiement sécurisé."}
               </p>
-            )}
 
-            <p className="text-center text-sm text-slate-600">
-              {canUseEmbeddedCheckout
-                ? "Tu vas ouvrir le paiement Stripe sur cette page (carte, Apple Pay, Google Pay…)."
-                : "Tu seras redirigé·e vers une page Stripe : carte bancaire, Apple Pay ou Google Pay selon l’appareil."}
-            </p>
-
-            <div className="flex flex-col gap-3 border-t border-qissali-rose/20 pt-6 sm:flex-row sm:justify-between">
-              <button
-                type="button"
-                onClick={goBack}
-                disabled={checkoutLoading}
-                className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-mauve transition hover:bg-qissali-mauve/10 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                ← Retour
-              </button>
-              <button
-                type="submit"
-                disabled={checkoutLoading}
-                aria-busy={checkoutLoading}
-                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-qissali-rose to-qissali-mauve px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-qissali-mauve/25 transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {checkoutLoading
-                  ? canUseEmbeddedCheckout
-                    ? "Préparation du paiement…"
-                    : "Redirection vers Stripe…"
-                  : canUseEmbeddedCheckout
-                    ? "Continuer vers le paiement"
-                    : "Commander et payer"}
-              </button>
+              <div className="flex flex-col gap-3 border-t border-qissali-rose/20 pt-6 sm:flex-row sm:justify-between">
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  disabled={checkoutLoading}
+                  className="inline-flex items-center justify-center rounded-full border-2 border-qissali-mauve/30 px-6 py-3 text-sm font-medium text-qissali-mauve transition hover:bg-qissali-mauve/10 disabled:opacity-50"
+                >
+                  ← Modifier
+                </button>
+                <button
+                  type="submit"
+                  disabled={checkoutLoading}
+                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-qissali-rose to-qissali-mauve px-8 py-3 text-sm font-bold text-white shadow-lg transition hover:brightness-105 disabled:opacity-60"
+                >
+                  {checkoutLoading
+                    ? "Préparation…"
+                    : `Payer ${centsToEuroLabel(pack.prix)} →`}
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
         </form>
       )}
 
@@ -938,5 +946,19 @@ export function CommanderForm() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export function CommanderForm() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-2xl rounded-2xl border border-qissali-rose/20 bg-white/80 p-12 text-center text-slate-600">
+          Chargement du formulaire…
+        </div>
+      }
+    >
+      <CommanderFormInner />
+    </Suspense>
   );
 }

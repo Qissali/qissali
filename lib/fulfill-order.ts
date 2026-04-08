@@ -11,6 +11,141 @@ import { createOrderPdfToken } from "./order-pdf-token";
 import { getStory, getStoryOrDefault, storyKey } from "./stories.js";
 import type { StoryMetadata } from "./story-metadata";
 import { prenomDisplay } from "./story-metadata";
+import { histoiresFromStripeMetadata } from "./checkout-histoires";
+
+function strMeta(v: unknown): string {
+  if (v == null) return "";
+  return String(v);
+}
+
+function itemToStoryMeta(
+  item: Record<string, unknown>,
+  email: string,
+  format: string
+): StoryMetadata {
+  return {
+    prenom1: strMeta(item.prenom1),
+    prenom2: strMeta(item.prenom2),
+    univers: strMeta(item.univers),
+    valeur: strMeta(item.valeur),
+    occasion: strMeta(item.occasion),
+    format,
+    message: strMeta(item.message),
+    email,
+    age_enfant1: strMeta(item.age_enfant1),
+    age_enfant2: strMeta(item.age_enfant2),
+    profils: strMeta(item.profils),
+    precisionsNeuro: strMeta(item.precisionsNeuro),
+  };
+}
+
+async function fulfillPackHistoires(
+  session: Stripe.Checkout.Session,
+  items: Record<string, unknown>[]
+): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const baseMeta = sessionToMetadata(session.metadata as Record<string, string> | null);
+  if (!baseMeta) {
+    return { ok: false, reason: "Metadata invalides." };
+  }
+  const clientEmail =
+    baseMeta.email ||
+    (typeof session.customer_email === "string" ? session.customer_email : "") ||
+    "";
+  if (!clientEmail) {
+    return { ok: false, reason: "Email client introuvable." };
+  }
+  if (!process.env.RESEND_API_KEY?.trim()) {
+    return { ok: false, reason: "RESEND_API_KEY manquant." };
+  }
+
+  const format = baseMeta.format || "pdf";
+  const multiPdf: { filename: string; content: string }[] = [];
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i] as Record<string, unknown>;
+    const meta = itemToStoryMeta(item, clientEmail, format);
+    const nbEnfants = meta.prenom2.trim() ? 2 : 1;
+    const story = getStoryOrDefault(
+      meta.univers,
+      meta.valeur,
+      meta.occasion,
+      nbEnfants,
+      meta.prenom1,
+      meta.prenom2,
+      meta.profils || "",
+      meta.precisionsNeuro || ""
+    );
+    const base64 = generateStoryPDF({
+      prenom1: meta.prenom1,
+      prenom2: meta.prenom2,
+      univers: meta.univers,
+      valeur: meta.valeur,
+      occasion: meta.occasion,
+      titre: story.titre,
+      texte: story.texte,
+      citation: story.citation,
+      source: story.source,
+      questions: story.questions,
+      defi: story.defi,
+    });
+    const label = prenomDisplay(meta).replace(/[^a-zA-ZÀ-ÿ0-9-_]/g, "-").slice(0, 40) || "enfant";
+    multiPdf.push({
+      filename: `histoire-qissali-${i + 1}-${label}.pdf`,
+      content: base64,
+    });
+  }
+
+  const prenomLabel =
+    items.length > 1 ? "vos histoires" : prenomDisplay(itemToStoryMeta(items[0] as Record<string, unknown>, clientEmail, format));
+
+  const prixEuro =
+    session.amount_total != null
+      ? `${(session.amount_total / 100).toFixed(2).replace(".", ",")} €`
+      : "—";
+
+  const timestamp =
+    session.created != null
+      ? new Date(session.created * 1000).toLocaleString("fr-FR", {
+          dateStyle: "short",
+          timeStyle: "short",
+        })
+      : new Date().toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" });
+
+  const customerSend = await sendDeliveryEmail(clientEmail, prenomLabel, "", undefined, {
+    multiPdfAttachments: multiPdf,
+  });
+
+  if (customerSend.error) {
+    console.error("Resend client email (pack):", customerSend.error);
+    return { ok: false, reason: `Email client: ${JSON.stringify(customerSend.error)}` };
+  }
+
+  const first = itemToStoryMeta(items[0] as Record<string, unknown>, clientEmail, format);
+  const adminSend = await sendAdminNotification({
+    prenom1: `${items.length} histoire(s) — ${first.prenom1}`,
+    prenom2: first.prenom2,
+    age: formatAgeLine(first),
+    univers: first.univers,
+    valeur: first.valeur,
+    occasion: first.occasion,
+    format: formatOrderFormatLabel(format),
+    prix: prixEuro,
+    emailClient: clientEmail,
+    timestamp,
+    sessionId: session.id,
+  });
+
+  if (adminSend.error) {
+    console.error("Resend admin email (non bloquant):", adminSend.error);
+  }
+
+  sendEmailSequence(clientEmail, first.prenom1, first.prenom2, {
+    sessionId: session.id,
+    amountTotal: prixEuro,
+  });
+
+  return { ok: true };
+}
 
 type ResolvedStory = {
   titre: string;
@@ -40,6 +175,7 @@ function sessionToMetadata(
     age_enfant2: metadata.age_enfant2?.trim() || "",
     profils: metadata.profils?.trim() || "",
     precisionsNeuro: metadata.precisionsNeuro?.trim() || "",
+    pack: metadata.pack?.trim() || "",
   };
 }
 
@@ -118,6 +254,14 @@ export async function fulfillOrderFromSession(
   session: Stripe.Checkout.Session,
   options?: { profils?: string; precisionsNeuro?: string; storyOverride?: ResolvedStory | null }
 ): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const rawMd = session.metadata as Record<string, string> | null;
+  if (rawMd?.hj_count) {
+    const list = histoiresFromStripeMetadata(rawMd);
+    if (list && Array.isArray(list) && list.length > 0) {
+      return fulfillPackHistoires(session, list as Record<string, unknown>[]);
+    }
+  }
+
   const meta = sessionToMetadata(session.metadata as Record<string, string> | null);
   if (!meta) {
     return { ok: false, reason: "Metadata invalides ou prenom1 manquant." };

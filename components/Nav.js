@@ -20,24 +20,24 @@ export default function Nav() {
 
   return (
     <header
-      className={`fixed left-0 right-0 top-0 z-50 border-b border-[var(--rose-light)] bg-white/75 backdrop-blur-md transition-shadow duration-300 ease-out ${
+      className={`fixed left-0 right-0 top-0 z-50 min-h-[80px] border-b border-[var(--rose-light)] bg-white/75 backdrop-blur-md transition-shadow duration-300 ease-out ${
         scrolled
           ? "scrolled shadow-lg shadow-[#9B6EC8]/25"
           : "shadow-none"
       }`}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-3 py-2.5 sm:gap-6 sm:px-6 sm:py-3.5">
+      <div className="mx-auto flex min-h-[80px] max-w-6xl items-center justify-between gap-3 px-3 py-2.5 sm:gap-6 sm:px-6 sm:py-3.5">
         <Link
           href="/"
           className="shrink-0 transition hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-deep)]"
         >
           <Image
-            src="/logo.png"
-            alt="Qissali"
-            width={220}
-            height={52}
-            className="h-[52px] w-auto max-w-[min(220px,55vw)] object-contain"
+            src="/logo-qissali.png"
+            alt="Qissali — Mon histoire islamique personnalisée"
+            width={180}
+            height={90}
             priority
+            className="h-[56px] w-auto max-w-[min(180px,55vw)] object-contain sm:h-[64px] lg:h-[70px]"
           />
         </Link>
         <button

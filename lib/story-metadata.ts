@@ -13,6 +13,8 @@ export type StoryMetadata = {
   age_enfant2?: string;
   profils?: string;
   precisionsNeuro?: string;
+  /** Tarif pack (homepage) : solo | duo | trio | famille */
+  pack?: string;
 };
 
 export function prenomDisplay(meta: Pick<StoryMetadata, "prenom1" | "prenom2">): string {

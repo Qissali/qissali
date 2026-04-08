@@ -61,13 +61,14 @@ export async function POST(request: Request) {
     );
     const nbEnfantsValue: 1 | 2 = nbEnfantsMeta === 2 ? 2 : 1;
     let histoire: any = null;
+    const hasPackHistoires = Boolean(metadata.hj_count);
 
     if (session.payment_status !== "paid") {
       return NextResponse.json({ received: true, ignored: "payment not paid" });
     }
 
-    // Si profil neuro sélectionné, tente une adaptation via l'API dédiée
-    if (profilPrincipal) {
+    // Commande multi-histoires : fulfillment lit hj_* (pas d’adaptation neuro ici)
+    if (!hasPackHistoires && profilPrincipal) {
       const profilMap: Record<string, string> = {
         "Dys (dyslexie, dyscalculie, dyspraxie...)": "dys",
         TDAH: "tdah",
@@ -125,7 +126,7 @@ export async function POST(request: Request) {
           );
         }
       }
-    } else {
+    } else if (!hasPackHistoires) {
       histoire = getStory(
         metadata.univers,
         metadata.valeur,
@@ -143,7 +144,7 @@ export async function POST(request: Request) {
     const result = await fulfillOrderFromSession(session, {
       profils,
       precisionsNeuro,
-      storyOverride: histoire,
+      storyOverride: hasPackHistoires ? undefined : histoire,
     });
     if (!result.ok) {
       console.error("fulfillOrderFromSession:", result.reason);

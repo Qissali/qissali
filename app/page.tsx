@@ -97,20 +97,74 @@ const storyPreviewFeatures = [
   },
 ] as const;
 
-const pdfPlanBullets = [
-  "Histoire complète personnalisée",
-  "Prénom partout dans le texte",
-  "Hadith intégré naturellement",
-  "Débat et défi de la semaine",
-  "PDF illustré 6 pages",
-  "Livraison par email",
+const packOffers = [
+  {
+    pack: "solo",
+    icon: "📖",
+    title: "Solo",
+    price: "3,90€",
+    subPrice: "1 histoire",
+    badge: null as string | null,
+    bullets: [
+      "1 histoire personnalisée",
+      "1 enfant ou fratrie",
+      "PDF illustré 6 pages",
+      "Livré par email",
+    ],
+    featured: false,
+  },
+  {
+    pack: "duo",
+    icon: "📚",
+    title: "Duo",
+    price: "6,90€",
+    subPrice: "2 histoires · 3,45€ chacune",
+    badge: "-11%",
+    bullets: [
+      "2 histoires personnalisées",
+      "Prénoms différents possibles",
+      "2 PDFs illustrés 6 pages",
+      "Livrés ensemble par email",
+    ],
+    featured: false,
+  },
+  {
+    pack: "trio",
+    icon: "🌟",
+    title: "Trio",
+    price: "8,90€",
+    subPrice: "3 histoires · 2,97€ chacune",
+    badge: "Le plus choisi ✦",
+    bullets: [
+      "3 histoires personnalisées",
+      "Prénoms différents possibles",
+      "3 PDFs illustrés 6 pages",
+      "Livrés ensemble par email",
+    ],
+    featured: true,
+  },
+  {
+    pack: "famille",
+    icon: "👨‍👩‍👧‍👦",
+    title: "Famille",
+    price: "12,90€",
+    subPrice: "5 histoires · 2,58€ chacune",
+    badge: "-34%",
+    bullets: [
+      "5 histoires personnalisées",
+      "Prénoms différents possibles",
+      "5 PDFs illustrés 6 pages",
+      "Livrés ensemble par email",
+    ],
+    featured: false,
+  },
 ] as const;
 
-const audioComingSoonBullets = [
-  "Histoire audio ~10 min",
-  "Voix douce et naturelle",
-  "Format MP3",
-  "Parfait pour l'endormissement",
+const packPriceTable = [
+  { pack: "Solo", stories: "1", total: "3,90€", unit: "3,90€" },
+  { pack: "Duo", stories: "2", total: "6,90€", unit: "3,45€" },
+  { pack: "Trio", stories: "3", total: "8,90€", unit: "2,97€" },
+  { pack: "Famille", stories: "5", total: "12,90€", unit: "2,58€" },
 ] as const;
 
 const notreHistoireBlocs = [
@@ -177,30 +231,25 @@ export default function Home() {
         <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 pb-8 pt-4 text-center sm:px-6">
           <h1 className="sr-only">Qissali — Histoires islamiques personnalisées</h1>
           <Image
-            src="/logo.png"
+            src="/logo-qissali.png"
             alt="Qissali"
-            width={440}
-            height={220}
+            width={400}
+            height={200}
             priority
-            className="hero-fade-up hero-delay-1 h-[220px] w-auto max-w-[min(440px,92vw)] object-contain drop-shadow-sm"
+            className="hero-fade-up hero-delay-1 h-[120px] w-auto max-w-full object-contain drop-shadow-sm sm:h-[140px] lg:h-[160px]"
           />
           <p
-            className="hero-fade-up hero-delay-2 mt-8 text-[13px] font-medium uppercase tracking-[4px] text-[var(--mauve)]"
-          >
-            ✦ Histoires islamiques personnalisées ✦
-          </p>
-          <p
-            className="hero-fade-up hero-delay-3 mx-auto mt-6 max-w-[560px] text-lg leading-[1.8] text-[var(--text)] sm:text-xl"
+            className="hero-fade-up hero-delay-2 mx-auto mt-8 max-w-[560px] text-lg leading-[1.8] text-[var(--text)] sm:text-xl"
           >
             Offre à ton enfant une histoire rien que pour lui, avec son prénom, son univers
             préféré et les valeurs de l&apos;islam, transmises avec douceur.
           </p>
           <CommanderModalTrigger
-            className="hero-fade-up hero-delay-4 mt-10 inline-flex items-center justify-center rounded-[50px] bg-gradient-to-r from-[var(--rose-deep)] to-[var(--mauve-deep)] px-12 py-[18px] text-base font-bold text-white shadow-lg shadow-[#9B6EC8]/45 transition hover:-translate-y-[3px] hover:shadow-xl hover:shadow-[#9B6EC8]/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-deep)] active:translate-y-0"
+            className="hero-fade-up hero-delay-3 mt-10 inline-flex items-center justify-center rounded-[50px] bg-gradient-to-r from-[var(--rose-deep)] to-[var(--mauve-deep)] px-12 py-[18px] text-base font-bold text-white shadow-lg shadow-[#9B6EC8]/45 transition hover:-translate-y-[3px] hover:shadow-xl hover:shadow-[#9B6EC8]/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-deep)] active:translate-y-0"
           >
             ✨ Créer l&apos;histoire de mon enfant
           </CommanderModalTrigger>
-          <p className="hero-fade-up hero-delay-5 mt-5 text-[13px] text-[var(--text-light)]">
+          <p className="hero-fade-up hero-delay-4 mt-5 text-[13px] text-[var(--text-light)]">
             Livraison par email en moins de 5 minutes · à partir de 3,90€
           </p>
         </div>
@@ -416,100 +465,6 @@ export default function Home() {
 
       <PdfPreview />
 
-      {/* Tarifs */}
-      <section className="relative bg-[var(--dark)]">
-        <div
-          className="pointer-events-none absolute inset-0"
-          aria-hidden
-          style={{
-            background:
-              "radial-gradient(ellipse 55% 50% at 50% 45%, rgba(196, 154, 216, 0.14) 0%, transparent 62%)",
-          }}
-        />
-        <div className="relative z-10 mx-auto max-w-[1100px] px-8 py-[100px]">
-          <header className="text-center">
-            <p className="text-[13px] font-medium uppercase tracking-[4px] text-[var(--or)]">Nos offres</p>
-            <h2 className="mt-4 font-display text-[28px] font-normal leading-tight text-[var(--white)] sm:text-3xl md:text-4xl">
-              Simple et{" "}
-              <span className="italic text-[var(--rose)]">transparent</span>
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-[rgba(255,255,255,0.6)]">
-              Pas d&apos;abonnement. Tu paies, tu reçois ton histoire. C&apos;est tout.
-            </p>
-          </header>
-          <div className="mx-auto mt-14 flex max-w-[900px] flex-col items-stretch gap-6 md:flex-row md:gap-6">
-            {/* PDF Illustré */}
-            <article className="flex min-w-0 flex-1 flex-col rounded-[24px] border border-[rgba(232,160,192,0.15)] bg-[rgba(255,255,255,0.04)] p-8">
-              <span className="text-4xl" aria-hidden>
-                📄
-              </span>
-              <h3 className="mt-4 text-xl font-bold text-[var(--white)]">PDF Illustré</h3>
-              <p className="mt-3 text-[15px] leading-relaxed text-[rgba(255,255,255,0.65)]">
-                Un beau livre à lire ensemble, à imprimer ou à conserver précieusement.
-              </p>
-              <p className="font-display text-[48px] font-bold leading-none text-[var(--or)]">3,90€</p>
-              <p className="mt-1 text-sm text-[rgba(255,255,255,0.45)]">par histoire</p>
-              <ul className="mt-6 flex flex-col gap-3 text-left text-[14px] leading-snug text-[rgba(255,255,255,0.75)]">
-                {pdfPlanBullets.map((line) => (
-                  <li key={line} className="flex gap-2">
-                    <span className="text-[var(--rose-light)]" aria-hidden>
-                      ·
-                    </span>
-                    <span>{line}</span>
-                  </li>
-                ))}
-              </ul>
-              <CommanderModalTrigger
-                aria-label="Commander — PDF illustré"
-                className="mt-8 inline-flex w-full items-center justify-center rounded-full border-2 border-[var(--rose)] bg-transparent py-3.5 text-sm font-bold text-[var(--rose-light)] transition hover:bg-[rgba(232,160,192,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--rose)]"
-              >
-                Commander →
-              </CommanderModalTrigger>
-            </article>
-            {/* PDF + Audio — bientôt */}
-            <article
-              className="relative flex min-w-0 flex-1 flex-col rounded-[24px] border border-dashed p-8 opacity-75"
-              style={{
-                borderColor: "#C49AD8",
-                background: "#F9F5FF",
-              }}
-            >
-              <div className="mb-3 flex justify-center">
-                <span className="rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-[#7A5A8A]" style={{ background: "#EDE5F7" }}>
-                  Bientôt disponible
-                </span>
-              </div>
-              <span className="text-4xl" aria-hidden>
-                🎧
-              </span>
-              <h3 className="mt-4 text-xl font-bold text-[#5a3d6b]">PDF + Audio</h3>
-              <p className="font-display mt-2 text-[48px] font-bold leading-none text-[#9B7CAD] line-through decoration-[#7A5A8A]/50">
-                7,90€
-              </p>
-              <p className="mt-2 text-sm text-[#7A5A8A]/90">Disponible très prochainement</p>
-              <ul className="mt-6 flex flex-col gap-2.5 text-left text-[14px] leading-snug text-[#7A5A8A]/65">
-                {audioComingSoonBullets.map((line) => (
-                  <li key={line} className="flex gap-2">
-                    <span className="text-[#C49AD8]" aria-hidden>
-                      ·
-                    </span>
-                    <span>{line}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                type="button"
-                disabled
-                aria-disabled="true"
-                className="mt-8 inline-flex w-full cursor-not-allowed items-center justify-center rounded-full border-2 border-[#C49AD8]/50 bg-white/60 py-3.5 text-sm font-bold text-[#7A5A8A] opacity-60 pointer-events-none"
-              >
-                Bientôt disponible →
-              </button>
-            </article>
-          </div>
-        </div>
-      </section>
-
       {/* Témoignages */}
       <section className="bg-[var(--rose-pale)]">
         <div className="mx-auto max-w-[1100px] px-8 py-[100px]">
@@ -547,6 +502,115 @@ export default function Home() {
                 </article>
               </li>
             ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Packs */}
+      <section className="border-t border-[rgba(232,160,192,0.35)] bg-[var(--white)]">
+        <div className="mx-auto max-w-[1100px] px-8 py-[100px]">
+          <header className="text-center">
+            <h2 className="font-display text-[28px] font-normal leading-tight text-[var(--text)] sm:text-3xl md:text-4xl">
+              Choisissez votre pack
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-[var(--text-mid)]">
+              Plus vous commandez, plus vous économisez.
+            </p>
+          </header>
+
+          <ul className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+            {packOffers.map((p) => (
+              <li key={p.pack} className="flex min-w-0">
+                <article
+                  className={`flex h-full w-full flex-col rounded-[24px] bg-white p-7 ${
+                    p.featured
+                      ? "border-2 border-[var(--rose)] shadow-lg shadow-[#9B6EC8]/30 ring-1 ring-[rgba(232,160,192,0.35)]"
+                      : "border border-[rgba(232,160,192,0.45)] shadow-sm"
+                  }`}
+                >
+                  {p.badge ? (
+                    <div className="mb-3 flex min-h-[28px] justify-center">
+                      <span
+                        className={`rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide ${
+                          p.featured
+                            ? "bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] text-xs uppercase text-white shadow-md"
+                            : "bg-[var(--mauve-light)]/90 text-[var(--mauve-deep)]"
+                        }`}
+                      >
+                        {p.badge}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="mb-3 min-h-[28px]" aria-hidden />
+                  )}
+                  <span className="text-4xl" aria-hidden>
+                    {p.icon}
+                  </span>
+                  <h3 className="mt-3 text-xl font-bold text-[var(--text)]">{p.title}</h3>
+                  <p className="font-display mt-3 text-[40px] font-bold leading-none text-[var(--or)] sm:text-[44px]">
+                    {p.price}
+                  </p>
+                  <p className="mt-2 text-sm text-[var(--text-mid)]">{p.subPrice}</p>
+                  <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-left text-[13px] leading-snug text-[var(--text-mid)]">
+                    {p.bullets.map((line) => (
+                      <li key={line} className="flex gap-2">
+                        <span className="text-[var(--rose-deep)]" aria-hidden>
+                          ·
+                        </span>
+                        <span>{line}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={`/commander?pack=${p.pack}`}
+                    className="mt-8 inline-flex w-full items-center justify-center rounded-full border-2 border-[var(--mauve)]/35 bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] py-3.5 text-sm font-bold text-white shadow-md shadow-[#9B6EC8]/25 transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-deep)]"
+                  >
+                    Commander →
+                  </Link>
+                </article>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mx-auto mt-14 max-w-[640px] overflow-hidden rounded-2xl" style={{ background: "#FDF0F7" }}>
+            <table className="w-full border-collapse text-left text-[12px] text-[var(--text-mid)] sm:text-[13px]">
+              <thead>
+                <tr className="border-b border-[rgba(232,160,192,0.35)] text-[var(--text)]">
+                  <th className="px-4 py-3 font-semibold sm:px-5">Pack</th>
+                  <th className="px-2 py-3 font-semibold sm:px-3">Histoires</th>
+                  <th className="px-2 py-3 font-semibold sm:px-3">Prix total</th>
+                  <th className="px-4 py-3 font-semibold sm:px-5">Prix unitaire</th>
+                </tr>
+              </thead>
+              <tbody>
+                {packPriceTable.map((row) => (
+                  <tr
+                    key={row.pack}
+                    className="border-b border-[rgba(232,160,192,0.2)] last:border-0"
+                  >
+                    <td className="px-4 py-2.5 sm:px-5">{row.pack}</td>
+                    <td className="px-2 py-2.5 sm:px-3">{row.stories}</td>
+                    <td className="px-2 py-2.5 sm:px-3">{row.total}</td>
+                    <td className="px-4 py-2.5 sm:px-5">{row.unit}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <ul className="mx-auto mt-10 flex max-w-[720px] flex-col gap-3 text-center text-[13px] text-[var(--text-mid)] sm:text-[14px] md:flex-row md:flex-wrap md:justify-center md:gap-x-8 md:gap-y-2">
+            <li className="flex items-center justify-center gap-2">
+              <span aria-hidden>🛡️</span>
+              <span>Satisfait ou remboursé 48h</span>
+            </li>
+            <li className="flex items-center justify-center gap-2">
+              <span aria-hidden>🔒</span>
+              <span>Paiement sécurisé Stripe</span>
+            </li>
+            <li className="flex items-center justify-center gap-2">
+              <span aria-hidden>💌</span>
+              <span>Livraison par email en moins de 5 minutes</span>
+            </li>
           </ul>
         </div>
       </section>
@@ -599,15 +663,12 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-[var(--dark)] px-8 py-12 text-center">
         <Image
-          src="/logo.png"
+          src="/logo-qissali.png"
           alt="Qissali"
-          width={200}
-          height={64}
-          className="mx-auto h-16 w-auto object-contain opacity-[0.85]"
+          width={160}
+          height={80}
+          className="mx-auto h-[50px] w-auto object-contain opacity-90 sm:h-14 lg:h-[60px]"
         />
-        <p className="mt-4 text-[11px] font-medium uppercase tracking-[3px] text-[rgba(255,255,255,0.3)]">
-          Mon histoire islamique personnalisée
-        </p>
         <nav className="mt-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-sm text-[rgba(255,255,255,0.4)]">
           <Link href="/a-propos" className="transition hover:text-[var(--rose-light)]">
             À propos
