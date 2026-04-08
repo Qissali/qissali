@@ -174,13 +174,17 @@ export default function Home() {
           </svg>
         ))}
 
-        <div style={{ position: "relative", zIndex: 1 }}>
+        <div
+          className="flex w-full max-w-full flex-col items-center"
+          style={{ position: "relative", zIndex: 1 }}
+        >
           <Image
             src="/logo-qissali.png"
             alt="Qissali — Mon histoire personnalisée"
             width={612}
             height={408}
             priority
+            className="mx-auto block max-w-[min(100%,92vw)]"
             style={{
               height: "clamp(180px, 28vw, 320px)",
               width: "auto",
