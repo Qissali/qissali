@@ -10,7 +10,7 @@ const howToSteps = [
     step: 1,
     title: "Tu remplis le formulaire",
     description:
-      "Prénom, âge, univers préféré, valeur à transmettre, occasion. 2 minutes chrono.",
+      "Prénom, âge, univers préféré, valeur à transmettre, occasion. Tu peux aussi indiquer un profil neuroatypique (Dys, TDAH, TSA, HPI…) pour adapter le récit. 2 minutes chrono.",
   },
   {
     emoji: "🌙",
@@ -84,6 +84,11 @@ const storyPreviewFeatures = [
     icon: "👭",
     title: "Version fratrie disponible",
     body: "Deux sœurs, deux frères, frère et sœur : les deux héros de l'histoire, ensemble.",
+  },
+  {
+    icon: "🧠",
+    title: "Pensé pour la neuroatypie",
+    body: "À la commande, indique si tu le souhaites un profil (Dys, TDAH, autisme/TSA, haut potentiel…) : l'histoire pourra être adaptée au rythme et au vécu de ton enfant, toujours dans le respect de la foi.",
   },
   {
     icon: "🎁",
@@ -381,6 +386,33 @@ export default function Home() {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      {/* Neuroatypie */}
+      <section className="border-y border-[rgba(196,154,216,0.25)] bg-gradient-to-br from-[var(--mauve-light)]/35 via-[var(--rose-pale)] to-[var(--cream)]">
+        <div className="mx-auto max-w-[1100px] px-8 py-[72px]">
+          <div className="mx-auto max-w-[720px] text-center">
+            <p className="text-[13px] font-medium uppercase tracking-[4px] text-[var(--mauve)]">
+              Neuroatypie
+            </p>
+            <h2 className="mt-4 font-display text-[26px] font-normal leading-tight text-[var(--text)] sm:text-3xl md:text-[2rem]">
+              Une histoire qui peut suivre{" "}
+              <span className="italic text-[var(--rose-deep)]">ton enfant</span>, pas l&apos;inverse
+            </h2>
+            <p className="mt-5 text-[15px] leading-relaxed text-[var(--text-mid)]">
+              Chaque enfant apprend à son rythme. Si le tien est Dys, TDAH, autiste (TSA), à haut potentiel ou
+              a d&apos;autres besoins particuliers, tu peux le dire au moment de la commande : nous adaptons le
+              texte pour qu&apos;il reste lisible, rassurant et en lien avec l&apos;islam — sans étiqueter,
+              sans juger.
+            </p>
+            <Link
+              href="/commander"
+              className="mt-8 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[var(--rose-deep)] to-[var(--mauve-deep)] px-8 py-3.5 text-sm font-semibold text-white shadow-md shadow-[#9B6EC8]/35 transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-deep)]"
+            >
+              Commander avec profil neuroatypique
+            </Link>
+          </div>
         </div>
       </section>
 

@@ -6,7 +6,7 @@ import { CommanderForm } from "./commander-form";
 export const metadata: Metadata = {
   title: "Commander — Qissali",
   description:
-    "Personnalise l’histoire de ton enfant : univers, valeurs et livraison par email.",
+    "Personnalise l’histoire de ton enfant : univers, valeurs, neuroatypie optionnelle (Dys, TDAH, TSA, HPI…) et livraison par email.",
 };
 
 export default function CommanderPage() {

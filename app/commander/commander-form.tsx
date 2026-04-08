@@ -28,7 +28,7 @@ const OCCASIONS = [
 ] as const;
 
 const PROFILS = [
-  { id: "aucun", label: "Aucun profil particulier" },
+  { id: "aucun", label: "Pas de profil neuroatypique" },
   { id: "dys", label: "Dys (dyslexie, dyscalculie, dyspraxie...)" },
   { id: "tdah", label: "TDAH" },
   { id: "tsa", label: "Autisme / TSA" },
@@ -330,7 +330,14 @@ export function CommanderForm() {
         {/* STEP 1 */}
         {step === 1 && (
           <div className="space-y-8">
-            <h2 className="font-display text-xl text-qissali-mauve">Étape 1 — L&apos;enfant</h2>
+            <div>
+              <h2 className="font-display text-xl text-qissali-mauve">Étape 1 — L&apos;enfant</h2>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                Inclut la partie{" "}
+                <span className="font-medium text-qissali-mauve">neuroatypie</span> (optionnelle) : si tu
+                coches un profil, l&apos;histoire pourra être adaptée.
+              </p>
+            </div>
 
             <div>
               <p className="mb-3 text-sm font-medium text-slate-700">Histoire solo ou fratrie ?</p>
@@ -545,8 +552,9 @@ export function CommanderForm() {
             )}
 
             <div className="rounded-xl border border-qissali-rose/25 bg-qissali-cream/40 p-4">
-              <p className="text-sm font-medium text-slate-700">
-                Votre enfant a-t-il un profil particulier ?
+              <p className="text-sm font-semibold text-qissali-mauve">Neuroatypie</p>
+              <p className="mt-1 text-sm font-medium text-slate-700">
+                Votre enfant a-t-il un profil neuroatypique ou des besoins particuliers ?
                 <span className="font-normal text-slate-500">
                   {" "}
                   (optionnel — pour personnaliser l&apos;histoire)
@@ -666,8 +674,8 @@ export function CommanderForm() {
               )}
               {hasNeuroProfile && (
                 <p className="mt-2 text-sm text-qissali-mauve">
-                  ✨ Nous avons des histoires spécialement pensées pour {profilsLabel}. Votre
-                  sélection sera prise en compte.
+                  ✨ Nous adaptons l&apos;histoire à la neuroatypie indiquée ({profilsLabel}). Votre sélection
+                  sera prise en compte.
                 </p>
               )}
             </div>
@@ -848,7 +856,7 @@ export function CommanderForm() {
                 </div>
                 {hasNeuroProfile && (
                   <div className="flex justify-between gap-4">
-                    <dt className="text-slate-500">Profil</dt>
+                    <dt className="text-slate-500">Neuroatypie</dt>
                     <dd className="text-right">{profilsLabel}</dd>
                   </div>
                 )}
