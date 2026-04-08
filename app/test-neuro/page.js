@@ -65,11 +65,12 @@ export default function TestNeuro() {
   };
 
   return (
-    <div style={{ padding: 32, maxWidth: 800 }}>
-      <h1>Test Génération Neuro</h1>
+    <div className="min-h-screen bg-qissali-cream px-6 py-8 text-qissali-body">
+      <div className="mx-auto max-w-[800px]">
+      <h1 className="font-display text-2xl text-qissali-title">Test Génération Neuro</h1>
 
-      <div style={{ display: "grid", gap: 12, marginTop: 16, marginBottom: 16 }}>
-        <label>
+      <div className="mt-4 grid gap-3">
+        <label className="block text-sm font-medium text-qissali-title">
           Univers
           <select
             value={form.univers}
@@ -175,7 +176,7 @@ export default function TestNeuro() {
         </label>
       </div>
 
-      <button type="button" onClick={generate} disabled={loading}>
+      <button type="button" className="btn-primary mt-6" onClick={generate} disabled={loading}>
         Générer l&apos;histoire neuro
       </button>
 
@@ -188,7 +189,7 @@ export default function TestNeuro() {
             ⏱ Généré en {timer}s
             {story.fromCache ? " (depuis cache)" : " (via Claude)"}
           </p>
-          <h2>{story.titre}</h2>
+          <h2 className="mt-4 font-display text-xl text-qissali-title">{story.titre}</h2>
           <p style={{ whiteSpace: "pre-wrap" }}>{story.texte}</p>
           <blockquote>{story.citation}</blockquote>
           <p>{story.source}</p>
@@ -202,6 +203,7 @@ export default function TestNeuro() {
           </p>
         </div>
       )}
+      </div>
     </div>
   );
 }

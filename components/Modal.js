@@ -416,7 +416,7 @@ function OrderModalDialog({ open, onClose }) {
     >
       <button
         type="button"
-        className="absolute inset-0 z-0 cursor-default bg-[rgba(42,26,46,0.85)] backdrop-blur-[8px]"
+        className="absolute inset-0 z-0 cursor-default bg-[rgba(74,46,90,0.32)] backdrop-blur-[10px]"
         aria-label="Fermer"
         onClick={onClose}
       />
@@ -444,7 +444,7 @@ function OrderModalDialog({ open, onClose }) {
             >
               🌙
             </div>
-            <p className="font-display text-2xl text-[var(--mauve-deep)]">
+            <p className="font-display text-2xl text-[var(--text-title)]">
               Barakallahu fik !
             </p>
             <p className="mt-4 text-lg text-[var(--text)]">
@@ -459,9 +459,9 @@ function OrderModalDialog({ open, onClose }) {
           <>
             <div className="mb-8 flex flex-col items-center pt-2">
               <Image
-                src="/logo.png"
+                src="/logo-qissali.png"
                 alt="Qissali"
-                width={240}
+                width={90}
                 height={60}
                 className="h-[60px] w-auto object-contain"
               />
@@ -865,7 +865,7 @@ function OrderModalDialog({ open, onClose }) {
                     <button
                       type="button"
                       onClick={goNext}
-                      className="rounded-full bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] px-8 py-3 text-sm font-bold text-white shadow-md shadow-[#9B6EC8]/35 transition hover:brightness-105"
+                      className="rounded-full bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] px-8 py-3 text-sm font-bold text-white shadow-md shadow-[rgba(196,154,216,0.35)] transition hover:brightness-105"
                     >
                       Suivant
                     </button>
@@ -977,7 +977,7 @@ function OrderModalDialog({ open, onClose }) {
                     <button
                       type="button"
                       onClick={goNext}
-                      className="rounded-full bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] px-8 py-3 text-sm font-bold text-white shadow-md shadow-[#9B6EC8]/35"
+                      className="rounded-full bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] px-8 py-3 text-sm font-bold text-white shadow-md shadow-[rgba(196,154,216,0.35)]"
                     >
                       Suivant
                     </button>
@@ -1086,7 +1086,7 @@ function OrderModalDialog({ open, onClose }) {
                     <button
                       type="submit"
                       disabled={checkoutLoading}
-                      className="rounded-full bg-gradient-to-r from-[var(--or)] via-[var(--rose)] to-[var(--mauve)] px-8 py-3 text-sm font-bold text-white shadow-lg shadow-[#9B6EC8]/30 transition hover:brightness-105 disabled:opacity-60"
+                      className="rounded-full bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] px-8 py-3 text-sm font-bold text-white shadow-lg shadow-[rgba(196,154,216,0.35)] transition hover:brightness-105 disabled:opacity-60"
                     >
                       {checkoutLoading
                         ? canUseEmbeddedCheckout

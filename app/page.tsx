@@ -1,552 +1,802 @@
 import { CommanderModalTrigger } from "@/components/Modal";
+import UniversTile from "@/components/UniversTile";
 import Image from "next/image";
 import Link from "next/link";
+import { Fragment } from "react";
 
-const howToSteps = [
-  { step: 1, title: "Tu remplis le formulaire" },
-  { step: 2, title: "On crée l'histoire" },
-  { step: 3, title: "Tu reçois ton PDF" },
+const commentSteps = [
+  { num: "1", titre: "Tu remplis le formulaire" },
+  { num: "2", titre: "On crée l'histoire" },
+  { num: "3", titre: "Tu reçois ton PDF" },
 ] as const;
 
-const universeCards = [
+const packs = [
   {
-    id: "princesse",
-    emoji: "👑",
-    title: "Princesse",
-    gradient: "linear-gradient(160deg, #FFF0F7 0%, #FFE0EF 100%)",
-    hoverBorder: "hover:border-[#E8A0C0]",
-  },
-  {
-    id: "licorne",
-    emoji: "🦄",
-    title: "Licorne & Magie",
-    gradient: "linear-gradient(160deg, #F5F0FF 0%, #EDE0FF 100%)",
-    hoverBorder: "hover:border-[var(--mauve)]",
-  },
-  {
-    id: "super-heros",
-    emoji: "🦸",
-    title: "Super-Héros",
-    gradient: "linear-gradient(160deg, #F0F4FF 0%, #E0ECFF 100%)",
-    hoverBorder: "hover:border-[var(--bleu)]",
-  },
-  {
-    id: "animaux",
-    emoji: "🐾",
-    title: "Animaux Parlants",
-    gradient: "linear-gradient(160deg, #F0FFF5 0%, #E0FFEC 100%)",
-    hoverBorder: "hover:border-[#90E0A0]",
-  },
-] as const;
-
-const packOffers = [
-  {
-    pack: "solo",
-    icon: "📖",
-    title: "Solo",
-    price: "3,90€",
-    subPrice: "1 histoire",
+    titre: "Solo",
+    slug: "solo",
+    nb: 1,
+    prix: "3,90€",
+    unitaire: "3,90€ / histoire",
     badge: null as string | null,
-    bullets: [
-      "1 histoire personnalisée",
-      "1 enfant ou fratrie",
-      "PDF illustré 6 pages",
-      "Livré par email",
-    ],
-    featured: false,
+    highlight: false,
   },
   {
-    pack: "duo",
-    icon: "📚",
-    title: "Duo",
-    price: "6,90€",
-    subPrice: "2 histoires · 3,45€ chacune",
+    titre: "Duo",
+    slug: "duo",
+    nb: 2,
+    prix: "6,90€",
+    unitaire: "3,45€ / histoire",
     badge: "-11%",
-    bullets: [
-      "2 histoires personnalisées",
-      "Prénoms différents possibles",
-      "2 PDFs illustrés 6 pages",
-      "Livrés ensemble par email",
-    ],
-    featured: false,
+    highlight: false,
   },
   {
-    pack: "trio",
-    icon: "🌟",
-    title: "Trio",
-    price: "8,90€",
-    subPrice: "3 histoires · 2,97€ chacune",
-    badge: "Le plus choisi ✦",
-    bullets: [
-      "3 histoires personnalisées",
-      "Prénoms différents possibles",
-      "3 PDFs illustrés 6 pages",
-      "Livrés ensemble par email",
-    ],
-    featured: true,
+    titre: "Trio",
+    slug: "trio",
+    nb: 3,
+    prix: "8,90€",
+    unitaire: "2,97€ / histoire",
+    badge: "Le plus choisi",
+    highlight: true,
   },
   {
-    pack: "famille",
-    icon: "👨‍👩‍👧‍👦",
-    title: "Famille",
-    price: "12,90€",
-    subPrice: "5 histoires · 2,58€ chacune",
+    titre: "Famille",
+    slug: "famille",
+    nb: 5,
+    prix: "12,90€",
+    unitaire: "2,58€ / histoire",
     badge: "-34%",
-    bullets: [
-      "5 histoires personnalisées",
-      "Prénoms différents possibles",
-      "5 PDFs illustrés 6 pages",
-      "Livrés ensemble par email",
-    ],
-    featured: false,
+    highlight: false,
   },
 ] as const;
 
-const packPriceTable = [
-  { pack: "Solo", stories: "1", total: "3,90€", unit: "3,90€" },
-  { pack: "Duo", stories: "2", total: "6,90€", unit: "3,45€" },
-  { pack: "Trio", stories: "3", total: "8,90€", unit: "2,97€" },
-  { pack: "Famille", stories: "5", total: "12,90€", unit: "2,58€" },
+const neuroProfiles = [
+  { label: "Dys", sub: "Dyslexie, dyscalculie, dyspraxie" },
+  { label: "TDAH", sub: "Énergie vive et créativité" },
+  { label: "TSA", sub: "Autisme, sensibilité du monde" },
+  { label: "HPI", sub: "Haut potentiel intellectuel" },
 ] as const;
 
-const testimonials = [
+const avis = [
   {
-    quote:
-      "Ma fille a demandé à réentendre l'histoire tous les soirs pendant une semaine. Le fait qu'elle s'appelle Inès dans l'histoire, c'est magique pour elle.",
-    avatar: "👩",
-    name: "Fatima R.",
-    city: "Lyon",
+    texte:
+      "Espace réservé aux premiers témoignages de familles — merci de votre patience pendant le lancement.",
+    nom: "—",
+    ville: "",
   },
   {
-    quote:
-      "J'ai offert l'histoire de l'Aïd el-Adha à mes deux fils. La version fratrie, c'est exactement ce que je cherchais. Ils se sont reconnus dans chaque réplique.",
-    avatar: "👩‍🦱",
-    name: "Samira K.",
-    city: "Paris",
+    texte: "Vous pourrez partager votre expérience ici lorsque la collecte d’avis sera ouverte.",
+    nom: "À venir",
+    ville: "",
   },
   {
-    quote:
-      "Le débat à la fin de l'histoire, c'est génial. Ma fille de 6 ans m'a expliqué pendant 20 minutes pourquoi la princesse avait bien fait. Je n'aurais pas pu lui enseigner ça autrement.",
-    avatar: "🧕",
-    name: "Nadia M.",
-    city: "Bruxelles",
+    texte: "Merci aux parents qui nous font confiance pour des histoires alignées avec leurs valeurs.",
+    nom: "L’équipe Qissali",
+    ville: "",
   },
 ] as const;
 
 export default function Home() {
   return (
     <main className="min-h-screen">
-      {/* Header — CTA (ex-bas de page), logo à la place du texte arabe */}
+      {/* 1. Hero */}
       <section
-        className="relative overflow-hidden px-8 pb-20 pt-16 text-center sm:pb-24 sm:pt-20"
         style={{
-          background: "linear-gradient(135deg, var(--rose-deep), var(--mauve-deep))",
+          background: "var(--bg-section)",
+          minHeight: "90vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "80px 24px",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.45]"
+        <svg
+          style={{ position: "absolute", right: "5%", top: "8%", opacity: 0.06 }}
+          width="140"
+          height="140"
+          viewBox="0 0 100 100"
           aria-hidden
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at center, rgba(255,255,255,0.22) 1px, transparent 1px)",
-            backgroundSize: "22px 22px",
-          }}
-        />
-        <div className="relative z-10 mx-auto max-w-3xl">
-          <h1 className="sr-only">Qissali — Histoires islamiques personnalisées</h1>
+        >
+          <path
+            d="M70 50c0 22-18 40-40 40C13 90 2 74 2 57c13 8 28 8 40 0 12-8 20-22 20-38 5 8 8 19 8 31z"
+            fill="#C49AD8"
+          />
+        </svg>
+
+        <svg
+          style={{ position: "absolute", right: "3%", bottom: "15%", opacity: 0.06 }}
+          width="50"
+          height="70"
+          viewBox="0 0 60 80"
+          aria-hidden
+        >
+          <line x1="30" y1="0" x2="30" y2="10" stroke="#E8A0C0" strokeWidth="2" />
+          <ellipse cx="30" cy="12" rx="8" ry="4" fill="none" stroke="#E8A0C0" strokeWidth="1.5" />
+          <path
+            d="M15 20 Q10 45 15 60 L45 60 Q50 45 45 20 Z"
+            fill="none"
+            stroke="#E8A0C0"
+            strokeWidth="1.5"
+          />
+          <line x1="30" y1="20" x2="30" y2="60" stroke="#E8A0C0" strokeWidth="0.8" opacity="0.6" />
+          <path d="M12 60 L15 68 L45 68 L48 60 Z" fill="none" stroke="#E8A0C0" strokeWidth="1.5" />
+          <ellipse cx="30" cy="42" rx="6" ry="8" fill="#E8A0C0" opacity="0.06" />
+        </svg>
+
+        <svg
+          style={{ position: "absolute", left: "3%", top: "20%", opacity: 0.06 }}
+          width="40"
+          height="55"
+          viewBox="0 0 60 80"
+          aria-hidden
+        >
+          <line x1="30" y1="0" x2="30" y2="10" stroke="#C49AD8" strokeWidth="2" />
+          <ellipse cx="30" cy="12" rx="8" ry="4" fill="none" stroke="#C49AD8" strokeWidth="1.5" />
+          <path
+            d="M15 20 Q10 45 15 60 L45 60 Q50 45 45 20 Z"
+            fill="none"
+            stroke="#C49AD8"
+            strokeWidth="1.5"
+          />
+          <path d="M12 60 L15 68 L45 68 L48 60 Z" fill="none" stroke="#C49AD8" strokeWidth="1.5" />
+        </svg>
+
+        {[
+          { x: "10%", y: "15%", s: 5 },
+          { x: "90%", y: "12%", s: 4 },
+          { x: "18%", y: "78%", s: 6 },
+          { x: "82%", y: "72%", s: 3 },
+          { x: "50%", y: "6%", s: 4 },
+          { x: "30%", y: "88%", s: 5 },
+          { x: "70%", y: "85%", s: 3 },
+          { x: "6%", y: "50%", s: 4 },
+        ].map((s, i) => (
+          <svg
+            key={i}
+            style={{
+              position: "absolute",
+              left: s.x,
+              top: s.y,
+              opacity: 0.06,
+            }}
+            width={s.s * 2}
+            height={s.s * 2}
+            viewBox="0 0 24 24"
+            aria-hidden
+          >
+            <path
+              d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"
+              fill="#E8A0C0"
+            />
+          </svg>
+        ))}
+
+        <div
+          className="flex w-full max-w-full flex-col items-center"
+          style={{ position: "relative", zIndex: 1 }}
+        >
           <Image
             src="/logo-qissali.png"
-            alt="Qissali"
-            width={400}
-            height={200}
+            alt="Qissali — Mon histoire personnalisée"
+            width={612}
+            height={408}
             priority
-            className="mx-auto h-[100px] w-auto max-w-[min(400px,88vw)] object-contain drop-shadow-md sm:h-[120px] lg:h-[140px]"
+            className="mx-auto block max-w-[min(100%,92vw)]"
+            style={{
+              height: "clamp(180px, 28vw, 320px)",
+              width: "auto",
+              marginBottom: "32px",
+            }}
           />
-          <h2 className="mt-8 font-display text-[28px] font-normal leading-tight text-white sm:text-[36px] lg:text-[44px]">
-            Offre-lui une histoire{" "}
-            <span className="italic text-[var(--or)]">qu&apos;il n&apos;oubliera jamais</span>
-          </h2>
-          <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-[rgba(255,255,255,0.75)]">
-            Son prénom. Son univers. Ses valeurs. Une histoire rien que pour lui, livrée par email en
-            moins de 5 minutes.
-          </p>
-          <CommanderModalTrigger
-            className="mt-10 inline-flex items-center justify-center rounded-[50px] bg-white px-12 py-4 text-base font-extrabold text-[var(--rose-deep)] transition hover:-translate-y-1 hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-0 active:scale-100 sm:px-14 sm:py-5 sm:text-[17px]"
-            style={{ boxShadow: "0 8px 28px rgba(0,0,0,0.2)" }}
+
+          <h1
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              fontSize: "clamp(28px, 5vw, 52px)",
+              color: "var(--text-title)",
+              lineHeight: 1.2,
+              maxWidth: "640px",
+              margin: "0 auto 16px",
+            }}
           >
-            Créer l&apos;histoire de mon enfant
+            Offre-lui une histoire
+            <br />
+            <em style={{ color: "var(--rose)" }}>qu&apos;il n&apos;oubliera jamais</em>
+          </h1>
+
+          <p
+            style={{
+              color: "var(--text-body)",
+              fontSize: "clamp(15px, 2vw, 18px)",
+              maxWidth: "460px",
+              margin: "0 auto 40px",
+              lineHeight: 1.7,
+            }}
+          >
+            Son prénom. Son univers. Ses valeurs. Une histoire rien que pour lui, prête en moins de 5 minutes.
+          </p>
+
+          <CommanderModalTrigger className="btn-primary" style={{ fontSize: "17px", padding: "16px 48px" }}>
+            ✨ Créer l&apos;histoire de mon enfant
           </CommanderModalTrigger>
-          <p className="mt-6 text-sm leading-relaxed text-[rgba(255,255,255,0.5)]">
-            PDF livré par email · à partir de 3,90€ · Cadeau parfait pour l&apos;Aïd, un anniversaire
-            ou juste comme ça
+
+          <p style={{ color: "var(--text-soft)", fontSize: "13px", marginTop: "16px" }}>
+            à partir de 3,90€ · PDF livré par email
           </p>
         </div>
       </section>
 
-      {/* Notre histoire — fond violet + récit (paysage) */}
-      <section
-        className="storytelling-section border-b border-[rgba(196,154,216,0.35)]"
-        aria-labelledby="notre-histoire-titre"
-      >
-        <div className="storytelling-left">
-          <div>
-            <p className="storytelling-label">Notre histoire</p>
-            <h2 id="notre-histoire-titre" className="storytelling-title">
-              Qissali, c&apos;est mon histoire en arabe
-            </h2>
-            <p className="storytelling-subtitle">
-              Qissali vient de l&apos;arabe{" "}
-              <span dir="rtl" lang="ar" className="inline-block">
-                قصتي
-              </span>{" "}
-              — qui signifie tout simplement mon histoire. Parce que chaque enfant mérite une histoire
-              rien que pour lui.
-            </p>
-          </div>
-          <blockquote className="storytelling-quote">
-            <p>
-              &ldquo;Le plus grand trésor d&apos;une princesse, ma chérie, ce n&apos;est pas sa couronne.
-              C&apos;est son cœur.&rdquo;
-            </p>
-            <cite className="storytelling-quote-source">Extrait d&apos;une histoire Qissali</cite>
-          </blockquote>
-        </div>
-        <div className="storytelling-right">
-          <div className="storytelling-text">
-            <p>
-              Un soir, ma fille m&apos;a demandé une histoire. Pas n&apos;importe laquelle. Une histoire
-              avec elle dedans. Avec son prénom, son univers, ses héros préférés.
-            </p>
-            <p>
-              J&apos;ai cherché. Longtemps. Des livres en arabe trop difficiles pour elle. Des histoires
-              islamiques en anglais qu&apos;elle ne comprenait pas. Du contenu générique, sans âme, sans
-              personnalisation, sans cette petite étincelle qui fait qu&apos;un enfant écoute avec les
-              yeux grands ouverts.
-            </p>
-            <p>
-              Et pourtant, j&apos;avais tellement envie de lui transmettre notre foi d&apos;une façon qui
-              lui ressemble. Pas des leçons. Pas des récitations. Des histoires. Celles qui restent,
-              celles qu&apos;on raconte à ses propres enfants des années plus tard.
-            </p>
-            <p>
-              Alors j&apos;ai créé Qissali. Pour que mes filles entendent une histoire où elles sont les
-              héroïnes. Où leur prénom résonne à chaque page. Où la générosité, le courage, la confiance
-              en Allah arrivent naturellement, dans la bouche d&apos;un personnage qu&apos;elles aiment,
-              au moment où ça compte vraiment.
-            </p>
-          </div>
-          <p className="storytelling-tags">
-            Conçu pour transmettre · Unique pour chaque enfant · Un moment partagé
-          </p>
-        </div>
-      </section>
-
-      {/* Comment ça marche */}
-      <section id="decouvrir" className="bg-[var(--white)]">
-        <div className="mx-auto max-w-[1100px] px-8 py-[100px]">
-          <header className="text-center">
-            <h2 className="font-display text-[28px] font-normal leading-tight text-[var(--text)] sm:text-3xl md:text-4xl">
-              Comment ça marche
-            </h2>
-          </header>
-          <div className="mt-14 flex flex-col items-stretch gap-6 md:flex-row md:gap-6">
-            {howToSteps.map((item) => (
-              <article
-                key={item.step}
-                className="flex min-w-0 flex-1 flex-col items-center rounded-[24px] border border-[rgba(232,160,192,0.2)] bg-[var(--rose-pale)] px-6 py-9 text-center transition duration-300 hover:-translate-y-[6px] hover:shadow-lg hover:shadow-[#9B6EC8]/20"
-              >
-                <div
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] text-lg font-bold text-white shadow-sm"
-                  aria-hidden
-                >
-                  {item.step}
-                </div>
-                <h3 className="mt-5 text-lg font-bold text-[var(--text)]">{item.title}</h3>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Les univers */}
-      <section className="bg-gradient-to-b from-[var(--cream)] to-[var(--rose-pale)]">
-        <div className="mx-auto max-w-[1100px] px-8 py-[100px]">
-          <header className="text-center">
-            <h2 className="font-display text-[28px] font-normal leading-tight text-[var(--text)] sm:text-3xl md:text-4xl">
-              Les univers
-            </h2>
-          </header>
-          <ul className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-4">
-            {universeCards.map((card) => (
-              <li key={card.id} className="min-w-0">
-                <CommanderModalTrigger
-                  aria-label={`Commander une histoire — ${card.title}`}
-                  className={`flex h-full w-full flex-col items-center rounded-2xl border-2 border-transparent p-8 text-center shadow-sm transition duration-300 hover:-translate-y-2 hover:shadow-md hover:shadow-[#9B6EC8]/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-deep)] ${card.hoverBorder}`}
-                  style={{ background: card.gradient }}
-                >
-                  <span className="text-5xl sm:text-6xl" role="img" aria-hidden>
-                    {card.emoji}
-                  </span>
-                  <h3 className="mt-5 text-lg font-bold text-[var(--text)]">{card.title}</h3>
-                </CommanderModalTrigger>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* Neuroatypie */}
-      <section className="border-y border-[rgba(196,154,216,0.25)] bg-gradient-to-br from-[var(--mauve-light)]/35 via-[var(--rose-pale)] to-[var(--cream)]">
-        <div className="mx-auto max-w-[1100px] px-8 py-[72px]">
-          <div className="mx-auto max-w-[720px] text-center">
-            <p className="text-[13px] font-medium uppercase tracking-[4px] text-[var(--mauve)]">
-              Neuroatypie
-            </p>
-            <h2 className="mt-4 font-display text-[26px] font-normal leading-tight text-[var(--text)] sm:text-3xl md:text-[2rem]">
-              Une histoire qui peut suivre{" "}
-              <span className="italic text-[var(--rose-deep)]">ton enfant</span>, pas l&apos;inverse
-            </h2>
-            <p className="mt-5 text-[15px] leading-relaxed text-[var(--text-mid)]">
-              Chaque enfant apprend à son rythme. Si le tien est Dys, TDAH, autiste (TSA), à haut potentiel ou
-              a d&apos;autres besoins particuliers, tu peux le dire au moment de la commande : nous adaptons le
-              texte pour qu&apos;il reste lisible, rassurant et en lien avec l&apos;islam — sans étiqueter,
-              sans juger.
-            </p>
-            <Link
-              href="/commander"
-              className="mt-8 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[var(--rose-deep)] to-[var(--mauve-deep)] px-8 py-3.5 text-sm font-semibold text-white shadow-md shadow-[#9B6EC8]/35 transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-deep)]"
-            >
-              Commander avec profil neuroatypique
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Packs */}
-      <section className="border-t border-[rgba(232,160,192,0.35)] bg-[var(--white)]">
-        <div className="mx-auto max-w-[1100px] px-8 py-[100px]">
-          <header className="text-center">
-            <h2 className="font-display text-[28px] font-normal leading-tight text-[var(--text)] sm:text-3xl md:text-4xl">
-              Choisissez votre pack
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-[var(--text-mid)]">
-              Plus vous commandez, plus vous économisez.
-            </p>
-          </header>
-
-          <ul className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 lg:gap-5">
-            {packOffers.map((p) => (
-              <li key={p.pack} className="flex min-w-0">
-                <article
-                  className={`flex h-full w-full flex-col rounded-[24px] bg-white p-7 ${
-                    p.featured
-                      ? "border-2 border-[var(--rose)] shadow-lg shadow-[#9B6EC8]/30 ring-1 ring-[rgba(232,160,192,0.35)]"
-                      : "border border-[rgba(232,160,192,0.45)] shadow-sm"
-                  }`}
-                >
-                  {p.badge ? (
-                    <div className="mb-3 flex min-h-[28px] justify-center">
-                      <span
-                        className={`rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide ${
-                          p.featured
-                            ? "bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] text-xs uppercase text-white shadow-md"
-                            : "bg-[var(--mauve-light)]/90 text-[var(--mauve-deep)]"
-                        }`}
-                      >
-                        {p.badge}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="mb-3 min-h-[28px]" aria-hidden />
-                  )}
-                  <span className="text-4xl" aria-hidden>
-                    {p.icon}
-                  </span>
-                  <h3 className="mt-3 text-xl font-bold text-[var(--text)]">{p.title}</h3>
-                  <p className="font-display mt-3 text-[40px] font-bold leading-none text-[var(--or)] sm:text-[44px]">
-                    {p.price}
-                  </p>
-                  <p className="mt-2 text-sm text-[var(--text-mid)]">{p.subPrice}</p>
-                  <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-left text-[13px] leading-snug text-[var(--text-mid)]">
-                    {p.bullets.map((line) => (
-                      <li key={line} className="flex gap-2">
-                        <span className="text-[var(--rose-deep)]" aria-hidden>
-                          ·
-                        </span>
-                        <span>{line}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href={`/commander?pack=${p.pack}`}
-                    className="mt-8 inline-flex w-full items-center justify-center rounded-full border-2 border-[var(--mauve)]/35 bg-gradient-to-r from-[var(--rose)] to-[var(--mauve)] py-3.5 text-sm font-bold text-white shadow-md shadow-[#9B6EC8]/25 transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--mauve-deep)]"
-                  >
-                    Commander →
-                  </Link>
-                </article>
-              </li>
-            ))}
-          </ul>
-
-          <div className="mx-auto mt-14 max-w-[640px] overflow-hidden rounded-2xl" style={{ background: "#FDF0F7" }}>
-            <table className="w-full border-collapse text-left text-[12px] text-[var(--text-mid)] sm:text-[13px]">
-              <thead>
-                <tr className="border-b border-[rgba(232,160,192,0.35)] text-[var(--text)]">
-                  <th className="px-4 py-3 font-semibold sm:px-5">Pack</th>
-                  <th className="px-2 py-3 font-semibold sm:px-3">Histoires</th>
-                  <th className="px-2 py-3 font-semibold sm:px-3">Prix total</th>
-                  <th className="px-4 py-3 font-semibold sm:px-5">Prix unitaire</th>
-                </tr>
-              </thead>
-              <tbody>
-                {packPriceTable.map((row) => (
-                  <tr
-                    key={row.pack}
-                    className="border-b border-[rgba(232,160,192,0.2)] last:border-0"
-                  >
-                    <td className="px-4 py-2.5 sm:px-5">{row.pack}</td>
-                    <td className="px-2 py-2.5 sm:px-3">{row.stories}</td>
-                    <td className="px-2 py-2.5 sm:px-3">{row.total}</td>
-                    <td className="px-4 py-2.5 sm:px-5">{row.unit}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <ul className="mx-auto mt-10 flex max-w-[720px] flex-col gap-3 text-center text-[13px] text-[var(--text-mid)] sm:text-[14px] md:flex-row md:flex-wrap md:justify-center md:gap-x-8 md:gap-y-2">
-            <li className="flex items-center justify-center gap-2">
-              <span aria-hidden>🛡️</span>
-              <span>Satisfait ou remboursé 48h</span>
-            </li>
-            <li className="flex items-center justify-center gap-2">
-              <span aria-hidden>🔒</span>
-              <span>Paiement sécurisé Stripe</span>
-            </li>
-            <li className="flex items-center justify-center gap-2">
-              <span aria-hidden>💌</span>
-              <span>Livraison par email en moins de 5 minutes</span>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      {/* Extrait d&apos;histoire (sans titre de section) */}
-      <section className="bg-[var(--white)]">
-        <div className="mx-auto max-w-[640px] px-8 py-[100px]">
-          <div
-            className="rounded-[24px] border border-[var(--rose-light)] bg-[var(--rose-pale)] p-10 text-left"
-            style={{ boxShadow: "8px 8px 0 0 var(--rose-light)" }}
+      {/* 2. Notre histoire — encart unique */}
+      <section style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
+        <div
+          className="storytelling-card"
+          style={{
+            maxWidth: "780px",
+            margin: "0 auto",
+            background: "#FFFFFF",
+            borderRadius: "24px",
+            border: "1px solid var(--rose-light)",
+            boxShadow: "0 4px 24px rgba(196,154,216,0.10)",
+            padding: "56px 64px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 0,
+          }}
+        >
+          <p
+            style={{
+              fontSize: "11px",
+              letterSpacing: "3px",
+              textTransform: "uppercase",
+              color: "var(--mauve-mid)",
+              marginBottom: "16px",
+            }}
           >
-            <div className="flex flex-wrap items-center gap-2 border-b border-[var(--rose-light)]/60 pb-4">
-              <span className="font-display text-xl italic text-[var(--rose-deep)]">Qissali</span>
-              <span className="rounded-full bg-[var(--mauve-light)] px-3 py-1 text-xs font-medium text-[var(--mauve-deep)]">
-                Princesse
-              </span>
-              <span className="rounded-full bg-[var(--mauve-light)] px-3 py-1 text-xs font-medium text-[var(--mauve-deep)]">
-                Aïd
-              </span>
-            </div>
-            <h3 className="mt-6 font-display text-[22px] font-normal leading-snug text-[var(--text)] sm:text-2xl">
-              L&apos;histoire de Nour et le plus grand trésor du royaume
-            </h3>
-            <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-[var(--text-mid)]">
-              <p>
-                Il était une fois, dans un royaume où les jardins sentaient toujours le jasmin et le miel, une petite
-                princesse prénommée Nour.
-              </p>
-              <p>
-                Ce matin-là, c&apos;était l&apos;Aïd. Papa lui tendit une petite bourse en velours violet. À
-                l&apos;intérieur : dix pièces dorées, rien que pour elle.
-              </p>
-              <p>C&apos;est là qu&apos;elle vit Lina, seule sous l&apos;oranger, les yeux rouges...</p>
-              <p>Alors, dans sa tête, la voix de sa grand-mère s&apos;éleva doucement.</p>
-            </div>
-            <blockquote className="mt-8 border-l-[3px] border-[var(--mauve)] bg-[var(--mauve-light)]/80 px-4 py-4">
-              <p className="font-display text-[15px] italic leading-relaxed text-[var(--text)]">
-                &quot;Le Prophète ﷺ nous a enseigné que jamais une aumône n&apos;a appauvri son donneur.
-                Jamais.&quot;
-              </p>
-              <p className="mt-3 text-xs font-medium text-[var(--text-mid)]">Source : At-Tirmidhi</p>
-            </blockquote>
+            Notre histoire
+          </p>
+
+          <p style={{ fontSize: "15px", color: "var(--text-body)", lineHeight: 1.8, marginBottom: "32px" }}>
+            Qissali est inspiré de l&apos;arabe{" "}
+            <span dir="rtl" lang="ar" className="inline-block">
+              قصتي
+            </span>{" "}
+            (qissati) — qui signifie &quot;mon histoire&quot;. Parce que chaque enfant mérite une histoire rien que pour lui.
+          </p>
+
+          <div style={{ height: "1px", background: "var(--rose-light)", marginBottom: "32px" }} />
+
+          <div style={{ fontSize: "15px", color: "var(--text-body)", lineHeight: 1.9, marginBottom: "32px" }}>
+            <p style={{ marginBottom: "16px" }}>
+              Un soir, l&apos;une de mes deux filles m&apos;a demandé une histoire. Pas n&apos;importe laquelle. Une
+              histoire avec elle dedans, avec son prénom, ses héros, son univers à elle.
+            </p>
+            <p style={{ marginBottom: "16px" }}>
+              J&apos;ai cherché partout. Des livres trop compliqués, trop lointains, trop generiques. Rien qui lui
+              ressemble. Rien qui parle d&apos;elle tout en parlant de notre foi.
+            </p>
+            <p style={{ marginBottom: "16px" }}>
+              Moi je voulais lui transmettre l&apos;islam comme je l&apos;ai reçu. Dans des histoires. Pas des leçons, pas
+              des récitations imposées. Des récits qui restent, ceux qu&apos;on raconte encore à ses propres enfants des
+              années plus tard.
+            </p>
+            <p style={{ marginBottom: "16px" }}>
+              Avec Qissali l&apos;histoire arrive en quelques minutes dans votre boîte mail. Et si vous avez envie de
+              changer un personnage, d&apos;inventer une suite ou de laisser voguer votre imagination, l&apos;histoire est
+              là pour ça aussi.
+            </p>
+            <p style={{ marginBottom: 0 }}>
+              C&apos;est comme ça qu&apos;est né Qissali.
+              <br />
+              Pour mes filles. Et pour tous les vôtres.
+            </p>
+          </div>
+
+          <div style={{ height: "1px", background: "var(--rose-light)", marginBottom: "32px" }} />
+
+          <div style={{ borderLeft: "3px solid var(--rose)", paddingLeft: "24px" }}>
+            <p
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                fontStyle: "italic",
+                color: "var(--text-title)",
+                fontSize: "17px",
+                lineHeight: 1.6,
+                marginBottom: "10px",
+              }}
+            >
+              &ldquo;Le plus grand trésor d&apos;une princesse, ma chérie, ce n&apos;est pas sa couronne. C&apos;est son
+              cœur.&rdquo;
+            </p>
+            <p style={{ fontSize: "12px", color: "var(--text-soft)", letterSpacing: "0.5px" }}>
+              Extrait d&apos;une histoire Qissali
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Témoignages — dernière section avant le footer */}
-      <section className="bg-[var(--rose-pale)]">
-        <div className="mx-auto max-w-[1100px] px-8 py-[100px]">
-          <header className="text-center">
-            <p className="text-[13px] font-medium uppercase tracking-[4px] text-[var(--mauve)]">
-              Elles ont adoré
-            </p>
-            <h2 className="mt-4 font-display text-[28px] font-normal leading-tight text-[var(--text)] sm:text-3xl md:text-4xl">
-              Ce que disent les premières{" "}
-              <span className="italic text-[var(--rose-deep)]">mamans</span>
-            </h2>
-          </header>
-          <ul className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {testimonials.map(({ quote, avatar, name, city }) => (
-              <li key={name}>
-                <article className="flex h-full flex-col rounded-[20px] border border-[var(--rose-light)]/60 bg-[var(--white)] p-[28px] shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md">
-                  <p className="text-lg text-[var(--or)]" aria-label="5 sur 5 étoiles">
-                    ★★★★★
-                  </p>
-                  <blockquote className="mt-4 flex-1 font-display text-[17px] italic leading-relaxed text-[var(--text)]">
-                    &quot;{quote}&quot;
-                  </blockquote>
-                  <div className="mt-6 flex items-center gap-3">
-                    <div
-                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--rose)] to-[var(--mauve)] text-2xl shadow-inner"
-                      aria-hidden
-                    >
-                      {avatar}
-                    </div>
-                    <div>
-                      <p className="font-bold text-[var(--text)]">{name}</p>
-                      <p className="text-sm text-[var(--text-mid)]">{city}</p>
-                    </div>
+      {/* 3. Comment ça marche */}
+      <section id="decouvrir" style={{ background: "#FFFFFF", padding: "80px 24px" }}>
+        <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center" }}>
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "var(--text-title)",
+              fontSize: "clamp(22px, 3vw, 36px)",
+              marginBottom: "56px",
+            }}
+          >
+            Comment ça marche
+          </h2>
+
+          <div className="steps-flex-home">
+            {commentSteps.map((step, i) => (
+              <Fragment key={step.num}>
+                <div style={{ textAlign: "center", flex: 1, minWidth: "160px" }}>
+                  <div
+                    style={{
+                      width: "52px",
+                      height: "52px",
+                      borderRadius: "50%",
+                      background: "linear-gradient(135deg,#E8A0C0,#C49AD8)",
+                      color: "white",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      margin: "0 auto 16px",
+                      fontFamily: "'Playfair Display', serif",
+                      fontWeight: 700,
+                      fontSize: "20px",
+                      boxShadow: "0 4px 16px rgba(196,154,216,0.3)",
+                    }}
+                  >
+                    {step.num}
                   </div>
-                </article>
-              </li>
+                  <h3
+                    style={{
+                      color: "var(--text-title)",
+                      fontFamily: "'Nunito', sans-serif",
+                      fontWeight: 700,
+                      fontSize: "16px",
+                    }}
+                  >
+                    {step.titre}
+                  </h3>
+                </div>
+                {i < 2 ? (
+                  <div
+                    style={{
+                      color: "var(--rose)",
+                      fontSize: "22px",
+                      opacity: 0.6,
+                      flexShrink: 0,
+                      paddingBottom: "20px",
+                    }}
+                    aria-hidden
+                  >
+                    →
+                  </div>
+                ) : null}
+              </Fragment>
             ))}
-          </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Les univers */}
+      <section style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
+        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+          <h2
+            style={{
+              textAlign: "center",
+              fontFamily: "'Playfair Display', serif",
+              color: "var(--text-title)",
+              fontSize: "clamp(22px, 3vw, 36px)",
+              marginBottom: "48px",
+            }}
+          >
+            Les univers
+          </h2>
+
+          <div className="grid-4">
+            <UniversTile emoji="👑" titre="Princesse" />
+            <UniversTile emoji="🦄" titre="Licorne & Magie" />
+            <UniversTile emoji="🦸" titre="Super-Héros" />
+            <UniversTile emoji="🐾" titre="Animaux" />
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Neuroatypie */}
+      <section style={{ background: "#FFFFFF", padding: "80px 24px" }}>
+        <div style={{ maxWidth: "800px", margin: "0 auto", textAlign: "center" }}>
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "var(--text-title)",
+              fontSize: "clamp(22px, 3vw, 36px)",
+              marginBottom: "16px",
+            }}
+          >
+            Des histoires pour tous les enfants
+          </h2>
+
+          <p
+            style={{
+              color: "var(--text-body)",
+              fontSize: "15px",
+              lineHeight: 1.8,
+              maxWidth: "560px",
+              margin: "0 auto 48px",
+            }}
+          >
+            Chaque enfant mérite une histoire qui lui ressemble vraiment. Nos histoires peuvent être adaptées aux profils
+            neuroatypiques.
+          </p>
+
+          <div className="grid-4" style={{ marginBottom: "32px" }}>
+            {neuroProfiles.map((p) => (
+              <div
+                key={p.label}
+                style={{
+                  background: "var(--bg-card)",
+                  border: "1px solid var(--rose-light)",
+                  borderRadius: "16px",
+                  padding: "24px 16px",
+                  textAlign: "center",
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontWeight: 700,
+                    fontSize: "20px",
+                    color: "var(--text-title)",
+                    marginBottom: "8px",
+                  }}
+                >
+                  {p.label}
+                </p>
+                <p style={{ fontSize: "12px", color: "var(--text-soft)", lineHeight: 1.5 }}>{p.sub}</p>
+              </div>
+            ))}
+          </div>
+
+          <p style={{ fontSize: "12px", color: "var(--text-soft)", fontStyle: "italic" }}>
+            Option disponible dans le formulaire. Informations confidentielles.
+          </p>
+        </div>
+      </section>
+
+      {/* 6. Les packs */}
+      <section style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
+        <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
+          <h2
+            style={{
+              textAlign: "center",
+              fontFamily: "'Playfair Display', serif",
+              color: "var(--text-title)",
+              fontSize: "clamp(22px, 3vw, 36px)",
+              marginBottom: "12px",
+            }}
+          >
+            Choisissez votre pack
+          </h2>
+          <p
+            style={{
+              textAlign: "center",
+              color: "var(--text-soft)",
+              fontSize: "14px",
+              marginBottom: "48px",
+            }}
+          >
+            Plus vous commandez, plus vous économisez.
+          </p>
+
+          <div className="grid-4">
+            {packs.map((pack) => (
+              <div
+                key={pack.slug}
+                style={{
+                  background: pack.highlight ? "linear-gradient(160deg,#E8A0C0,#C49AD8)" : "var(--bg-card)",
+                  border: pack.highlight ? "none" : "1px solid var(--rose-light)",
+                  borderRadius: "24px",
+                  padding: "32px 20px",
+                  textAlign: "center",
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  boxShadow: pack.highlight ? "0 8px 32px rgba(196,154,216,0.35)" : "none",
+                }}
+              >
+                {pack.badge ? (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "-12px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      background: pack.highlight ? "white" : "linear-gradient(135deg,#E8A0C0,#C49AD8)",
+                      color: pack.highlight ? "var(--text-title)" : "white",
+                      borderRadius: "50px",
+                      padding: "4px 16px",
+                      fontSize: "11px",
+                      fontWeight: 700,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {pack.badge}
+                  </div>
+                ) : null}
+
+                <h3
+                  style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: "22px",
+                    color: pack.highlight ? "white" : "var(--text-title)",
+                    marginBottom: "4px",
+                  }}
+                >
+                  {pack.titre}
+                </h3>
+
+                <p
+                  style={{
+                    fontSize: "13px",
+                    color: pack.highlight ? "rgba(255,255,255,0.8)" : "var(--text-soft)",
+                    marginBottom: "20px",
+                  }}
+                >
+                  {pack.nb} histoire{pack.nb > 1 ? "s" : ""}
+                </p>
+
+                <div
+                  style={{
+                    fontSize: "36px",
+                    fontWeight: 800,
+                    fontFamily: "'Playfair Display', serif",
+                    color: pack.highlight ? "white" : "var(--text-title)",
+                    marginBottom: "4px",
+                  }}
+                >
+                  {pack.prix}
+                </div>
+
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: pack.highlight ? "rgba(255,255,255,0.7)" : "var(--text-soft)",
+                    marginBottom: "28px",
+                  }}
+                >
+                  {pack.unitaire}
+                </p>
+
+                <Link
+                  href={`/commander?pack=${pack.slug}`}
+                  className="mt-auto inline-block text-center no-underline"
+                  style={{
+                    background: pack.highlight ? "white" : "linear-gradient(135deg,#E8A0C0,#C49AD8)",
+                    color: pack.highlight ? "var(--text-title)" : "white",
+                    border: "none",
+                    borderRadius: "50px",
+                    padding: "12px 24px",
+                    fontWeight: 700,
+                    fontSize: "15px",
+                    cursor: "pointer",
+                    boxShadow: pack.highlight ? "0 4px 16px rgba(0,0,0,0.1)" : "0 4px 16px rgba(196,154,216,0.3)",
+                  }}
+                >
+                  Commander →
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: "32px",
+              fontSize: "13px",
+              color: "var(--text-soft)",
+              display: "flex",
+              justifyContent: "center",
+              gap: "32px",
+              flexWrap: "wrap",
+            }}
+          >
+            <span>🔒 Paiement sécurisé Stripe</span>
+            <span>🛡️ Satisfait ou remboursé 48h</span>
+            <span>💌 Email en moins de 5 min</span>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Exemple */}
+      <section style={{ background: "#FFFFFF", padding: "80px 24px" }}>
+        <div style={{ maxWidth: "640px", margin: "0 auto" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              marginBottom: "24px",
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {["Qissali", "👑 Princesse", "🌙 Aïd"].map((b) => (
+              <span
+                key={b}
+                style={{
+                  background: "linear-gradient(135deg,#E8A0C0,#C49AD8)",
+                  color: "white",
+                  borderRadius: "50px",
+                  padding: "4px 14px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                }}
+              >
+                {b}
+              </span>
+            ))}
+          </div>
+
+          <h2
+            style={{
+              fontFamily: "'Playfair Display', serif",
+              color: "var(--text-title)",
+              fontSize: "clamp(18px, 2.5vw, 26px)",
+              textAlign: "center",
+              marginBottom: "32px",
+              lineHeight: 1.3,
+            }}
+          >
+            L&apos;histoire de Nour et le plus grand trésor du royaume
+          </h2>
+
+          <div
+            style={{
+              background: "var(--bg-card)",
+              borderRadius: "20px",
+              padding: "36px 40px",
+              fontSize: "15px",
+              color: "var(--text-body)",
+              lineHeight: 1.9,
+              border: "1px solid var(--rose-light)",
+            }}
+          >
+            <p style={{ marginBottom: "16px" }}>
+              Il était une fois, dans un royaume où les jardins sentaient toujours le jasmin et le miel, une petite
+              princesse prénommée Nour.
+            </p>
+            <p style={{ marginBottom: "16px" }}>
+              Ce matin-là, c&apos;était l&apos;Aïd. Papa lui tendit une petite bourse en velours violet. À l&apos;intérieur
+              : dix pièces dorées, rien que pour elle.
+            </p>
+            <p style={{ marginBottom: "16px" }}>
+              C&apos;est là qu&apos;elle vit Lina, seule sous l&apos;oranger, les yeux rouges...
+            </p>
+            <p style={{ marginBottom: "24px" }}>
+              Alors, dans sa tête, la voix de sa grand-mère s&apos;éleva doucement.
+            </p>
+
+            <div style={{ borderLeft: "3px solid var(--rose)", paddingLeft: "20px" }}>
+              <p
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontStyle: "italic",
+                  color: "var(--text-title)",
+                  fontSize: "16px",
+                  marginBottom: "8px",
+                  lineHeight: 1.6,
+                }}
+              >
+                &ldquo;Le Prophète ﷺ nous a enseigné que jamais une aumône n&apos;a appauvri son donneur.
+                Jamais.&rdquo;
+              </p>
+              <p style={{ fontSize: "12px", color: "var(--text-soft)", fontStyle: "normal" }}>Source : At-Tirmidhi</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 8. Avis */}
+      <section style={{ background: "var(--bg-section)", padding: "80px 24px" }}>
+        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+          <h2
+            style={{
+              textAlign: "center",
+              fontFamily: "'Playfair Display', serif",
+              color: "var(--text-title)",
+              fontSize: "clamp(22px, 3vw, 36px)",
+              marginBottom: "48px",
+            }}
+          >
+            Ce que disent les premières mamans
+          </h2>
+
+          <div className="grid-3">
+            {avis.map((a, i) => (
+              <div
+                key={i}
+                style={{
+                  background: "var(--bg-card)",
+                  border: "1px solid var(--rose-light)",
+                  borderRadius: "20px",
+                  padding: "28px 24px",
+                }}
+              >
+                <div style={{ color: "var(--rose)", fontSize: "18px", marginBottom: "12px" }} aria-hidden>
+                  ★★★★★
+                </div>
+                <p
+                  style={{
+                    fontStyle: "italic",
+                    fontSize: "14px",
+                    color: "var(--text-body)",
+                    lineHeight: 1.7,
+                    marginBottom: "16px",
+                  }}
+                >
+                  &ldquo;{a.texte}&rdquo;
+                </p>
+                <p style={{ fontWeight: 700, fontSize: "13px", color: "var(--text-title)" }}>{a.nom}</p>
+                {a.ville ? <p style={{ fontSize: "12px", color: "var(--text-soft)" }}>{a.ville}</p> : null}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-[var(--dark)] px-8 py-12 text-center">
+      <footer
+        style={{
+          background: "#FFFFFF",
+          borderTop: "1px solid var(--rose-light)",
+          padding: "40px 24px",
+          textAlign: "center",
+        }}
+      >
         <Image
           src="/logo-qissali.png"
           alt="Qissali"
-          width={160}
+          width={120}
           height={80}
-          className="mx-auto h-[50px] w-auto object-contain opacity-90 sm:h-14 lg:h-[60px]"
+          style={{ height: "60px", width: "auto", marginBottom: "20px" }}
         />
-        <nav className="mt-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-2 text-sm text-[rgba(255,255,255,0.4)]">
-          <Link href="/a-propos" className="transition hover:text-[var(--rose-light)]">
-            À propos
-          </Link>
-          <span aria-hidden className="text-[rgba(255,255,255,0.25)]">
-            ·
-          </span>
-          <Link href="/contact" className="transition hover:text-[var(--rose-light)]">
-            Contact
-          </Link>
-          <span aria-hidden className="text-[rgba(255,255,255,0.25)]">
-            ·
-          </span>
-          <Link href="/cgv" className="transition hover:text-[var(--rose-light)]">
-            CGV
-          </Link>
-          <span aria-hidden className="text-[rgba(255,255,255,0.25)]">
-            ·
-          </span>
-          <Link href="/mentions-legales" className="transition hover:text-[var(--rose-light)]">
-            Mentions légales
-          </Link>
-        </nav>
-        <p className="mt-10 text-xs text-[rgba(255,255,255,0.2)]">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "24px",
+            marginBottom: "16px",
+            flexWrap: "wrap",
+          }}
+        >
+          {(
+            [
+              ["À propos", "/a-propos"],
+              ["Contact", "/contact"],
+              ["CGV", "/cgv"],
+              ["Mentions légales", "/mentions-legales"],
+            ] as const
+          ).map(([label, href]) => (
+            <Link
+              key={href}
+              href={href}
+              style={{
+                color: "var(--text-soft)",
+                fontSize: "13px",
+                textDecoration: "none",
+              }}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+        <p style={{ color: "var(--text-soft)", fontSize: "12px" }}>
           © 2025 Qissali · qissali.fr · Fait avec ❤️ pour nos enfants
         </p>
       </footer>

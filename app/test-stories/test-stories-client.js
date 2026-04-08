@@ -161,36 +161,37 @@ export function TestStoriesClient() {
   }, [activeKey]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10">
+    <div className="min-h-screen bg-qissali-cream">
+      <div className="mx-auto max-w-6xl px-4 py-10">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-qissali-body">
             <strong>{keys.length}</strong> histoires disponibles sur{" "}
             <strong>{POSSIBLE_COMBINATIONS}</strong> combinaisons possibles
           </p>
-          <h1 className="mt-2 font-display text-2xl text-qissali-mauve">
+          <h1 className="mt-2 font-display text-2xl text-qissali-title">
             Test des histoires (dev)
           </h1>
         </div>
         <Link
           href="/"
-          className="rounded-xl border border-qissali-mauve/30 px-4 py-2 text-sm text-qissali-mauve hover:bg-qissali-cream"
+          className="rounded-xl border border-qissali-rose-light px-4 py-2 text-sm text-qissali-mauve-mid hover:bg-qissali-section"
         >
           ← Accueil
         </Link>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <table className="w-full min-w-[720px] border-collapse text-left text-sm">
+      <div className="overflow-x-auto rounded-2xl border border-qissali-rose-light bg-white shadow-sm shadow-qissali-mauve/10">
+        <table className="w-full min-w-[720px] border-collapse text-left text-sm text-qissali-body">
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50">
-              <th className="px-3 py-3 font-semibold text-slate-700">Clé</th>
-              <th className="px-3 py-3 font-semibold text-slate-700">Univers</th>
-              <th className="px-3 py-3 font-semibold text-slate-700">Valeur</th>
-              <th className="px-3 py-3 font-semibold text-slate-700">Occasion</th>
-              <th className="px-3 py-3 font-semibold text-slate-700">Enfants</th>
-              <th className="px-3 py-3 font-semibold text-slate-700">Statut</th>
-              <th className="px-3 py-3 font-semibold text-slate-700"> </th>
+            <tr className="border-b border-qissali-rose-light bg-qissali-section">
+              <th className="px-3 py-3 font-semibold text-qissali-title">Clé</th>
+              <th className="px-3 py-3 font-semibold text-qissali-title">Univers</th>
+              <th className="px-3 py-3 font-semibold text-qissali-title">Valeur</th>
+              <th className="px-3 py-3 font-semibold text-qissali-title">Occasion</th>
+              <th className="px-3 py-3 font-semibold text-qissali-title">Enfants</th>
+              <th className="px-3 py-3 font-semibold text-qissali-title">Statut</th>
+              <th className="px-3 py-3 font-semibold text-qissali-title"> </th>
             </tr>
           </thead>
           <tbody>
@@ -203,14 +204,14 @@ export function TestStoriesClient() {
               const statut = raw ? statusForStory({ texte: raw.texte }) : "❓";
 
               return (
-                <tr key={key} className="border-b border-slate-100 hover:bg-slate-50/80">
-                  <td className="max-w-[220px] break-all px-3 py-2 font-mono text-xs text-slate-800">
+                <tr key={key} className="border-b border-qissali-rose-light/60 hover:bg-qissali-section/50">
+                  <td className="max-w-[220px] break-all px-3 py-2 font-mono text-xs text-qissali-title">
                     {key}
                   </td>
                   <td className="px-3 py-2 text-lg">{metaU?.emoji ?? "—"}</td>
-                  <td className="px-3 py-2 text-slate-700">{valLabel}</td>
-                  <td className="px-3 py-2 text-slate-700">{occLabel}</td>
-                  <td className="px-3 py-2 text-slate-700">
+                  <td className="px-3 py-2">{valLabel}</td>
+                  <td className="px-3 py-2">{occLabel}</td>
+                  <td className="px-3 py-2">
                     {parsed?.nbEnfants ?? "—"}
                   </td>
                   <td className="px-3 py-2">{statut}</td>
@@ -218,7 +219,7 @@ export function TestStoriesClient() {
                     <button
                       type="button"
                       onClick={() => setActiveKey(key)}
-                      className="rounded-lg bg-qissali-mauve px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
+                      className="rounded-lg bg-gradient-to-r from-qissali-rose to-qissali-mauve px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:opacity-95"
                     >
                       Tester
                     </button>
@@ -232,47 +233,48 @@ export function TestStoriesClient() {
 
       {preview && (
         <section
-          className="mt-8 rounded-2xl border border-qissali-rose/40 bg-qissali-cream/50 p-6"
+          className="mt-8 rounded-2xl border border-qissali-rose-light bg-qissali-section/60 p-6"
           aria-live="polite"
         >
-          <h2 className="font-display text-lg text-qissali-mauve">Aperçu</h2>
+          <h2 className="font-display text-lg text-qissali-title">Aperçu</h2>
           {"error" in preview && preview.error ? (
             <p className="mt-2 text-sm text-red-600">{preview.error}</p>
           ) : (
             <>
               <dl className="mt-4 space-y-3 text-sm">
                 <div>
-                  <dt className="font-semibold text-slate-600">Clé</dt>
-                  <dd className="font-mono text-xs text-slate-800">{preview.key}</dd>
+                  <dt className="font-semibold text-qissali-mauve-mid">Clé</dt>
+                  <dd className="font-mono text-xs text-qissali-title">{preview.key}</dd>
                 </div>
                 <div>
-                  <dt className="font-semibold text-slate-600">
+                  <dt className="font-semibold text-qissali-mauve-mid">
                     Titre (prénoms de test : {preview.prenom1}
                     {preview.prenom2 ? ` & ${preview.prenom2}` : ""})
                   </dt>
-                  <dd className="text-slate-800">{preview.titre}</dd>
+                  <dd className="text-qissali-body">{preview.titre}</dd>
                 </div>
                 <div>
-                  <dt className="font-semibold text-slate-600">
+                  <dt className="font-semibold text-qissali-mauve-mid">
                     Les 3 premières lignes du texte
                   </dt>
-                  <dd className="whitespace-pre-wrap text-slate-800">
+                  <dd className="whitespace-pre-wrap text-qissali-body">
                     {preview.lines.join("\n")}
                   </dd>
                 </div>
                 <div>
-                  <dt className="font-semibold text-slate-600">Citation</dt>
-                  <dd className="italic text-slate-800">{preview.citation}</dd>
+                  <dt className="font-semibold text-qissali-mauve-mid">Citation</dt>
+                  <dd className="italic text-qissali-body">{preview.citation}</dd>
                 </div>
                 <div>
-                  <dt className="font-semibold text-slate-600">Défi</dt>
-                  <dd className="text-slate-800">{preview.defi}</dd>
+                  <dt className="font-semibold text-qissali-mauve-mid">Défi</dt>
+                  <dd className="text-qissali-body">{preview.defi}</dd>
                 </div>
               </dl>
             </>
           )}
         </section>
       )}
+      </div>
     </div>
   );
 }

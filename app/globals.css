@@ -1,25 +1,56 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Nunito:wght@300;400;500;600;700&family=Dancing+Script:wght@500;600&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --rose: #E8A0C0;
-  --rose-deep: #D4729E;
-  --rose-light: #F5D0E4;
-  --rose-pale: #FDF0F7;
-  --mauve: #C49AD8;
-  --mauve-deep: #9B6EC8;
-  --mauve-light: #E8D5F5;
-  --bleu: #A0C4E8;
-  --or: #E8C870;
-  --or-deep: #C8A040;
-  --cream: #FEF6FF;
-  --dark: #2A1A2E;
-  --dark-2: #3D2845;
-  --text: #4A2E5A;
-  --text-mid: #7A5A8A;
-  --text-light: #A888B8;
-  --white: #FFFBFF;
+  /* Fonds */
+  --bg-main: #fef6ff;
+  --bg-card: #ffffff;
+  --bg-section: #fdf0f7;
+
+  /* Couleurs */
+  --rose: #e8a0c0;
+  --rose-light: #f5d0e4;
+  --rose-pale: #fde8f4;
+  --mauve: #c49ad8;
+  --mauve-mid: #9b6fb8;
+
+  /* Textes */
+  --text-title: #4a2e5a;
+  --text-body: #7a5a8a;
+  --text-soft: #b8a0c8;
+
+  /* Bouton */
+  --btn-bg: linear-gradient(135deg, #e8a0c0, #c49ad8);
+  --btn-text: #ffffff;
+
+  /* Compatibilité (Modal, autres pages, Tailwind) */
+  --lila: var(--bg-main);
+  --lila-med: var(--bg-section);
+  --lila-dark: var(--rose-light);
+  --violet: #9b6fb8;
+  --violet-deep: var(--text-title);
+  --violet-soft: var(--mauve-mid);
+  --white: #ffffff;
+  --bg-cream: var(--bg-main);
+  --cream: var(--bg-main);
+  --text-mid: var(--text-body);
+  --text-dark: var(--text-title);
+  --text-white: #ffffff;
+  --text: var(--text-body);
+  --mauve-deep: var(--text-title);
+  --mauve-light: var(--rose-light);
+  --rose-deep: #d4729e;
+  --or: #e8c870;
+  --or-deep: #c8a040;
+  --bleu: #a0c4e8;
+  --text-light: var(--text-soft);
+  --dark: var(--text-title);
+  --dark-2: var(--text-title);
+  --bg-dark: var(--bg-section);
+  --bg-darkmed: var(--bg-section);
 }
 
 html {
@@ -27,10 +58,95 @@ html {
 }
 
 body {
-  font-family: 'Nunito', sans-serif;
-  background: var(--cream);
-  color: var(--text);
+  background-color: var(--bg-main);
+  color: var(--text-body);
+  font-family: "Nunito", var(--font-nunito), sans-serif;
+  font-size: 16px;
   overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Playfair Display", var(--font-playfair), serif;
+  color: var(--text-title);
+}
+
+.script {
+  font-family: "Dancing Script", var(--font-dancing), cursive;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #e8a0c0, #c49ad8);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 36px;
+  font-family: "Nunito", var(--font-nunito), sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(196, 154, 216, 0.35);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(196, 154, 216, 0.45);
+}
+
+.btn-primary:focus-visible {
+  outline: 2px solid var(--mauve);
+  outline-offset: 3px;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-title);
+  border: 2px solid var(--mauve);
+  border-radius: 50px;
+  padding: 12px 28px;
+  font-family: "Nunito", var(--font-nunito), sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--rose-pale);
+}
+
+.btn-secondary:focus-visible {
+  outline: 2px solid var(--mauve-mid);
+  outline-offset: 3px;
+}
+
+.storytelling-grid {
+  display: grid;
+  grid-template-columns: 42% 58%;
+  width: 100%;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.steps-flex-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 @keyframes modal-fade-up {
@@ -97,106 +213,29 @@ body {
   animation-delay: 0.64s;
 }
 
-/* Notre histoire — section paysage (violet + texte long) */
-.storytelling-section {
-  display: grid;
-  grid-template-columns: 40% 60%;
-  min-height: 500px;
-  width: 100%;
-}
-
-.storytelling-left {
-  background: linear-gradient(135deg, #2a1a3e 0%, #4a2e6e 100%);
-  padding: 64px 48px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 32px;
-}
-
-.storytelling-right {
-  background: #fef6ff;
-  padding: 64px 48px;
-}
-
-.storytelling-label {
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #c49ad8;
-  margin-bottom: 16px;
-}
-
-.storytelling-title {
-  font-family: var(--font-playfair), "Playfair Display", Georgia, serif;
-  font-size: 28px;
-  font-weight: 400;
-  color: #fff;
-  line-height: 1.3;
-  margin-bottom: 16px;
-}
-
-.storytelling-subtitle {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.75);
-  line-height: 1.7;
-}
-
-.storytelling-quote {
-  font-style: italic;
-  color: #f5d0e4;
-  font-size: 14px;
-  line-height: 1.6;
-  border-left: 2px solid #c49ad8;
-  padding-left: 16px;
-  margin-top: auto;
-}
-
-.storytelling-quote p {
-  margin: 0;
-}
-
-.storytelling-quote-source {
-  display: block;
-  margin-top: 12px;
-  font-style: normal;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.storytelling-text {
-  font-size: 15px;
-  color: #5a3a5a;
-  line-height: 1.8;
-}
-
-.storytelling-text p {
-  margin-bottom: 16px;
-}
-
-.storytelling-text p:last-child {
-  margin-bottom: 0;
-}
-
-.storytelling-tags {
-  margin-top: 32px;
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: #c49ad8;
+@media (max-width: 640px) {
+  .storytelling-card {
+    padding: 36px 24px !important;
+    border-radius: 16px !important;
+  }
 }
 
 @media (max-width: 768px) {
-  .storytelling-section {
-    grid-template-columns: 1fr;
+  .storytelling-grid {
+    grid-template-columns: 1fr !important;
   }
 
-  .storytelling-left {
-    padding: 40px 24px;
-    min-height: 300px;
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 
-  .storytelling-right {
-    padding: 40px 24px;
+  .grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .steps-flex-home {
+    flex-direction: column !important;
+    align-items: center !important;
   }
 }
+

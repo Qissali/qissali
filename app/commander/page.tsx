@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function CommanderPage() {
   return (
-    <div className="min-h-screen px-4 pb-12 pt-8 sm:px-6">
+    <div className="min-h-screen bg-qissali-cream px-4 pb-12 pt-8 sm:px-6">
       <header className="mx-auto mb-6 flex max-w-2xl items-center justify-center">
         <Link
           href="/"
@@ -20,8 +20,8 @@ export default function CommanderPage() {
           <Image
             src="/logo-qissali.png"
             alt="Qissali — Retour à l’accueil"
-            width={220}
-            height={110}
+            width={240}
+            height={160}
             className="h-auto w-[min(220px,70vw)]"
           />
         </Link>

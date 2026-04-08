@@ -11,8 +11,14 @@ const config: Config = {
       colors: {
         qissali: {
           rose: "#E8A0C0",
+          "rose-light": "#F5D0E4",
           mauve: "#C49AD8",
+          "mauve-mid": "#9B6FB8",
           cream: "#FEF6FF",
+          section: "#FDF0F7",
+          title: "#4A2E5A",
+          body: "#7A5A8A",
+          soft: "#B8A0C8",
         },
       },
       fontFamily: {

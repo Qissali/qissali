@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { OrderModalProvider } from "@/components/Modal";
-import { Nunito, Playfair_Display } from "next/font/google";
+import { Dancing_Script, Nunito, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -11,6 +11,12 @@ const nunito = Nunito({
 const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
+});
+
+const dancing = Dancing_Script({
+  subsets: ["latin"],
+  variable: "--font-dancing",
+  weight: ["500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -25,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${nunito.variable} ${playfair.variable}`}>
+    <html lang="fr" className={`${nunito.variable} ${playfair.variable} ${dancing.variable}`}>
       <body className="antialiased">
         <OrderModalProvider>{children}</OrderModalProvider>
       </body>
