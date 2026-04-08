@@ -1,4 +1,5 @@
 import { CommanderModalTrigger } from "@/components/Modal";
+import { PdfPreview } from "@/components/PdfPreview";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment } from "react";
@@ -23,7 +24,7 @@ const howToSteps = [
     step: 3,
     title: "Tu reçois ton PDF",
     description:
-      "Un beau livre illustré à lire ensemble, imprimer, offrir. Livré par email en quelques minutes.",
+      "Un beau livre illustré à lire ensemble, imprimer, offrir. Livré par email en moins de 5 minutes.",
   },
 ] as const;
 
@@ -96,7 +97,7 @@ const pdfPlanBullets = [
   "Prénom partout dans le texte",
   "Hadith intégré naturellement",
   "Débat et défi de la semaine",
-  "PDF illustré 4 pages",
+  "PDF illustré 6 pages",
   "Livraison par email",
 ] as const;
 
@@ -176,7 +177,7 @@ export default function Home() {
             ✨ Créer l&apos;histoire de mon enfant
           </CommanderModalTrigger>
           <p className="hero-fade-up hero-delay-5 mt-5 text-[13px] text-[var(--text-light)]">
-            Livraison par email en quelques minutes · à partir de 3,90€
+            Livraison par email en moins de 5 minutes · à partir de 3,90€
           </p>
         </div>
         <div className="relative z-10 flex flex-col items-center pb-10">
@@ -453,6 +454,8 @@ export default function Home() {
         </div>
       </section>
 
+      <PdfPreview />
+
       {/* Tarifs */}
       <section className="relative bg-[var(--dark)]">
         <div
@@ -610,8 +613,8 @@ export default function Home() {
             <span className="italic text-[var(--or)]">qu&apos;il n&apos;oubliera jamais</span>
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-[rgba(255,255,255,0.75)]">
-            Son prénom. Son univers. Ses valeurs. Une histoire rien que pour lui, prête en quelques
-            minutes.
+            Son prénom. Son univers. Ses valeurs. Une histoire rien que pour lui, livrée par email en
+            moins de 5 minutes.
           </p>
           <CommanderModalTrigger
             className="mt-10 inline-flex items-center justify-center rounded-[50px] bg-white px-14 py-5 text-[17px] font-extrabold text-[var(--rose-deep)] transition hover:-translate-y-1 hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white active:translate-y-0 active:scale-100"
@@ -620,7 +623,8 @@ export default function Home() {
             Créer l&apos;histoire de mon enfant ✨
           </CommanderModalTrigger>
           <p className="mt-6 text-sm leading-relaxed text-[rgba(255,255,255,0.5)]">
-            PDF livré par email · à partir de 3,90€ · Aïd el-Adha bientôt 🐑
+            PDF livré par email · à partir de 3,90€ · Cadeau parfait pour l&apos;Aïd, un anniversaire
+            ou juste comme ça 🌙
           </p>
         </div>
       </section>

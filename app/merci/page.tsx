@@ -145,7 +145,8 @@ export default async function MerciPage({ searchParams }: Props) {
         Barakallahu fik !
       </h1>
       <p className="mt-6 text-lg leading-relaxed text-slate-600">
-        L&apos;histoire de {prenom} est en préparation. Tu la recevras dans quelques minutes sur{" "}
+        L&apos;histoire de {prenom} est en préparation. Tu la recevras par email en moins de 5
+        minutes sur{" "}
         {email ? (
           <span className="font-medium text-qissali-mauve">{email}</span>
         ) : (

@@ -12,6 +12,15 @@ import { getStory, getStoryOrDefault, storyKey } from "./stories.js";
 import type { StoryMetadata } from "./story-metadata";
 import { prenomDisplay } from "./story-metadata";
 
+type ResolvedStory = {
+  titre: string;
+  texte: string;
+  citation: string;
+  source: string;
+  questions: string[];
+  defi: string;
+};
+
 function sessionToMetadata(
   metadata: Record<string, string> | null | undefined
 ): StoryMetadata | null {
@@ -62,7 +71,7 @@ function safePdfFilename(prenomLabel: string): string {
  */
 export function buildPdfFromCheckoutSession(
   session: Stripe.Checkout.Session,
-  options?: { profils?: string; precisionsNeuro?: string }
+  options?: { profils?: string; precisionsNeuro?: string; storyOverride?: ResolvedStory | null }
 ):
   | { ok: true; base64: string; filename: string }
   | { ok: false; reason: string } {
@@ -73,16 +82,18 @@ export function buildPdfFromCheckoutSession(
   if (options?.profils !== undefined) meta.profils = options.profils;
   if (options?.precisionsNeuro !== undefined) meta.precisionsNeuro = options.precisionsNeuro;
   const nbEnfants = meta.prenom2.trim() ? 2 : 1;
-  const story = getStoryOrDefault(
-    meta.univers,
-    meta.valeur,
-    meta.occasion,
-    nbEnfants,
-    meta.prenom1,
-    meta.prenom2,
-    meta.profils || "",
-    meta.precisionsNeuro || ""
-  );
+  const story =
+    options?.storyOverride ||
+    getStoryOrDefault(
+      meta.univers,
+      meta.valeur,
+      meta.occasion,
+      nbEnfants,
+      meta.prenom1,
+      meta.prenom2,
+      meta.profils || "",
+      meta.precisionsNeuro || ""
+    );
   const base64 = generateStoryPDF({
     prenom1: meta.prenom1,
     prenom2: meta.prenom2,
@@ -105,7 +116,7 @@ export function buildPdfFromCheckoutSession(
  */
 export async function fulfillOrderFromSession(
   session: Stripe.Checkout.Session,
-  options?: { profils?: string; precisionsNeuro?: string }
+  options?: { profils?: string; precisionsNeuro?: string; storyOverride?: ResolvedStory | null }
 ): Promise<{ ok: true } | { ok: false; reason: string }> {
   const meta = sessionToMetadata(session.metadata as Record<string, string> | null);
   if (!meta) {
@@ -130,16 +141,18 @@ export async function fulfillOrderFromSession(
   const nbEnfants = meta.prenom2.trim() ? 2 : 1;
   const prenomLabel = prenomDisplay(meta);
 
-  const storyResolved = getStory(
-    meta.univers,
-    meta.valeur,
-    meta.occasion,
-    nbEnfants,
-    meta.prenom1,
-    meta.prenom2,
-    meta.profils || "",
-    meta.precisionsNeuro || ""
-  );
+  const storyResolved =
+    options?.storyOverride ||
+    getStory(
+      meta.univers,
+      meta.valeur,
+      meta.occasion,
+      nbEnfants,
+      meta.prenom1,
+      meta.prenom2,
+      meta.profils || "",
+      meta.precisionsNeuro || ""
+    );
 
   if (storyResolved === null) {
     console.error(
@@ -187,6 +200,7 @@ export async function fulfillOrderFromSession(
   const built = buildPdfFromCheckoutSession(session, {
     profils: meta.profils || "",
     precisionsNeuro: meta.precisionsNeuro || "",
+    storyOverride: storyResolved,
   });
   if (!built.ok) {
     return { ok: false, reason: built.reason };

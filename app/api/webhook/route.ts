@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getStory } from "@/lib/stories";
 import { fulfillOrderFromSession } from "@/lib/fulfill-order";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 90;
 
 export async function POST(request: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim();
@@ -52,9 +54,83 @@ export async function POST(request: Request) {
     const metadata = (session.metadata ?? {}) as Record<string, string>;
     const profils = metadata.profils || "";
     const precisionsNeuro = metadata.precisionsNeuro || "";
+    const profilPrincipal = profils.split(",")[0]?.trim() || "";
+    let histoire: any = null;
 
     if (session.payment_status !== "paid") {
       return NextResponse.json({ received: true, ignored: "payment not paid" });
+    }
+
+    // Si profil neuro sélectionné, tente une adaptation via l'API dédiée
+    if (profilPrincipal) {
+      const profilMap: Record<string, string> = {
+        "Dys (dyslexie, dyscalculie, dyspraxie...)": "dys",
+        TDAH: "tdah",
+        "Autisme / TSA": "tsa",
+        "Haut potentiel (HPI/HQI)": "hpi",
+        dys: "dys",
+        tdah: "tdah",
+        tsa: "tsa",
+        hpi: "hpi",
+      };
+      const profilKey = profilMap[profilPrincipal] || profilMap[profilPrincipal.toLowerCase()];
+
+      if (profilKey) {
+        try {
+          const baseUrl = process.env.NEXT_PUBLIC_URL?.replace(/\/$/, "");
+          if (!baseUrl) throw new Error("NEXT_PUBLIC_URL manquant");
+          const nbEnfants = parseInt(
+            metadata.nbEnfants || (metadata.prenom2?.trim() ? "2" : "1"),
+            10
+          );
+
+          const neuroResponse = await fetch(`${baseUrl}/api/generate-neuro-story`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              univers: metadata.univers,
+              valeur: metadata.valeur,
+              occasion: metadata.occasion,
+              nbEnfants: Number.isFinite(nbEnfants) ? nbEnfants : 1,
+              prenom1: metadata.prenom1,
+              prenom2: metadata.prenom2 || "",
+              profil: profilKey,
+              precisions: precisionsNeuro,
+            }),
+          });
+
+          const neuroData = await neuroResponse.json();
+          if (neuroData?.success && neuroData?.story) {
+            histoire = neuroData.story;
+            console.log("✅ Histoire neuro générée pour:", profilKey);
+          } else {
+            throw new Error("Génération neuro échouée");
+          }
+        } catch (error) {
+          console.error("❌ Fallback vers histoire standard:", error);
+          histoire = getStory(
+            metadata.univers,
+            metadata.valeur,
+            metadata.occasion,
+            parseInt(metadata.nbEnfants || (metadata.prenom2?.trim() ? "2" : "1"), 10) || 1,
+            metadata.prenom1,
+            metadata.prenom2 || "",
+            profils,
+            precisionsNeuro
+          );
+        }
+      }
+    } else {
+      histoire = getStory(
+        metadata.univers,
+        metadata.valeur,
+        metadata.occasion,
+        parseInt(metadata.nbEnfants || (metadata.prenom2?.trim() ? "2" : "1"), 10) || 1,
+        metadata.prenom1,
+        metadata.prenom2 || "",
+        profils,
+        precisionsNeuro
+      );
     }
 
     // fulfillOrderFromSession : PDF + emails ; si getStory() est null → emails admin/client
@@ -62,6 +138,7 @@ export async function POST(request: Request) {
     const result = await fulfillOrderFromSession(session, {
       profils,
       precisionsNeuro,
+      storyOverride: histoire,
     });
     if (!result.ok) {
       console.error("fulfillOrderFromSession:", result.reason);
